@@ -1,45 +1,117 @@
 import React, { useState } from "react"
 import LogoImg from "../assets/images/iapm-logo.jpg"
 import { LinkData } from "../assets/data/dummydata"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import { BiShoppingBag } from "react-icons/bi"
 import { HiOutlineMenuAlt1, HiViewGrid } from "react-icons/hi"
+import { LoginPopup } from "./LoginPopup"
+import { useAuth } from "../../contexts/authContext"
+
+
 
 export const Header = () => {
-  const [open, setOpen] = useState(false)
+
+  const { user, logout } = useAuth(); 
+
+  const [open, setOpen] = useState(false);
+  const [isLoginOpen, setLoginOpen] = useState(false); 
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();  // Perform the logout
+    navigate("/"); // Redirect to homepage or any other route
+  };
+
   return (
     <>
-      <header className='bg-white py-4 text-black sticky z-50 shadow-md top-0 left-0 w-full'>
-        <div className='container flex justify-between items-center'>
-          <div className='logo flex items-center gap-6'>
-            <h3 className="text-lg text-secondary font-bold">IAP<span className="text-black font-bold"> ~ M</span></h3>
-            <div className='category flex items-center text-sm gap-3'>
+      <header className='bg-white py-3 text-black sticky top-0 left-0 w-full z-50 shadow-md'>
+        <div className='container mx-auto px-4 flex items-center justify-between'>
+          {/* Logo and BORD Link */}
+          <div className='flex items-center gap-4'>
+            <h3 className="text-lg text-secondary font-bold whitespace-nowrap">
+              IAP<span className="text-black font-bold"> ~ M</span>
+            </h3>
+            {/* Show BORD on all screen sizes */}
+            <NavLink to="/bord" className='flex items-center text-sm gap-2'>
               <HiViewGrid size={20} />
-              <span>category</span>
-            </div>
+              <span>BORD</span>
+            </NavLink>
           </div>
-          <nav className={open ? "mobile-view" : "desktop-view"}>
-            <ul className='flex items-center gap-6'>
+  
+          {/* Desktop Navigation */}
+          <nav className='hidden md:flex flex-grow justify-center'>
+            <ul className='flex items-center gap-4'>
               {LinkData.map((link) => (
-                <li key={link.id} onClick={() => setOpen(null)}>
-                  <NavLink className={({ isActive }) => (isActive ? "text-primary text-sm" : "text-[15px]")} to={link.url}>
+                <li key={link.id}>
+                  <NavLink
+                    className={({ isActive }) => (isActive ? "text-primary text-sm" : "text-[15px]")}
+                    to={link.url}
+                  >
                     {link.title}
                   </NavLink>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className='account flex items-center gap-5'>
-            <button>
+  
+          {/* Mobile Menu Button */}
+          <button className='md:hidden flex items-center' onClick={() => setOpen(!open)}>
+            <HiOutlineMenuAlt1 size={25} />
+          </button>
+  
+          {/* Account and Cart */}
+          <div className='flex items-center gap-4'>
+            <button className='hidden md:flex'>
               <BiShoppingBag size={25} />
             </button>
-            <button>Login</button>{" "}
-            <button className='open-menu' onClick={() => setOpen(!open)}>
-              <HiOutlineMenuAlt1 size={25} />
-            </button>
+            {user ? (
+              <button onClick={handleLogout} className="text-red-600">Logout</button>
+            ) : (
+              <>
+                <button onClick={() => setLoginOpen(true)} className="hidden md:inline">Login</button>
+                <NavLink to="/signup" className="hidden md:inline">Signup</NavLink>
+              </>
+            )}
           </div>
         </div>
+  
+        {/* Mobile Navigation Menu */}
+        {open && (
+          <nav className='md:hidden absolute top-14 left-0 w-full bg-white shadow-lg z-40'>
+            <ul className='flex flex-col items-center'>
+              {LinkData.map((link) => (
+                <li key={link.id} className='py-2'>
+                  <NavLink
+                    className={({ isActive }) => (isActive ? "text-primary text-sm" : "text-[15px]")}
+                    to={link.url}
+                    onClick={() => setOpen(false)}
+                  >
+                    {link.title}
+                  </NavLink>
+                </li>
+              ))}
+              {/* Add BORD link to mobile menu */}
+              <li className='py-2'>
+                <NavLink
+                  to="/bord"
+                  className={({ isActive }) => (isActive ? "text-primary text-sm" : "text-[15px]")}
+                  onClick={() => setOpen(false)}
+                >
+                  <div className='flex items-center gap-2'>
+                    <HiViewGrid size={20} />
+                    <span>BORD</span>
+                  </div>
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+        )}
       </header>
+  
+      {/* Login Popup */}
+      <LoginPopup isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
     </>
-  )
-}
+  
+  );
+};

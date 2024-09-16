@@ -11,22 +11,39 @@ export const Instructor = () => {
             <h1 className='text-3xl font-semibold text-black'>IAP-M</h1>
             <span className='text-[14px] mt-2 block'>Qëllimi i Institutit IAPM eshte trajnimi dhe certifikimi i studentëve dhe individëve për sukses në karrierë.</span>
           </div>
-          <div className='content grid grid-cols-2 gap-5 md:grid-cols-1'>
-            <div className='images rounded-lg relative overflow-hidden h-72 w-ful before:bg-backbg before:h-72 before:w-full before:absolute before:top-0 before:left-0 before:content before:z-10'>
-              <img src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-1.jpg' alt='' className='rounded-t-lg object-cover w-full h-72' />
-              <div className='categ flex flex-col gap-4 absolute top-5 z-30 m-3 p-8 items-center justify-center text-center'>
-                <h2 className='text-3xl text-white font-semibold'>Mesoni ne menyre profesionale</h2>
-                <button className='text-[15px] py-2 px-4 border border-gray-200 rounded-md text-white'>Start a class today</button>
-              </div>
-            </div>
-            <div className='images rounded-lg relative overflow-hidden h-72 w-ful before:bg-backbg before:h-72 before:w-full before:absolute before:top-0 before:left-0 before:content before:z-10'>
-              <img src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-2.jpg' alt='' className='rounded-t-lg object-cover w-full h-72 relative' />
-              <div className='categ flex flex-col gap-4 absolute top-5 z-30 m-3 p-8 items-center justify-center text-center'>
-                <h2 className='text-3xl text-white font-semibold'>Behuni instruktore</h2>
-                <button className='text-[15px] py-2 px-4 border border-gray-200 rounded-md text-white'>Join us today</button>
-              </div>
-            </div>
-          </div>
+          <div className='content grid grid-cols-1 sm:grid-cols-2 gap-5'>
+  <div className='images rounded-lg relative overflow-hidden h-60 sm:h-72 w-full'>
+    <img 
+      src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-1.jpg' 
+      alt='Image 1' 
+      className='rounded-t-lg object-cover w-full h-full'
+    />
+    <div className='categ flex flex-col gap-4 absolute inset-0 m-3 p-4 sm:p-8 items-center justify-center text-center bg-black bg-opacity-50'>
+      <h2 className='text-xl sm:text-3xl text-white font-semibold'>
+        Mesoni ne menyre profesionale
+      </h2>
+      <button className='text-sm sm:text-base py-2 px-4 border border-gray-200 rounded-md text-white'>
+        Start a class today
+      </button>
+    </div>
+  </div>
+  <div className='images rounded-lg relative overflow-hidden h-60 sm:h-72 w-full'>
+    <img 
+      src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-2.jpg' 
+      alt='Image 2' 
+      className='rounded-t-lg object-cover w-full h-full'
+    />
+    <div className='categ flex flex-col gap-4 absolute inset-0 m-3 p-4 sm:p-8 items-center justify-center text-center bg-black bg-opacity-50'>
+      <h2 className='text-xl sm:text-3xl text-white font-semibold'>
+        Behuni instruktore
+      </h2>
+      <button className='text-sm sm:text-base py-2 px-4 border border-gray-200 rounded-md text-white'>
+        Join us today
+      </button>
+    </div>
+  </div>
+</div>
+
           <div className='content'>
             <div className='heading py-12 text-center w-2/3 m-auto md:w-full'>
               <h1 className='text-3xl font-semibold text-black'>Ne jemi krenare</h1>

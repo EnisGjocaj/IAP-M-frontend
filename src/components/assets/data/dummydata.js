@@ -24,6 +24,11 @@ export const LinkData = [
     title: "blog",
     url: "/blog",
   },
+  {
+    id: 6,
+    title: "news",
+    url: "/news",
+  },
 ]
 export const courses = [
   {
