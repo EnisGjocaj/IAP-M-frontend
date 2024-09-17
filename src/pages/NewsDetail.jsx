@@ -29,7 +29,7 @@ export const NewsDetail = () => {
       <div className='container mx-auto px-4'>
         <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
           <img
-            src={`http://localhost:4000${news.imageUrl}`} // Update the image URL
+            src={`https://iap-m-api.onrender.com${news.imageUrl}`} // Update the image URL
             alt={news.title}
             className='w-full h-64 object-cover'
           />

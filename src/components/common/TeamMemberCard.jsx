@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 
 const TeamMemberCard = ({ id, name, role, title, imgSrc, socialLinks = [] }) => {
   console.log(imgSrc);
-  const imageUrl = `http://localhost:4000${imgSrc}`;
+  const imageUrl = `https://iap-m-api.onrender.com${imgSrc}`;
 
   const navigate = useNavigate();
 

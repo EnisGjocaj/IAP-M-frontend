@@ -33,7 +33,7 @@ const TeamMemberProfile = () => {
     return (
         <ProfileDetails
             coverImage={memberData.coverImage}
-            avatarImage={`http://localhost:4000${memberData.imagePath}`}
+            avatarImage={`https://iap-m-api.onrender.com${memberData.imagePath}`}
             name={memberData.fullName}
             role={memberData.role}
             location={memberData.location}
