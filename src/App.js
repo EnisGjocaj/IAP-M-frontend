@@ -28,7 +28,7 @@ import TeamMemberProfile from "./pages/TeamMemberProfile"
 function App() {
   return (
     <>
-      <BrowserRouter basename="/">
+      <BrowserRouter>
       <AuthProvider>
         <Routes>
           <Route

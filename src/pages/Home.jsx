@@ -9,12 +9,29 @@ import { About } from "./About";
 import { Courses } from "./Courses";
 import { Instructor } from "./Instructor";
 import { Blog } from "./Blog";
+import { useAuth } from "../contexts/authContext";
 
 import banner from "../components/assets/images/iapm-banner.jpg";
 
+import { NavLink } from "react-router-dom";
+
 export const Home = () => {
+
+  const { user } = useAuth(); // Get the user from context
+
+  // Check if the user has a name or username "Ardit"
+  const isArdit = user && (user.email === 'arditbobi@gmail.com');
+
   return (
     <>
+
+      {isArdit && (
+        <div className="text-center mb-4">
+          <NavLink to="/admin" className="px-4 py-2 bg-blue-500 rounded-lg text-white font-semibold text-center">
+            Go to Admin page
+          </NavLink>
+        </div>
+      )}
       <HomeContent />
       <About />
       <br />
