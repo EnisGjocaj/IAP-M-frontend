@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createNews, getNewsById, updateNews } from '../../api/news';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { FaNewspaper, FaImage } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 
 const CreateNewsForm = () => {
@@ -107,67 +107,121 @@ const CreateNewsForm = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit News' : 'Create News'}</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formValues.title}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-          />
+    <div className="max-w-4xl mx-auto p-8">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="px-8 py-6 bg-gradient-to-r from-blue-600 to-blue-700">
+          <h2 className="text-2xl font-bold text-white">
+            {isEditMode ? 'Edit News Article' : 'Create News Article'}
+          </h2>
         </div>
-        <div className="mb-4">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">Content</label>
-          <textarea
-            id="content"
-            name="content"
-            value={formValues.content}
-            onChange={handleChange}
-            required
-            rows="4"
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="mt-1 block w-full text-sm"
-          />
-          {formValues.imageUrl && (
-            <div className="relative mt-2">
-              <img
-                src={formValues.imageUrl}
-                alt="Preview"
-                className="w-full h-auto object-cover"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-1 right-1 text-white bg-red-600 hover:bg-red-700 rounded-full p-1 focus:outline-none"
-              >
-                ✕
-              </button>
+        
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* News Content Section */}
+          <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <FaNewspaper className="w-4 h-4 text-blue-600" />
+              </span>
+              <h3 className="text-lg font-semibold text-gray-800">News Details</h3>
             </div>
-          )}
-        </div>
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700"
-        >
-          {isEditMode ? 'Update News' : 'Create News'}
-        </button>
-      </form>
+
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formValues.title}
+                onChange={handleChange}
+                required
+                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder="Enter news title"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+              <textarea
+                id="content"
+                name="content"
+                value={formValues.content}
+                onChange={handleChange}
+                required
+                rows={6}
+                className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder="Enter news content"
+              />
+            </div>
+          </div>
+
+          {/* Image Upload Section */}
+          <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <FaImage className="w-4 h-4 text-purple-600" />
+              </span>
+              <h3 className="text-lg font-semibold text-gray-800">Featured Image</h3>
+            </div>
+
+            <div className="mt-2">
+              <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
+                <label className="relative cursor-pointer w-full">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    {formValues.imageUrl ? (
+                      <div className="w-48 h-48 rounded-lg overflow-hidden shadow-md">
+                        <img
+                          src={formValues.imageUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-48 h-48 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <FaImage className="w-12 h-12 text-gray-400" />
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-gray-700">
+                      {formValues.imageUrl ? 'Change Image' : 'Choose Image'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      PNG, JPG up to 10MB
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
+              {formValues.imageUrl && (
+                <div className="mt-3 flex items-center justify-between p-3 bg-purple-50 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <FaImage className="text-purple-500" />
+                    <span className="text-sm text-purple-700 font-medium">Image Selected</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-sm hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+          >
+            {isEditMode ? 'Update News Article' : 'Create News Article'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

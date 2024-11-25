@@ -23,6 +23,7 @@ import { AuthProvider } from "./contexts/authContext"
 
 import ProfileDetails from "./components/common/ProfileDetails"
 import TeamMemberProfile from "./pages/TeamMemberProfile"
+import JobListings from "./pages/JobListings.tsx"
 
 
 function App() {
@@ -96,7 +97,7 @@ function App() {
 
           <Route path="/bord/team/:id" element={<Layout><TeamMemberProfile /> </Layout>} />
 
-
+          <Route path="/jobs" element={<Layout><JobListings /></Layout>} />
         </Routes>
         <ToastContainer />
         </AuthProvider>

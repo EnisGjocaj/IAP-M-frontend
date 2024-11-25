@@ -1,5 +1,3 @@
-
-
 // src/pages/AdminDashboard.js
 import React , { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
@@ -8,15 +6,13 @@ import DashboardNews from './DashboardNews'; // Adjust import to your file name
 import Sidebar from './Sidebar';
 import CreateApplicationForm from './CreateApplicationForm';
 import CreateNewsForm from './CreateNewsForm';
-
 import DashboardTeamMembers from './DashboardTeamMembers';
 import CreateTeamMemberForm from './CreateTeamMemberForm';
-
 import DashboardUsers from './DashboardUsers';
 import CreateUserForm from './CreateUserForm';
-
+import DashboardJobListings from './DashboardJobListings';
+import CreateJobListingForm from './CreateJobListingForm';
 import { ToastContainer } from 'react-toastify';
-
 import DashboardForAdmin from './DashboardForAdmin';
 import { HiMenu } from 'react-icons/hi';
 
@@ -57,6 +53,11 @@ const AdminDashboard = () => {
           <Route path="edit-user/:id" element={<CreateUserForm />} />
           <Route path="edit-team-member/:id" element={<CreateTeamMemberForm />} />
           <Route path="edit-news/:id" element={<CreateNewsForm />} />
+          
+          {/* Job Listings Routes */}
+          <Route path="dashboard-job-listings" element={<DashboardJobListings />} />
+          <Route path="create-job-listing" element={<CreateJobListingForm />} />
+          <Route path="edit-job-listing/:id" element={<CreateJobListingForm />} />
         </Routes>
       </div>
       <ToastContainer />

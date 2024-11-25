@@ -1,8 +1,7 @@
 import axios from 'axios';
+import config from '../config';
 
-// const axiosInstance = axios.create({ baseURL: 'https://iap-m-api.onrender.com' });
-const axiosInstance = axios.create({ baseURL: 'https://iap-m-api.onrender.com' });
-
+const axiosInstance = axios.create({ baseURL: config.API_URL });
 
 export const fetcher = (url) =>
   axiosInstance.get(url).then((res) => {

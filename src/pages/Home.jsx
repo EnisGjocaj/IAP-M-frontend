@@ -46,14 +46,14 @@ export const Home = () => {
 export const HomeContent = () => {
   return (
     <motion.section 
-      className='bg-secondary py-16 md:py-20 sm:py-12 min-h-screen flex items-center justify-center'
+      className='bg-secondary py-16 md:py-20 sm:py-12 min-h-screen flex items-center justify-center relative overflow-visible'
       initial={{ opacity: 0, y: 50 }} 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <div className='container mx-auto px-6'>
-        {/* Adjust flex direction for responsiveness */}
-        <div className='relative flex flex-col md:flex-row items-center justify-center'>
+      <div className='container mx-auto px-6 relative'>
+        {/* Main content flex container */}
+        <div className='flex flex-col md:flex-row items-center justify-center'>
           {/* Left Section - Text and Search */}
           <motion.div 
             className='w-full md:w-1/2 text-slate-300 mb-10 md:mb-0 md:mr-8 z-10'
@@ -86,7 +86,7 @@ export const HomeContent = () => {
             </span>
           </motion.div>
 
-          {/* Right Section - Images and Buttons */}
+          {/* Right Section - Images */}
           <motion.div 
             className='w-full md:w-1/2 relative flex justify-center items-center z-10'
             initial={{ opacity: 0, scale: 0.9 }} 
@@ -110,51 +110,53 @@ export const HomeContent = () => {
               </div>
             </div>
           </motion.div>
+        </div>
 
-          {/* Animated Buttons */}
-          <motion.div 
-            className='content absolute inset-0 z-30'
-            initial={{ opacity: 0, y: 50 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8 }}
-          >
-            {/* Random placement of buttons */}
-            <button className='hidden bg-white shadow-md opacity-90 sm:absolute top-20 left-10 md:top-32 md:left-16 p-2 sm:p-1 sm:flex items-center rounded-md z-40'>
-              <div className='icon w-10 h-10 sm:w-8 sm:h-8 text-white rounded-full flex items-center justify-center bg-orange-400'>
-                <BsFillLightningChargeFill size={20} />
-              </div>
-              <div className='text  flex flex-col items-start px-4 sm:px-2'>
-                <span className='text-sm sm:text-xs text-black'>Urime</span>
-                <span className='text-xs sm:text-[10px]'>Kërkesat tuaja do plotsohen</span>
-              </div>
-            </button>
+        {/* Floating Cards Container - Positioned relative to section */}
+        <div className='absolute inset-0 -left-4 -right-4 -top-4 -bottom-4 pointer-events-none'>
+          {/* Top Left Card */}
+          <button className='pointer-events-auto hidden bg-white shadow-md hover:shadow-lg opacity-90 sm:absolute -top-6 -left-6 p-2 sm:flex items-center rounded-md transform hover:-translate-y-1 transition-all duration-200'>
+            <div className='icon w-8 h-8 sm:w-7 sm:h-7 text-white rounded-full flex items-center justify-center bg-orange-400'>
+              <BsFillLightningChargeFill size={14} />
+            </div>
+            <div className='text flex flex-col items-start px-2'>
+              <span className='text-xs font-medium text-black'>Urime</span>
+              <span className='text-[10px] text-gray-600'>Kërkesat tuaja</span>
+            </div>
+          </button>
 
-            <button className='bg-white shadow-md opacity-90 absolute bottom-20 left-20 md:bottom-28 md:left-32 p-2 sm:p-1 flex items-center rounded-md z-40'>
-              <div className='icon w-10 h-10 sm:w-8 sm:h-8 text-white rounded-full flex items-center justify-center bg-blue-400'>
-                <FaGraduationCap size={20} />
-              </div>
-              <div className='text flex flex-col items-start px-4 sm:px-2'>
-                <span className='text-sm sm:text-xs text-black'>640</span>
-                <span className='text-xs sm:text-[10px]'>Studentë të asistuar</span>
-              </div>
-            </button>
+          {/* Bottom Left Card */}
+          <button className='pointer-events-auto bg-white shadow-md hover:shadow-lg opacity-90 absolute -bottom-6 -left-4 p-2 flex items-center rounded-md transform hover:-translate-y-1 transition-all duration-200'>
+            <div className='icon w-8 h-8 sm:w-7 sm:h-7 text-white rounded-full flex items-center justify-center bg-blue-400'>
+              <FaGraduationCap size={14} />
+            </div>
+            <div className='text flex flex-col items-start px-2'>
+              <span className='text-xs font-medium text-black'>640</span>
+              <span className='text-[10px] text-gray-600'>Studentë</span>
+            </div>
+          </button>
 
-            <button className='bg-white shadow-md opacity-90 absolute top-1/2 right-10 md:right-24 p-2 sm:p-1 flex items-center rounded-md z-40'>
-              <div className='icon w-10 h-10 sm:w-8 sm:h-8 text-white rounded-full flex items-center justify-center bg-orange-400'>
-                <FaUsers size={20} />
-              </div>
-              <div className='text flex flex-col items-start px-4 sm:px-2'>
-                <span className='text-sm sm:text-xs text-black'>Trajnime të ndryshme</span>
-                <span className='text-xs sm:text-[10px]'>E ardhmja është e jone</span>
-              </div>
-            </button>
+          {/* Right Card */}
+          <button className='pointer-events-auto bg-white shadow-md hover:shadow-lg opacity-90 absolute top-1/2 -translate-y-1/2 -right-8 p-2 flex items-center rounded-md transform hover:-translate-x-1 transition-all duration-200'>
+            <div className='icon w-8 h-8 sm:w-7 sm:h-7 text-white rounded-full flex items-center justify-center bg-orange-400'>
+              <FaUsers size={14} />
+            </div>
+            <div className='text flex flex-col items-start px-2'>
+              <span className='text-xs font-medium text-black'>Trajnime</span>
+              <span className='text-[10px] text-gray-600'>E ardhmja</span>
+            </div>
+          </button>
 
-            <button className='bg-white shadow-md opacity-90 absolute top-1/4 right-1/4 p-2 sm:p-1 flex items-center rounded-md z-40'>
-              <div className='icon w-10 h-10 sm:w-8 sm:h-8 text-white rounded-full flex items-center justify-center bg-indigo-400'>
-                <FaBookReader size={20} />
-              </div>
-            </button>
-          </motion.div>
+          {/* Top Right Card */}
+          <button className='pointer-events-auto bg-white shadow-md hover:shadow-lg opacity-90 absolute -top-4 -right-6 p-2 flex items-center rounded-md transform hover:-translate-y-1 transition-all duration-200'>
+            <div className='icon w-8 h-8 sm:w-7 sm:h-7 text-white rounded-full flex items-center justify-center bg-indigo-400'>
+              <FaBookReader size={14} />
+            </div>
+            <div className='text flex flex-col items-start px-2'>
+              <span className='text-xs font-medium text-black'>Mëso</span>
+              <span className='text-[10px] text-gray-600'>Edukimi</span>
+            </div>
+          </button>
         </div>
       </div>
     </motion.section>
