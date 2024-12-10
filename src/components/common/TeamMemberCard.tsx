@@ -1,49 +1,39 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLinkedin, FaTwitter, FaFacebook, FaFilePdf, FaArrowRight } from 'react-icons/fa';
+import { Linkedin, Twitter, FileText, Mail, Phone, ArrowRight } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUtils';
 
 interface TeamMemberProps {
   id: string;
-  name: string;
+  fullName: string;
   role: string;
   title: string;
   description: string;
-  imgSrc: string;
-  cvUrl?: string;
-  socialLinks: {
-    platform: 'linkedin' | 'twitter' | 'facebook';
-    url: string;
-  }[];
+  imagePath: string;
+  cvPath?: string;
+  email?: string;
+  phoneNumber?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
 }
 
 const TeamMemberCard: React.FC<TeamMemberProps> = ({
   id,
-  name,
+  fullName,
   role,
   title,
   description,
-  imgSrc,
-  cvUrl,
-  socialLinks,
+  imagePath,
+  cvPath,
+  email,
+  phoneNumber,
+  linkedinUrl,
+  twitterUrl,
 }) => {
   const navigate = useNavigate();
-  const imageUrl = `https://iap-m-api.onrender.com${imgSrc}`;
 
   const handleReadMore = () => {
     navigate(`/bord/team/${id}`);
-  };
-
-  const getSocialIcon = (platform: string) => {
-    switch (platform) {
-      case 'linkedin':
-        return <FaLinkedin className="w-4 h-4" />;
-      case 'twitter':
-        return <FaTwitter className="w-4 h-4" />;
-      case 'facebook':
-        return <FaFacebook className="w-4 h-4" />;
-      default:
-        return null;
-    }
   };
 
   return (
@@ -52,68 +42,88 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
         {/* Image Container */}
         <div className="relative w-full md:w-2/5 h-64 md:h-auto overflow-hidden">
           <img
-            src={imageUrl}
-            alt={name}
+            src={getImageUrl(imagePath)}
+            alt={fullName}
             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/default-profile.png';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Content Container */}
-        <div className="relative flex flex-col justify-between w-full md:w-3/5 p-6">
-          {/* Top Content */}
+        <div className="flex flex-col justify-between w-full md:w-3/5 p-6">
           <div>
-            {/* Name and Role */}
             <div className="mb-3">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">{name}</h3>
-              <p className="text-blue-600 font-medium">{role}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{fullName}</h3>
+              <p className="text-blue-600 font-medium">{title}</p>
             </div>
 
-            {/* Title */}
-            <p className="text-gray-600 text-sm mb-3">{title}</p>
-
-            {/* Description with truncate */}
             <p className="text-gray-500 text-sm line-clamp-3 mb-4">{description}</p>
 
-            {/* Social Links and CV */}
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              {/* Social Media Icons */}
-              <div className="flex gap-3">
-                {socialLinks?.map((link) => (
-                  <a
-                    key={link.platform}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-blue-600 transition-colors duration-300"
-                  >
-                    {getSocialIcon(link.platform)}
+            {/* Contact Information */}
+            <div className="space-y-2 mb-4">
+              {email && (
+                <div className="flex items-center text-gray-600 text-sm">
+                  <Mail className="w-4 h-4 mr-2" />
+                  <a href={`mailto:${email}`} className="hover:text-blue-600 transition-colors">
+                    {email}
                   </a>
-                ))}
-              </div>
+                </div>
+              )}
+              {phoneNumber && (
+                <div className="flex items-center text-gray-600 text-sm">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <a href={`tel:${phoneNumber}`} className="hover:text-blue-600 transition-colors">
+                    {phoneNumber}
+                  </a>
+                </div>
+              )}
+            </div>
 
-              {/* CV Download Button */}
-              {cvUrl && (
+            {/* Social Links */}
+            <div className="flex items-center gap-4">
+              {linkedinUrl && (
                 <a
-                  href={`https://iap-m-api.onrender.com${cvUrl}`}
+                  href={linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                  className="text-gray-400 hover:text-blue-600 transition-colors duration-300"
                 >
-                  <FaFilePdf className="w-4 h-4" />
-                  <span className="text-sm">CV</span>
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              )}
+              {twitterUrl && (
+                <a
+                  href={twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+              )}
+              {cvPath && (
+                <a
+                  href={cvPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <FileText className="w-5 h-5" />
                 </a>
               )}
             </div>
           </div>
 
-          {/* Read More Button */}
           <button
             onClick={handleReadMore}
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm group mt-4"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm mt-6 group"
           >
             Read More
-            <FaArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
+            <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </div>
       </div>

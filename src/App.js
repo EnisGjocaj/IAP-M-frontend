@@ -17,7 +17,7 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard"
 import DashbaordApplications from "./pages/dashboard/DashboardApplications"
 import DashboardNews from "./pages/dashboard/DashboardNews"
 import { Signup } from "./pages/Signup"
-import TeamSection from "./pages/TeamSection"
+import TeamSection from "./pages/TeamSection.tsx"
 
 import { AuthProvider } from "./contexts/authContext"
 

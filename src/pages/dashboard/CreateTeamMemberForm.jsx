@@ -1,151 +1,3 @@
-// // src/pages/CreateTeamMemberForm.js
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { createTeamMember } from '../../api/teamMembers'; // Update import path as needed
-// import { toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-
-// const CreateTeamMemberForm = () => {
-//     const [formValues, setFormValues] = useState({
-//       fullName: '',
-//       role: '',
-//       description: '',
-//       title: '',
-//       imgSrc: '',
-//     });
-//     const [imageFile, setImageFile] = useState(null);
-//     const navigate = useNavigate();
-  
-//     const handleChange = (e) => {
-//       const { name, value } = e.target;
-//       setFormValues((prevValues) => ({
-//         ...prevValues,
-//         [name]: value,
-//       }));
-//     };
-  
-//     const handleImageUpload = (e) => {
-//       const file = e.target.files[0];
-//       setImageFile(file);
-//       setFormValues((prevValues) => ({
-//         ...prevValues,
-//         imgSrc: URL.createObjectURL(file),
-//       }));
-//     };
-  
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         const formData = new FormData();
-//         formData.append('fullName', formValues.fullName);
-//         formData.append('role', formValues.role);
-//         formData.append('description', formValues.description);
-//         formData.append('title', formValues.title);
-//         if (imageFile) {
-//           formData.append('image', imageFile); // Ensure this matches the field name expected by your backend
-//         }
-    
-//         try {
-//           await createTeamMember(formData); // Use updated API function
-    
-//           toast.success('Team member created successfully!', {
-//             position: "top-center",
-//             autoClose: 5000,
-//             closeButton: true,
-//             icon: '✅',
-//           });
-//           navigate('/admin/dashboard-team-members');
-//         } catch (error) {
-//           toast.error('Failed to submit application. Please try again.', {
-//             position: "top-center",
-//             autoClose: 5000,
-//             closeButton: true,
-//           });
-//         }
-//       };
-    
-  
-//     return (
-//       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-//         <h2 className="text-2xl font-bold mb-6">Create Team Member</h2>
-//         <form onSubmit={handleSubmit}>
-//           <div className="mb-4">
-//             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Name</label>
-//             <input
-//               type="text"
-//               id="fullName"
-//               name="fullName"
-//               value={formValues.fullName}
-//               onChange={handleChange}
-//               required
-//               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-//             />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
-//             <input
-//               type="text"
-//               id="role"
-//               name="role"
-//               value={formValues.role}
-//               onChange={handleChange}
-//               required
-//               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-//             />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-//             <input
-//               type="text"
-//               id="title"
-//               name="title"
-//               value={formValues.title}
-//               onChange={handleChange}
-//               required
-//               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-//             />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-//             <textarea
-//               id="description"
-//               name="description"
-//               value={formValues.description}
-//               onChange={handleChange}
-//               required
-//               rows="4"
-//               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-//             />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
-//             <input
-//               type="file"
-//               id="image"
-//               name="image"
-//               accept="image/*"
-//               onChange={handleImageUpload}
-//               className="mt-1 block w-full text-sm"
-//             />
-//             {formValues.imgSrc && (
-//               <img
-//                 src={formValues.imgSrc}
-//                 alt="Preview"
-//                 className="mt-2 w-12 object-cover"
-//               />
-//             )}
-//           </div>
-//           <button
-//             type="submit"
-//             className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700"
-//           >
-//             Create Team Member
-//           </button>
-//         </form>
-//       </div>
-//     );
-//   };
-// export default CreateTeamMemberForm;
-
 import React, { useState, useEffect } from 'react';
 import { FaLinkedin, FaTwitter, FaFacebook, FaFilePdf } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -162,6 +14,8 @@ const CreateTeamMemberForm = () => {
       description: '',
       title: '',
       imgSrc: '', // For previewing the image
+      email: '',
+      phoneNumber: '',
       linkedinUrl: '',
       twitterUrl: '',
       facebookUrl: '',
@@ -186,6 +40,8 @@ const CreateTeamMemberForm = () => {
                 description: member.description || '',
                 title: member.title || '',
                 imgSrc: member.imgSrc || '', // Set existing image URL
+                email: member.email || '',
+                phoneNumber: member.phoneNumber || '',
               });
               setLoading(false);
             } catch (error) {
@@ -238,6 +94,8 @@ const CreateTeamMemberForm = () => {
         e.preventDefault();
       
         const formData = new FormData();
+        formData.append('email', formValues.email);
+        formData.append('phoneNumber', formValues.phoneNumber);
         formData.append('fullName', formValues.fullName);
         formData.append('role', formValues.role);
         formData.append('description', formValues.description);
@@ -328,16 +186,20 @@ const CreateTeamMemberForm = () => {
                             </div>
                             <div>
                                 <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                                <input
-                                    type="text"
+                                <select
                                     id="role"
                                     name="role"
                                     value={formValues.role}
                                     onChange={handleChange}
                                     required
                                     className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    placeholder="Enter role"
-                                />
+                                >
+                                    <option value="">Select a role</option>
+                                    <option value="EXECUTIVE_DIRECTOR">Director</option>
+                                    <option value="MEETING_COORDINATOR">Coordinator</option>
+                                    <option value="BOARD_MEMBER">Board Member</option>
+                                    <option value="PRESIDENT">President</option>
+                                </select>
                             </div>
                         </div>
 
@@ -353,6 +215,51 @@ const CreateTeamMemberForm = () => {
                                 className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                 placeholder="Enter title"
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                Email Address
+                            </label>
+                            <div className="relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formValues.email}
+                                    onChange={handleChange}
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    placeholder="team.member@example.com"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                                Phone Number
+                            </label>
+                            <div className="relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="tel"
+                                    id="phoneNumber"
+                                    name="phoneNumber"
+                                    value={formValues.phoneNumber}
+                                    onChange={handleChange}
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    placeholder="+1 (555) 000-0000"
+                                />
+                            </div>
                         </div>
 
                         <div>
