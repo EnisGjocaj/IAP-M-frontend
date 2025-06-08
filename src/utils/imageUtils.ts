@@ -7,7 +7,7 @@ const getImageUrl = (imagePath: string | null | undefined): string => {
   }
 
   // Production environment
-  const API_URL = process.env.REACT_APP_API_URL || 'https://iap-m-api.onrender.com';
+  const API_URL = process.env.REACT_APP_API_URL || 'https://api.iap-m.com';
   return `${API_URL}${imagePath}`;
 };
 

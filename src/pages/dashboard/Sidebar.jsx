@@ -58,12 +58,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <aside
       ref={sidebar}
-      className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-gray-900 to-gray-800 transform transition-transform duration-300 ease-in-out ${
+      className={`fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:static lg:translate-x-0 shadow-xl border-r border-gray-700`}
     >
       {/* SIDEBAR HEADER */}
-      <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-700">
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-700">
         <NavLink to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
             <span className="text-blue-600 text-xl font-bold">IM</span>
@@ -73,7 +73,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       </div>
 
       {/* SIDEBAR MENU */}
-      <nav className="mt-5 py-4 px-4 lg:mt-6 lg:px-6">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden mt-5 py-4 px-4 lg:mt-6 lg:px-6">
         <div className="mb-4">
           <div className="flex items-center gap-2 px-4 py-2">
             <FaTachometerAlt className="text-gray-400" />

@@ -29,9 +29,13 @@ export const NewsDetail = () => {
       <div className='container mx-auto px-4'>
         <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
           <img
-            src={`https://iap-m-api.onrender.com${news.imageUrl}`} // Update the image URL
+            src={news.imageUrl || '/placeholder-image.jpg'} // Use direct Supabase URL with fallback
             alt={news.title}
             className='w-full h-64 object-cover'
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = '/placeholder-image.jpg'; // Fallback image
+            }}
           />
           <div className='p-6'>
             <h1 className='text-3xl font-bold mb-4'>{news.title}</h1>
@@ -39,9 +43,13 @@ export const NewsDetail = () => {
             <div className='flex items-center text-sm text-gray-500'>
               <FaCalendarAlt className='mr-2' />
               <span>{new Date(news.createdAt).toLocaleDateString()}</span>
-              <span className='mx-2'>|</span>
-              <FaUser className='mr-2' />
-              <span>{news.author}</span>
+              {news.author && (
+                <>
+                  <span className='mx-2'>|</span>
+                  <FaUser className='mr-2' />
+                  <span>{news.author}</span>
+                </>
+              )}
             </div>
           </div>
         </div>

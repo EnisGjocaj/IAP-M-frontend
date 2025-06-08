@@ -10,6 +10,7 @@ import { Courses } from "./Courses";
 import { Instructor } from "./Instructor";
 import { Blog } from "./Blog";
 import { useAuth } from "../contexts/authContext";
+import { AccountingCTA } from '../components/AccountingCTA';
 
 import banner from "../components/assets/images/iapm-banner.jpg";
 
@@ -33,7 +34,10 @@ export const Home = () => {
         </div>
       )}
       <HomeContent />
+      <AccountingCTA />
       <About />
+
+
       <br />
       <br />
       <br />

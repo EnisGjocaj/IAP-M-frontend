@@ -36,10 +36,10 @@ const onSubmit = async (data) => {
 };
 
   return (
-    <section className='py-16 bg-gradient-to-br from-blue-50 to-gray-50'>
+    <section className='py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-gray-50'>
       <div className='container mx-auto px-4'>
-        <div className='max-w-3xl mx-auto bg-white p-10 rounded-lg shadow-lg'>
-          <h2 className='text-3xl font-extrabold mb-6 text-center text-blue-700'>
+        <div className='max-w-3xl mx-auto bg-white p-5 sm:p-8 lg:p-10 rounded-lg shadow-lg'>
+          <h2 className='text-2xl sm:text-3xl font-extrabold mb-4 sm:mb-6 text-center text-blue-700'>
             <ReactTyped
               strings={["Study Programming", "Study Agrobusiness", "Study Accounting", "Study Marketing"]}
               typeSpeed={100}
@@ -47,44 +47,52 @@ const onSubmit = async (data) => {
               loop
             />
           </h2>
-          <p className='text-gray-500 text-center mb-8'>
+          <p className='text-gray-500 text-sm sm:text-base text-center mb-6 sm:mb-8'>
             Fill in your details to apply for our training programs.
           </p>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className='mb-6'>
-              <label htmlFor='name' className='block text-gray-600 text-sm font-semibold mb-2'>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className='space-y-4 sm:space-y-6'>
+            <div>
+              <label htmlFor='name' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
                 First Name
               </label>
               <input
                 id='name'
                 type='text'
                 {...register('name', { required: 'First name is required' })}
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
                   errors.name ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out`}
+                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
                 placeholder="Enter your first name"
               />
-              {errors.name && <p className='text-red-500 text-xs italic mt-2'>{errors.name.message}</p>}
+              {errors.name && (
+                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
-            <div className='mb-6'>
-              <label htmlFor='surname' className='block text-gray-600 text-sm font-semibold mb-2'>
+            <div>
+              <label htmlFor='surname' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
                 Last Name
               </label>
               <input
                 id='surname'
                 type='text'
                 {...register('surname', { required: 'Last name is required' })}
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
                   errors.surname ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out`}
+                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
                 placeholder="Enter your last name"
               />
-              {errors.surname && <p className='text-red-500 text-xs italic mt-2'>{errors.surname.message}</p>}
+              {errors.surname && (
+                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
+                  {errors.surname.message}
+                </p>
+              )}
             </div>
 
-            <div className='mb-6'>
-              <label htmlFor='email' className='block text-gray-600 text-sm font-semibold mb-2'>
+            <div>
+              <label htmlFor='email' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
                 Email Address
               </label>
               <input
@@ -97,24 +105,28 @@ const onSubmit = async (data) => {
                     message: 'Invalid email address',
                   },
                 })}
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
                   errors.email ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out`}
+                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
                 placeholder="Enter your email"
               />
-              {errors.email && <p className='text-red-500 text-xs italic mt-2'>{errors.email.message}</p>}
+              {errors.email && (
+                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
-            <div className='mb-6'>
-              <label htmlFor='type' className='block text-gray-600 text-sm font-semibold mb-2'>
+            <div>
+              <label htmlFor='type' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
                 Training Type
               </label>
               <select
                 id='type'
                 {...register('type', { required: 'Training type is required' })}
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
                   errors.type ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out`}
+                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base bg-white`}
               >
                 <option value=''>Select a training type</option>
                 {applicationTypes.map((type) => (
@@ -123,12 +135,19 @@ const onSubmit = async (data) => {
                   </option>
                 ))}
               </select>
-              {errors.type && <p className='text-red-500 text-xs italic mt-2'>{errors.type.message}</p>}
+              {errors.type && (
+                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
+                  {errors.type.message}
+                </p>
+              )}
             </div>
 
             <button
               type='submit'
-              className='w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out'
+              className='w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+                transition duration-300 ease-in-out text-sm sm:text-base
+                mt-6 sm:mt-8 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]'
             >
               Submit Application
             </button>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000';
+const API_URL = 'http://api.iap-m.com';
 
 // Get all job listings with filters
 export const getAllJobListings = async ({

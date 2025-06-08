@@ -4,7 +4,7 @@ const config = {
     API_URL: 'http://localhost:4000',
   },
   production: {
-    API_URL: 'https://iap-m-api.onrender.com', // Change this to your new hosting server URL
+    API_URL: 'https://api.iap-m.com', // Change this to your new hosting server URL
   },
 };
 
