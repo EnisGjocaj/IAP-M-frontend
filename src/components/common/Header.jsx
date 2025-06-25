@@ -19,27 +19,25 @@ export const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();  // Perform the logout
-    navigate("/"); // Redirect to homepage or any other route
+    logout(); 
+    navigate("/"); 
   };
 
   return (
     <>
       <header className='bg-white py-3 text-black sticky top-0 left-0 w-full z-50 shadow-md'>
         <div className='container mx-auto px-4 flex items-center justify-between'>
-          {/* Logo and BORD Link */}
+          
           <div className='flex items-center gap-4'>
             <h3 className="text-lg text-secondary font-bold whitespace-nowrap">
               IAP<span className="text-black font-bold"> ~ M</span>
             </h3>
-            {/* Show BORD on all screen sizes */}
             <NavLink to="/bord" className='flex items-center text-sm gap-2'>
               <HiViewGrid size={20} />
               <span>BORD</span>
             </NavLink>
           </div>
   
-          {/* Desktop Navigation */}
           <nav className='hidden md:flex flex-grow justify-center'>
             <ul className='flex items-center gap-4'>
               {LinkData.map((link) => (
@@ -55,12 +53,10 @@ export const Header = () => {
             </ul>
           </nav>
   
-          {/* Mobile Menu Button */}
           <button className='md:hidden flex items-center' onClick={() => setOpen(!open)}>
             <HiOutlineMenuAlt1 size={25} />
           </button>
   
-          {/* Account and Cart */}
           <div className='flex items-center gap-4'>
             <button className='hidden md:flex'>
               <BiShoppingBag size={25} />
@@ -76,7 +72,6 @@ export const Header = () => {
           </div>
         </div>
   
-        {/* Mobile Navigation Menu */}
         {open && (
           <nav className='md:hidden absolute top-14 left-0 w-full bg-white shadow-lg z-40'>
             <ul className='flex flex-col items-center'>
@@ -91,7 +86,6 @@ export const Header = () => {
                   </NavLink>
                 </li>
               ))}
-              {/* Add BORD link to mobile menu */}
               <li className='py-2'>
                 <NavLink
                   to="/bord"
@@ -109,7 +103,6 @@ export const Header = () => {
         )}
       </header>
   
-      {/* Login Popup */}
       <LoginPopup isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
     </>
   

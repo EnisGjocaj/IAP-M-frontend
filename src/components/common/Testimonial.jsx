@@ -38,7 +38,7 @@ const Testimonial = () => {
             }}
             modules={[Autoplay, Pagination]}
           >
-            {/* Dynamically render testimonials */}
+            
             {testimonialData.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
                 <div className="group bg-white border border-solid border-gray-300 rounded-xl p-6 transition-all duration-500 hover:border-indigo-600 hover:shadow-sm">

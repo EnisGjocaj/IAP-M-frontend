@@ -1,88 +1,129 @@
-// src/pages/News.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllNews } from '../api/news';
 import NewsArticle from '../components/common/NewsArticle';
 import bannerImg from '../components/assets/images/iapm-banner.jpg';
+import { FaCalendarAlt, FaArrowRight } from 'react-icons/fa';
 
 export const News = () => {
   const [newsArticles, setNewsArticles] = useState([]);
 
   useEffect(() => {
-    // Fetch all news articles from the API
     const fetchNews = async () => {
       try {
         const response = await getAllNews();
-        console.log(response.data);
-        // setNewsArticles(response.data);
         if (response.data && Array.isArray(response.data.message)) {
-            setNewsArticles(response.data.message);
-          } else {
-            console.error('Unexpected response format:', response.data);
-            setNewsArticles([]); // Fallback to empty array
-          }
-        } catch (error) {
-          console.error('Error fetching news:', error);
-          setNewsArticles([]); // Fallback to empty array in case of error
+          setNewsArticles(response.data.message);
+        } else {
+          setNewsArticles([]);
         }
+      } catch (error) {
+        console.error('Error fetching news:', error);
+        setNewsArticles([]);
+      }
     };
-
     fetchNews();
   }, []);
 
+  const featuredArticles = newsArticles.slice(-3).reverse();
+  const mainFeatured = featuredArticles[0];
+  const secondaryFeatured = featuredArticles.slice(1);
+
   return (
-    <section className='news py-4 sm:py-8 md:py-16 bg-gray-100'>
-      <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
-        {/* Hero Image Section */}
-        <div className='mb-8'>
-          <img
-            src={bannerImg} // Replace with your hero image path
-            alt='Hero'
-            className='w-full h-40 sm:h-56 md:h-64 object-cover rounded-lg shadow-md'
-          />
+    <section className='bg-gray-50'>
+      <div className='relative h-[400px] overflow-hidden'>
+        <img
+          src={bannerImg}
+          alt='News Banner'
+          className='w-full h-full object-cover'
+        />
+        <div className='absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent flex items-center'>
+          <div className='container mx-auto px-4'>
+            <h1 className='text-4xl md:text-6xl font-bold text-white mb-4'>Latest News</h1>
+            <p className='text-xl text-white/90 max-w-2xl'>Stay updated with the latest news and developments from our organization</p>
+          </div>
         </div>
+      </div>
 
-        {/* Headlines Section */}
-        <div className='mb-6'>
-          <h2 className='text-lg sm:text-xl md:text-2xl font-bold mb-4 text-gray-800'>Headlines</h2>
-          <ul className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
-            {Array.isArray(newsArticles) && newsArticles.length > 0 ? (
-              newsArticles.slice(-3).map((article) => (
-                <li
-                  key={article.id}
-                  className='bg-white p-4 rounded-lg shadow-lg transition-shadow duration-300 ease-in-out border-l-4 border-blue-600'
+      <div className='container mx-auto px-4 -mt-20 relative z-10'>
+        {newsArticles.length > 0 && (
+          <div className='mb-16'>
+            <div className='flex items-center justify-between mb-8'>
+              <h2 className='text-2xl md:text-3xl font-bold text-white'>Featured Stories</h2>
+              <Link 
+                to="/news/all" 
+                className='text-secondary hover:text-blue-700 flex items-center bg-white px-4 py-2 rounded-full shadow-lg transition-all hover:shadow-xl'
+              >
+                View All 
+                <FaArrowRight className='ml-2' />
+              </Link>
+            </div>
+
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+              {mainFeatured && (
+                <Link
+                  to={`/news/${mainFeatured.id}`}
+                  className='group relative h-[500px] overflow-hidden rounded-2xl shadow-xl'
                 >
-                  <Link
-                    to={`/news/${article.id}`}
-                    className='text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 ease-in-out'
-                  >
-                    {article.title}
-                  </Link>
-                  <p className='text-sm text-gray-500 mt-1'>{article.date}</p>
-                </li>
-              ))
-            ) : (
-              <p>No news articles available</p>
-            )}
-          </ul>
-        </div>
+                  <img
+                    src={mainFeatured.imageUrl || '/placeholder-image.jpg'}
+                    alt={mainFeatured.title}
+                    className='w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105'
+                  />
+                  <div className='absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-8'>
+                    <div className='flex items-center text-white/80 mb-4'>
+                      <FaCalendarAlt className='mr-2' />
+                      <span>{new Date(mainFeatured.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <h3 className='text-2xl md:text-3xl font-bold text-white mb-3'>{mainFeatured.title}</h3>
+                    <p className='text-white/90 line-clamp-2 mb-4'>{mainFeatured.content}</p>
+                    <span className='inline-flex items-center text-secondary bg-white px-4 py-2 rounded-full transform transition-transform group-hover:translate-x-2'>
+                      Read More <FaArrowRight className='ml-2' />
+                    </span>
+                  </div>
+                </Link>
+              )}
 
-        {/* Main Content Section */}
-        <div className=''>
-          {/* Main Content Grid Section */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {Array.isArray(newsArticles) && newsArticles.length > 0 ? (
-              newsArticles.map((article) => (
-                <NewsArticle key={article.id} article={article} />
-              ))
-            ) : (
-              <p>No news articles to display</p>
-            )}
+              <div className='grid grid-cols-1 gap-6'>
+                {secondaryFeatured.map((article) => (
+                  <Link
+                    key={article.id}
+                    to={`/news/${article.id}`}
+                    className='group bg-white rounded-xl p-6 shadow-card hover:shadow-xl transition-all duration-300 flex gap-6'
+                  >
+                    <div className='w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg'>
+                      <img
+                        src={article.imageUrl || '/placeholder-image.jpg'}
+                        alt={article.title}
+                        className='w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110'
+                      />
+                    </div>
+                    <div className='flex-1'>
+                      <div className='flex items-center text-gray-500 text-sm mb-2'>
+                        <FaCalendarAlt className='mr-2' />
+                        <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <h3 className='text-xl font-semibold text-neutral-850 mb-2 group-hover:text-secondary transition-colors'>
+                        {article.title}
+                      </h3>
+                      <p className='text-gray-600 line-clamp-2'>{article.content}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className='border-t border-gray-200 pt-16'>
+          <h2 className='text-2xl md:text-3xl font-bold text-neutral-850 mb-8'>All News</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {newsArticles.map((article) => (
+              <NewsArticle key={article.id} article={article} />
+            ))}
           </div>
         </div>
       </div>
     </section>
-
   );
-  
 };

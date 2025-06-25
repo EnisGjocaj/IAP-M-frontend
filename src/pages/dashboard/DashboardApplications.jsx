@@ -1,4 +1,4 @@
-// src/pages/Applications.js
+
 import React, { useEffect, useState } from 'react';
 
 import { deleteApplication, getAllApplications } from '../../api/application';
@@ -18,7 +18,7 @@ const DashboardApplications = () => {
     try {
       const response = await getAllApplications();
       console.log(response.data.message);
-      setApplications(response.data.message); // Access the actual data from API response
+      setApplications(response.data.message); 
     } catch (error) {
       console.error('Error fetching applications:', error);
     }
@@ -27,7 +27,7 @@ const DashboardApplications = () => {
   const handleDelete = async (id) => {
       try {
         await deleteApplication(id);
-        fetchApplications(); // Refresh the list
+        fetchApplications();
       } catch (error) {
         console.error('Error deleting application:', error);
       }

@@ -35,7 +35,6 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
   return (
     <div className="w-full bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row h-full group">
-        {/* Image Container */}
         <div className="relative w-full sm:w-2/5 h-48 sm:h-full min-h-[200px] overflow-hidden bg-gray-100">
           {imagePath && (
             <img
@@ -51,22 +50,17 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
-        {/* Content Container */}
         <div className="flex flex-col justify-between flex-grow sm:w-3/5 p-4 sm:p-5">
-          {/* Header Section */}
           <div className="space-y-3">
-            {/* Name and Title */}
             <div>
               <h3 className="text-lg font-bold text-gray-900">{fullName}</h3>
               <p className="text-sm text-blue-600 font-medium mt-1">{title}</p>
             </div>
 
-            {/* Description */}
             <p className="text-sm text-gray-500 line-clamp-3">
               {description}
             </p>
 
-            {/* Contact Info */}
             <div className="flex flex-wrap gap-3 text-sm">
               {email && (
                 <a href={`mailto:${email}`} className="flex items-center text-gray-600 hover:text-blue-600">
@@ -82,7 +76,6 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
               )}
             </div>
 
-            {/* Social Links */}
             <div className="flex items-center gap-4 pt-2">
               {linkedinUrl && (
                 <a
@@ -117,7 +110,6 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
             </div>
           </div>
 
-          {/* Read More Button */}
           <button
             onClick={() => navigate(`/bord/team/${id}`)}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 

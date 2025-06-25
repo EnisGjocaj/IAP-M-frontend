@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/users';
 import { useAuth } from '../contexts/authContext';
 
-import { toast } from 'react-toastify';  // Ensure the correct import
+import { toast } from 'react-toastify'; 
 
 export const Signup = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +14,7 @@ export const Signup = () => {
   });
   
   const navigate = useNavigate();
-  const { login } = useAuth(); // use login after signup
+  const { login } = useAuth(); 
   
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,24 +23,24 @@ export const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerUser(formData); // Register first
+      const response = await registerUser(formData); 
 
-      // Success toast after registration
+      
       toast.success('You are registered.', {
-        position: "top-center", // Position set correctly as a string
+        position: "top-center", 
         autoClose: 5000,
         closeButton: true,
         icon: '✅',
       });
 
-      login(response.data.token, response.data.user); // Auto-login after signup
+      login(response.data.token, response.data.user); 
       navigate('/');
     } catch (error) {
       console.error('Error registering user:', error);
 
-      // Error toast on registration failure
+      
       toast.error('Failed to submit. Please try again.', {
-        position: "top-center", // Position set correctly as a string
+        position: "top-center", 
         autoClose: 5000,
         closeButton: true,
       });

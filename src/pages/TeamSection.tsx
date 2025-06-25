@@ -55,7 +55,7 @@ const TeamSection = () => {
   return (
     <div className="bg-gray-50 py-12 sm:py-16 lg:py-20">
       <div className="max-w-[95%] lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-20">
-        {/* President Section */}
+      
         {presidents.length > 0 && (
           <TeamCategory
             title="President"
@@ -66,7 +66,7 @@ const TeamSection = () => {
           />
         )}
 
-        {/* Directors Section */}
+      
         {directors.length > 0 && (
           <TeamCategory
             title="Board of Directors"
@@ -77,7 +77,6 @@ const TeamSection = () => {
           />
         )}
 
-        {/* Coordinators Section */}
         {coordinators.length > 0 && (
           <TeamCategory
             title="Program Coordinators"
@@ -87,7 +86,6 @@ const TeamSection = () => {
           />
         )}
 
-        {/* Board Members Section */}
         {boardMembers.length > 0 && (
           <TeamCategory
             title="Board Members"

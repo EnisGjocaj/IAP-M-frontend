@@ -18,7 +18,6 @@ export const About = () => {
             <span className='text-sm mt-2 block'>Nuk keni pse të mundoheni si studentë vetëm kur na keni neve.</span>
           </div>
 
-          {/* Responsive grid: 1 column on small, 2 on medium, 3 on large, and 4 on extra-large */}
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5'>
             <AboutCard color='bg-[#2D69F0]' icon={<FaCalculator size={50} />} title='Tipet e trajnimeve te IAPM' desc='Trajnime të kontabilitetit.' />
             <AboutCard color='bg-[#DD246E]' icon={<FaCode size={50} />} title='Tipet e trajnimeve te IAPM' desc='Trajnime të programimit.' />
@@ -48,10 +47,8 @@ export const AboutContent = () => {
   return (
     <section className='mb-16'>
       <div className='container flex flex-col md:flex-row md:space-x-8'>
-        {/* Left Section - Image and Text */}
         <div className='left w-full md:w-1/3 relative mb-8 md:mb-0'>
           <img src={logoImage} alt='aboutImg' className='rounded-xl w-full' />
-          {/* Uncomment if you want to use this image */}
           {/* <img src={aboutImgBanner} alt='aboutImg' className='rounded-xl absolute -bottom-14 -left-24 h-56 md:left-80' /> */}
           <div className='img-group mt-3 flex flex-col items-start space-y-2'>
             <img src={imgs} alt='' className='w-1/4' />
@@ -61,7 +58,6 @@ export const AboutContent = () => {
           </div>
         </div>
 
-        {/* Right Section - Text and Button */}
         <div className='right w-full md:w-2/3'>
           <div className='heading'>
             <h1 className='text-3xl font-semibold text-black'>Arrini sukses me IAP-M</h1>

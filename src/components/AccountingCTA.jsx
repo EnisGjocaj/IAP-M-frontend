@@ -137,14 +137,14 @@ export const AccountingCTA = () => {
           className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-w-7xl mx-auto"
         >
           <div className="flex flex-col lg:flex-row relative">
-            {/* Image Section - Optimized for mobile */}
+           
             <div className="lg:w-2/5 relative overflow-hidden">
               <motion.div
                 initial={{ scale: 1.2 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.5 }}
-                className="relative h-[200px] sm:h-[250px] lg:min-h-[400px]" // Adjusted heights for different screens
+                className="relative h-[200px] sm:h-[250px] lg:min-h-[400px]" 
               >
                 <img
                   src={accountingImage}
@@ -154,7 +154,7 @@ export const AccountingCTA = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
               </motion.div>
 
-              {/* Stats Cards - Responsive layout */}
+             
               <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 flex justify-around gap-1 sm:gap-2">
                 {[
                   { icon: FaUsers, text: "Grupe të Vogla" },
@@ -177,7 +177,7 @@ export const AccountingCTA = () => {
               </div>
             </div>
 
-            {/* Content Section - Mobile optimized */}
+            
             <div className="lg:w-3/5 p-4 sm:p-6 lg:p-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

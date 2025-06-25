@@ -117,13 +117,11 @@ const JobListings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
       <div className="bg-secondary text-white py-16">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Find Your Dream Job</h1>
           <p className="text-lg opacity-90 mb-8">Discover the latest opportunities at IAPM</p>
           
-          {/* Search Bar */}
           <div className="bg-white rounded-lg p-4 shadow-lg flex flex-wrap gap-4">
             <div className="flex-1 min-w-[300px] relative flex gap-2">
               <div className="flex-1 relative">
@@ -181,7 +179,6 @@ const JobListings: React.FC = () => {
         </div>
       </div>
 
-      {/* Job Listings Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-semibold text-gray-800">
@@ -202,7 +199,6 @@ const JobListings: React.FC = () => {
           </div>
         </div>
 
-        {/* Job Cards */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -261,7 +257,6 @@ const JobListings: React.FC = () => {
           </div>
         )}
 
-        {/* Pagination */}
         {!loading && jobListings.length > 0 && renderPagination()}
       </div>
     </div>

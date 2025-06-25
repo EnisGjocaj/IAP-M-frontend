@@ -1,8 +1,8 @@
-// src/pages/DashboardTeamMembers.js
+
 import React, { useEffect, useState } from 'react';
-import { getAllTeamMembers, deleteTeamMember } from '../../api/teamMembers'; // Update import path as needed
+import { getAllTeamMembers, deleteTeamMember } from '../../api/teamMembers';
 import { useNavigate } from 'react-router-dom';
-import CustomTable from '../../components/common/CustomTable'; // Adjust import if needed
+import CustomTable from '../../components/common/CustomTable';
 
 const DashboardTeamMembers = () => {
   const [teamMembers, setTeamMembers] = useState([]);
@@ -16,10 +16,10 @@ const DashboardTeamMembers = () => {
     try {
       const response = await getAllTeamMembers();
       console.log(response.data);
-      setTeamMembers(response.data || []); // Ensure teamMembers is set to an empty array if undefined or null
+      setTeamMembers(response.data || []); 
     } catch (error) {
       console.error('Error fetching team members:', error);
-      setTeamMembers([]); // Ensure teamMembers is set to an empty array in case of error
+      setTeamMembers([]);
     }
   };
 
@@ -27,7 +27,7 @@ const DashboardTeamMembers = () => {
     if (window.confirm('Are you sure you want to delete this team member?')) {
       try {
         await deleteTeamMember(id);
-        fetchTeamMembers(); // Refresh the list after deletion
+        fetchTeamMembers(); 
       } catch (error) {
         console.error('Error deleting team member:', error);
       }

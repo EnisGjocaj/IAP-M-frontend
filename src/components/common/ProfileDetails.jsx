@@ -8,7 +8,7 @@ import { getTeamMemberById } from '../../api/teamMembers';
 const ProfileDetails = ({ coverImage, avatarImage, name, role, location, skills }) => {
     return (
         <section className="relative pt-40 pb-24">
-            {/* Cover Image */}
+            
             <img 
                 src={iapmBanner} 
                 alt="cover-image" 
@@ -16,7 +16,6 @@ const ProfileDetails = ({ coverImage, avatarImage, name, role, location, skills 
             />
 
             <div className="w-full max-w-7xl mx-auto px-6 md:px-8">
-                {/* Avatar */}
                 <div className="flex items-center justify-center sm:justify-start relative z-10 mb-5">
                     <img 
                         src={avatarImage} 
@@ -25,7 +24,6 @@ const ProfileDetails = ({ coverImage, avatarImage, name, role, location, skills 
                     />
                 </div>
 
-                {/* Name and Role */}
                 <div className="flex items-center justify-center flex-col sm:flex-row max-sm:gap-5 sm:justify-between my-5">
                     <div className="block">
                         <h3 className="font-manrope font-bold text-4xl text-gray-900 mb-1 max-sm:text-center">
@@ -37,7 +35,6 @@ const ProfileDetails = ({ coverImage, avatarImage, name, role, location, skills 
                         </p>
                     </div>
 
-                    {/* Send Message Button */}
                     <button
                         className="mt-8 py-3.5 px-5 flex rounded-full bg-indigo-600 items-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-indigo-700"
                     >
@@ -51,7 +48,6 @@ const ProfileDetails = ({ coverImage, avatarImage, name, role, location, skills 
                     </button>
                 </div>
 
-                {/* Skills */}
                 <div className="flex max-sm:flex-wrap max-sm:justify-center items-center gap-4">
                     {skills.map((skill, index) => (
                         <a

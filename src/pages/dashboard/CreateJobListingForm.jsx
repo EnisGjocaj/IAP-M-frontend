@@ -23,12 +23,11 @@ const CreateJobListingForm = () => {
         try {
           setLoading(true);
           const response = await getJobListingById(id);
-          console.log('Job data received:', response.data); // Debug log
+          console.log('Job data received:', response.data); 
           
           if (response.data && response.data.data) {
             const jobData = response.data.data;
             
-            // Ensure requirements is an array
             const requirements = Array.isArray(jobData.requirements) 
               ? jobData.requirements 
               : jobData.requirements ? [jobData.requirements] : [''];
@@ -83,14 +82,12 @@ const CreateJobListingForm = () => {
     try {
       setLoading(true);
       
-      // Validate requirements
       const filteredRequirements = formData.requirements.filter(req => req.trim() !== '');
       if (filteredRequirements.length === 0) {
         toast.error('At least one requirement is needed');
         return;
       }
 
-      // Validate required fields
       if (!formData.title.trim()) {
         toast.error('Title is required');
         return;
@@ -108,7 +105,6 @@ const CreateJobListingForm = () => {
         return;
       }
 
-      // Prepare the data
       const jobData = {
         title: formData.title.trim(),
         company: formData.company.trim(),
@@ -124,20 +120,17 @@ const CreateJobListingForm = () => {
 
       let response;
       if (id) {
-        // For update
         response = await updateJobListing(Number(id), jobData);
         console.log('Update response:', response);
         
         if (response?.data?.success) {
           toast.success('Job listing updated successfully');
-          // Force reload the dashboard
           await new Promise(resolve => setTimeout(resolve, 1000));
           navigate('/admin/jobs', { replace: true });
         } else {
           throw new Error(response?.data?.message || 'Failed to update job listing');
         }
       } else {
-        // For create
         response = await createJobListing(jobData);
         console.log('Create response:', response);
         
@@ -174,7 +167,6 @@ const CreateJobListingForm = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Job Title</label>
               <input
@@ -187,7 +179,6 @@ const CreateJobListingForm = () => {
               />
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Location</label>
               <input
@@ -200,7 +191,6 @@ const CreateJobListingForm = () => {
               />
             </div>
 
-            {/* Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Job Type</label>
               <select
@@ -216,7 +206,6 @@ const CreateJobListingForm = () => {
               </select>
             </div>
 
-            {/* Salary */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Salary</label>
               <input
@@ -229,7 +218,6 @@ const CreateJobListingForm = () => {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Description</label>
               <textarea
@@ -241,8 +229,6 @@ const CreateJobListingForm = () => {
                 placeholder="Enter job description..."
               />
             </div>
-
-            {/* Requirements */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
               {formData.requirements.map((requirement, index) => (
@@ -272,7 +258,6 @@ const CreateJobListingForm = () => {
               </button>
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end">
               <button
                 type="submit"

@@ -13,7 +13,7 @@ const CreateTeamMemberForm = () => {
       role: '',
       description: '',
       title: '',
-      imgSrc: '', // For previewing the image
+      imgSrc: '', 
       email: '',
       phoneNumber: '',
       linkedinUrl: '',
@@ -22,13 +22,13 @@ const CreateTeamMemberForm = () => {
     });
     const [cvFile, setCvFile] = useState(null);
 
-    const [imageFile, setImageFile] = useState(null); // Store the selected image file
-    const [loading, setLoading] = useState(true); // To manage loading state
+    const [imageFile, setImageFile] = useState(null); 
+    const [loading, setLoading] = useState(true); 
     const navigate = useNavigate();
-    const { id } = useParams(); // Get the ID from the URL
+    const { id } = useParams();
   
     useEffect(() => {
-        if (id) { // Checks if we are in edit mode
+        if (id) {
           const fetchTeamMember = async () => {
             try {
               const response = await getTeamMemberById(id);
@@ -39,7 +39,7 @@ const CreateTeamMemberForm = () => {
                 role: member.role || '',
                 description: member.description || '',
                 title: member.title || '',
-                imgSrc: member.imgSrc || '', // Set existing image URL
+                imgSrc: member.imgSrc || '', 
                 email: member.email || '',
                 phoneNumber: member.phoneNumber || '',
               });
@@ -52,7 +52,7 @@ const CreateTeamMemberForm = () => {
       
           fetchTeamMember();
         } else {
-          setLoading(false); // No ID, so no need to load existing data
+          setLoading(false);
         }
       }, [id]);
       
@@ -75,18 +75,18 @@ const CreateTeamMemberForm = () => {
   
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
-      setImageFile(file); // Set the selected image file
+      setImageFile(file); 
       setFormValues((prevValues) => ({
         ...prevValues,
-        imgSrc: URL.createObjectURL(file), // Set the preview image URL
+        imgSrc: URL.createObjectURL(file), 
       }));
     };
   
     const handleRemoveImage = () => {
-      setImageFile(null); // Clear the image file
+      setImageFile(null); 
       setFormValues((prevValues) => ({
         ...prevValues,
-        imgSrc: '', // Clear the preview image URL
+        imgSrc: '', 
       }));
     };
   
@@ -102,7 +102,7 @@ const CreateTeamMemberForm = () => {
         formData.append('title', formValues.title);
       
         if (imageFile) {
-          formData.append('image', imageFile); // Append the image file
+          formData.append('image', imageFile);
         }
 
         if (cvFile) {
@@ -115,7 +115,7 @@ const CreateTeamMemberForm = () => {
       
         try {
           if (id) {
-            // Update the existing team member
+            
             await updateTeamMember(id, formData);
             toast.success('Team member updated successfully!', {
               position: "top-center",
@@ -124,7 +124,7 @@ const CreateTeamMemberForm = () => {
               icon: '✅',
             });
           } else {
-            // Create a new team member
+            
             await createTeamMember(formData);
             toast.success('Team member created successfully!', {
               position: "top-center",
@@ -133,7 +133,7 @@ const CreateTeamMemberForm = () => {
               icon: '✅',
             });
           }
-          navigate('/admin/dashboard-team-members'); // Navigate to the team members dashboard after success
+          navigate('/admin/dashboard-team-members'); 
         } catch (error) {
           console.error('Error submitting form:', error);
           toast.error('Failed to save team member. Please try again.', {
@@ -146,7 +146,7 @@ const CreateTeamMemberForm = () => {
       
   
     if (loading) {
-      return <div>Loading...</div>; // You can replace this with a proper loading spinner
+      return <div>Loading...</div>; 
     }
   
     return (
@@ -159,7 +159,6 @@ const CreateTeamMemberForm = () => {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                    {/* Basic Information Section */}
                     <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
                         <div className="flex items-center gap-3 mb-4">
                             <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -276,7 +275,6 @@ const CreateTeamMemberForm = () => {
                             />
                         </div>
 
-                        {/* Profile Image Upload */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
                             <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
@@ -313,7 +311,6 @@ const CreateTeamMemberForm = () => {
                         </div>
                     </div>
 
-                    {/* Social Media Links */}
                     <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
                             <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -373,7 +370,6 @@ const CreateTeamMemberForm = () => {
                         </div>
                     </div>
 
-                    {/* CV Upload */}
                     <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
                         <div className="flex items-center gap-3 mb-4">
                             <span className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -419,7 +415,6 @@ const CreateTeamMemberForm = () => {
                         </div>
                     </div>
   
-                    {/* Submit Button */}
                     <button
                         type="submit"
                         className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-sm hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"

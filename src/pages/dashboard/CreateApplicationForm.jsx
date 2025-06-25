@@ -53,7 +53,6 @@ const CreateApplicationForm = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Personal Information Section */}
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -122,7 +121,6 @@ const CreateApplicationForm = () => {
             </div>
           </div>
 
-          {/* Program Selection Section */}
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -158,7 +156,6 @@ const CreateApplicationForm = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-sm hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"

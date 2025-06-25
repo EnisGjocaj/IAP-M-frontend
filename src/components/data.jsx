@@ -1,4 +1,4 @@
-// data.jsx
+
 
 
 import accountingImg from "../components/assets/images/accounting.jfif"
@@ -58,7 +58,7 @@ export const courses = [
       title: "Kontabilitet",
       cover: accountingImg, // placeholder image
       instructor: "Instruktori 1",
-      profileImg: "#", // placeholder profile image
+      profileImg: "#", 
       lessons: 12,
       rating: 4.8,
       reviews: 20,

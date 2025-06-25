@@ -7,17 +7,17 @@ import { FaNewspaper, FaImage } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 
 const CreateNewsForm = () => {
-  const { id } = useParams(); // Get the news ID from the URL
+  const { id } = useParams(); 
   const [formValues, setFormValues] = useState({
     title: '',
     content: '',
     imageUrl: '',
   });
   const [imageFile, setImageFile] = useState(null);
-  const isEditMode = !!id; // Check if we're in edit mode
+  const isEditMode = !!id; 
   const navigate = useNavigate();
 
-  // Fetch news data if editing
+
   useEffect(() => {
     if (isEditMode) {
       fetchNewsData(id);
@@ -80,7 +80,7 @@ const CreateNewsForm = () => {
 
     try {
       if (isEditMode) {
-        // Call updateNews if editing
+        
         await updateNews(id, formData);
         toast.success('News article updated successfully.', {
           position: "top-center",
@@ -88,7 +88,7 @@ const CreateNewsForm = () => {
           closeButton: true,
         });
       } else {
-        // Call createNews if creating
+        
         await createNews(formData);
         toast.success('News article created successfully.', {
           position: "top-center",
@@ -116,7 +116,8 @@ const CreateNewsForm = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* News Content Section */}
+          
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -154,7 +155,8 @@ const CreateNewsForm = () => {
             </div>
           </div>
 
-          {/* Image Upload Section */}
+        
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -212,8 +214,6 @@ const CreateNewsForm = () => {
               )}
             </div>
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-sm hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"

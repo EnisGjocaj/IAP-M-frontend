@@ -54,22 +54,17 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
 
-            {/* Content Container */}
             <div className="flex flex-col justify-between flex-grow p-4 sm:p-5 md:p-6">
               <div>
-                {/* Name and Role */}
                 <div className="mb-2 sm:mb-3">
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{member.fullName}</h3>
                   <p className="text-blue-600 font-medium text-sm sm:text-base">{member.role}</p>
                 </div>
 
-                {/* Title */}
                 <p className="text-gray-600 text-sm mb-2 sm:mb-3">{member.title}</p>
 
-                {/* Description with truncate */}
                 <p className="text-gray-500 text-sm line-clamp-3 mb-3 sm:mb-4">{member.description}</p>
 
-                {/* Social Links and CV */}
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                   <div className="flex gap-2 sm:gap-3">
                     {member.linkedinUrl && (
@@ -94,7 +89,6 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
                     )}
                   </div>
 
-                  {/* CV Download Button */}
                   {member.cvPath && (
                     <a
                       href={getFullUrl(member.cvPath)}
@@ -109,7 +103,6 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
                 </div>
               </div>
 
-              {/* Read More Button */}
               <button
                 onClick={() => handleReadMore(member.id)}
                 className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors duration-300 mt-2 sm:mt-3"

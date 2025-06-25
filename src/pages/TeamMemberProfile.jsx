@@ -1,11 +1,10 @@
-// TeamMemberProfile.js
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTeamMemberById } from '../api/teamMembers';
 import ProfileDetails from '../components/common/ProfileDetails';
 
 const TeamMemberProfile = () => {
-    const { id } = useParams(); // Get the team member ID from the URL
+    const { id } = useParams(); 
     const [memberData, setMemberData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,7 +14,7 @@ const TeamMemberProfile = () => {
             try {
                 setLoading(true);
                 const response = await getTeamMemberById(id);
-                setMemberData(response.data); // Assuming the API response is in response.data
+                setMemberData(response.data); 
             } catch (error) {
                 setError('Failed to fetch team member data');
             } finally {

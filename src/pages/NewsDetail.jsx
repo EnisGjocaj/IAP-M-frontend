@@ -11,49 +11,62 @@ export const NewsDetail = () => {
     const fetchNews = async () => {
       try {
         const response = await getNewsById(id);
-        setNews(response.data.message); // Accessing the correct property
+        setNews(response.data.message);
       } catch (error) {
         console.error('Error fetching news:', error);
       }
     };
-
     fetchNews();
   }, [id]);
 
   if (!news) {
-    return <div className='text-center'>Loading...</div>;
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary'></div>
+      </div>
+    );
   }
 
   return (
-    <section className='news-detail py-16 bg-gray-100'>
-      <div className='container mx-auto px-4'>
-        <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
-          <img
-            src={news.imageUrl || '/placeholder-image.jpg'} // Use direct Supabase URL with fallback
-            alt={news.title}
-            className='w-full h-64 object-cover'
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite loop
-              e.target.src = '/placeholder-image.jpg'; // Fallback image
-            }}
-          />
-          <div className='p-6'>
-            <h1 className='text-3xl font-bold mb-4'>{news.title}</h1>
-            <p className='text-gray-800 mb-4'>{news.content}</p>
-            <div className='flex items-center text-sm text-gray-500'>
-              <FaCalendarAlt className='mr-2' />
-              <span>{new Date(news.createdAt).toLocaleDateString()}</span>
+    <article className='bg-gray-50 min-h-screen'>
+      <div className='relative h-[400px] overflow-hidden'>
+        <img
+          src={news.imageUrl || '/placeholder-image.jpg'}
+          alt={news.title}
+          className='w-full h-full object-cover'
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/placeholder-image.jpg';
+          }}
+        />
+        <div className='absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end'>
+          <div className='container mx-auto px-4 pb-12'>
+            <h1 className='text-4xl md:text-5xl font-bold text-white mb-4'>{news.title}</h1>
+            <div className='flex items-center text-white/80 space-x-4'>
+              <div className='flex items-center'>
+                <FaCalendarAlt className='mr-2' />
+                <span>{new Date(news.createdAt).toLocaleDateString()}</span>
+              </div>
               {news.author && (
-                <>
-                  <span className='mx-2'>|</span>
+                <div className='flex items-center'>
                   <FaUser className='mr-2' />
                   <span>{news.author}</span>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
       </div>
-    </section>
+
+      <div className='container mx-auto px-4 py-12'>
+        <div className='max-w-3xl mx-auto bg-white rounded-xl shadow-card p-8'>
+          <div className='prose prose-lg max-w-none'>
+            {news.content.split('\n').map((paragraph, index) => (
+              <p key={index} className='text-gray-700 mb-4'>{paragraph}</p>
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
   );
 };

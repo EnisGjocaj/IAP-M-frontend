@@ -64,7 +64,7 @@ const DashboardForAdmin = () => {
         trainingType: type,
         count: trainingMap[type],
         percentage: Math.round((trainingMap[type] / statistics.applications) * 100) || 0,
-        trend: Math.random() > 0.5 // Simulated trend, replace with actual trend data
+        trend: Math.random() > 0.5 
       }));
 
       setTrainingData(trainingArray);
@@ -153,7 +153,7 @@ const DashboardForAdmin = () => {
       <Routes>
         <Route index element={
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-            {/* Main Dashboard Content */}
+           
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
               <StatCard
                 title="Total Users"
@@ -178,7 +178,7 @@ const DashboardForAdmin = () => {
               />
             </div>
 
-            {/* Training Applications Section */}
+          
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Training Applications</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -190,7 +190,7 @@ const DashboardForAdmin = () => {
           </div>
         } />
         
-        {/* Job Listings Routes */}
+        
         <Route path="jobs" element={<DashboardJobListings />} />
         <Route path="create-job" element={<CreateJobListingForm />} />
         <Route path="edit-job/:id" element={<CreateJobListingForm />} />

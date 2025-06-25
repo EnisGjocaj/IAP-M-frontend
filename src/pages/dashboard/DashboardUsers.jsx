@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllUsers, deleteUser } from '../../api/manageUsers'; // Replace with correct API function imports
+import { getAllUsers, deleteUser } from '../../api/manageUsers'; 
 import { useNavigate } from 'react-router-dom';
 import CustomTable from '../../components/common/CustomTable';
 
@@ -15,7 +15,7 @@ const DashboardUsers = () => {
     try {
       const response = await getAllUsers();
       console.log(response.data);
-      setUsersList(response.data || []); // Accessing the actual data from API response
+      setUsersList(response.data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -25,7 +25,7 @@ const DashboardUsers = () => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await deleteUser(id);
-        fetchUsers(); // Refresh the list after deletion
+        fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);
       }

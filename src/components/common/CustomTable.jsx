@@ -1,4 +1,4 @@
-// src/components/CustomTable.js
+
 import React from 'react';
 
 const CustomTable = ({ headers, data, onDelete, onEdit }) => {

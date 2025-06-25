@@ -19,16 +19,16 @@ const onSubmit = async (data) => {
   try {
     await createApplication(data);
     toast.success('Application submitted successfully! Expect to hear from us soon.', {
-      position: "top-center", // Updated position to string
+      position: "top-center", 
       autoClose: 5000,
       closeButton: true,
       icon: '✅',
     });
-    reset(); // Reset form after submission
+    reset(); 
   } catch (error) {
     console.error('Error submitting application:', error);
     toast.error('Failed to submit application. Please try again.', {
-      position: "top-center", // Updated position to string
+      position: "top-center",
       autoClose: 5000,
       closeButton: true,
     });

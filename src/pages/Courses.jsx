@@ -1,5 +1,4 @@
 import React from "react"
-// import { courses } from "../components/assets/data/dummydata"
 import { FaBook } from "react-icons/fa"
 import { AiFillStar } from "react-icons/ai"
 import { NavLink } from "react-router-dom"

@@ -20,23 +20,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     const clickHandler = ({ target }) => {
       if (!sidebar.current || !trigger.current) return;
       if (
-        !sidebarOpen || // If sidebarOpen is false, do nothing
-        sidebar.current.contains(target) || // If clicking inside the sidebar, do nothing
-        trigger.current.contains(target) // If clicking the trigger button, do nothing
+        !sidebarOpen || 
+        sidebar.current.contains(target) ||
+        trigger.current.contains(target)
       ) 
         return; 
-      setSidebarOpen(false); // Close the sidebar if none of the above conditions are met
+      setSidebarOpen(false); 
     };
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
-  }, [sidebarOpen]); // Add sidebarOpen to the dependency array
+  }, [sidebarOpen]); 
   
   useEffect(() => {
-    console.log('sidebarOpen:', sidebarOpen); // Log sidebarOpen prop
-    console.log('sidebarExpanded:', sidebarExpanded); // Log sidebarExpanded state
+    console.log('sidebarOpen:', sidebarOpen); 
+    console.log('sidebarExpanded:', sidebarExpanded); 
   }, [sidebarOpen, sidebarExpanded]);
 
-  // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }) => {
       if (!sidebarOpen || keyCode !== 27) return;
@@ -62,7 +61,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:static lg:translate-x-0 shadow-xl border-r border-gray-700`}
     >
-      {/* SIDEBAR HEADER */}
+     
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-700">
         <NavLink to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
@@ -72,7 +71,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </NavLink>
       </div>
 
-      {/* SIDEBAR MENU */}
+   
       <nav className="flex-1 overflow-y-auto overflow-x-hidden mt-5 py-4 px-4 lg:mt-6 lg:px-6">
         <div className="mb-4">
           <div className="flex items-center gap-2 px-4 py-2">

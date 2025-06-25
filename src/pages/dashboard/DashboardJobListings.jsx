@@ -10,7 +10,7 @@ const DashboardJobListings = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [showInactive, setShowInactive] = useState(true); // Start with showing all listings
+  const [showInactive, setShowInactive] = useState(true); 
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -73,7 +73,7 @@ const DashboardJobListings = () => {
     try {
       await toggleJobListingStatus(id);
       toast.success('Job listing status updated successfully');
-      fetchJobListings(); // Refresh the list after toggle
+      fetchJobListings();
     } catch (error) {
       console.error('Error toggling job listing status:', error);
       toast.error('Failed to update job listing status');
@@ -85,7 +85,7 @@ const DashboardJobListings = () => {
       try {
         await deleteJobListing(id);
         toast.success('Job listing deleted successfully');
-        fetchJobListings(); // Refresh the list after delete
+        fetchJobListings(); 
       } catch (error) {
         console.error('Error deleting job listing:', error);
         toast.error('Failed to delete job listing');
@@ -101,12 +101,12 @@ const DashboardJobListings = () => {
     const newValue = e.target.checked;
     console.log('Toggle inactive changed to:', newValue);
     setShowInactive(newValue);
-    setCurrentPage(1); // Reset to first page when toggling
+    setCurrentPage(1); 
   };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header Section */}
+     
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -122,10 +122,9 @@ const DashboardJobListings = () => {
         </div>
       </div>
 
-      {/* Filters Section */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
+         
           <div className="flex-1">
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -139,7 +138,7 @@ const DashboardJobListings = () => {
             </div>
           </div>
 
-          {/* Type Filter */}
+          
           <div className="w-full md:w-48">
             <select
               value={selectedType}
@@ -154,7 +153,7 @@ const DashboardJobListings = () => {
             </select>
           </div>
 
-          {/* Show Inactive Toggle */}
+          
           <div className="flex items-center gap-2">
             <label className="flex items-center cursor-pointer">
               <input
@@ -170,7 +169,7 @@ const DashboardJobListings = () => {
         </div>
       </div>
 
-      {/* Job Listings Table */}
+     
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

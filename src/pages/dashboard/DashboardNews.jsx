@@ -1,4 +1,4 @@
-// src/pages/News.js
+
 import React, { useEffect, useState } from 'react';
 import { getAllNews, deleteNews } from '../../api/news';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ const DashboardNews = () => {
   const fetchNews = async () => {
     try {
       const response = await getAllNews();
-      setNewsList(response.data.message || []); // Accessing the actual data from API response
+      setNewsList(response.data.message || []); 
     } catch (error) {
       console.error('Error fetching news:', error);
     }
@@ -26,7 +26,7 @@ const DashboardNews = () => {
     if (window.confirm('Are you sure you want to delete this news article?')) {
       try {
         await deleteNews(id);
-        fetchNews(); // Refresh the list after deletion
+        fetchNews(); 
       } catch (error) {
         console.error('Error deleting news:', error);
       }

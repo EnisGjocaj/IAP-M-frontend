@@ -1,38 +1,43 @@
-// src/components/NewsArticle.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendarAlt, FaUser } from 'react-icons/fa'; // Import icons if needed
+import { FaCalendarAlt, FaUser } from 'react-icons/fa';
 
 const NewsArticle = ({ article }) => {
-  // Use the imageUrl directly from Supabase
-  const imageUrl = article.imageUrl || '/placeholder-image.jpg'; // Add a fallback image
+  const imageUrl = article.imageUrl || '/placeholder-image.jpg';
   
   return (
-    <div className='bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-full'>
-      <img
-        src={imageUrl}
-        alt={article.title}
-        className='w-full h-48 object-cover'
-        onError={(e) => {
-          e.target.onerror = null; // Prevent infinite loop
-          e.target.src = '/placeholder-image.jpg'; // Fallback image
-        }}
-      />
-      <div className='p-4'>
-        <h3 className='text-lg font-semibold mb-2'>{article.title}</h3>
-        <p className='text-sm text-gray-600 mb-4'>
-          {article.content.substring(0, 150)}... {/* Show a preview of the content */}
+    <div className='group bg-white rounded-xl overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
+      <div className='aspect-w-16 aspect-h-9 overflow-hidden'>
+        <img
+          src={imageUrl}
+          alt={article.title}
+          className='w-full h-56 object-cover transform transition-transform duration-300 group-hover:scale-105'
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/placeholder-image.jpg';
+          }}
+        />
+      </div>
+      <div className='p-6'>
+        <h3 className='text-xl font-bold text-neutral-850 mb-3 line-clamp-2'>{article.title}</h3>
+        <p className='text-gray-600 mb-4 line-clamp-3'>
+          {article.content}
         </p>
-        <div className='flex items-center text-sm text-gray-500 mb-4'>
-          <FaCalendarAlt className='mr-2' />
-          <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center text-sm text-gray-500'>
+            <FaCalendarAlt className='mr-2' />
+            <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+          </div>
+          <Link
+            to={`/news/${article.id}`}
+            className='inline-flex items-center text-secondary font-semibold hover:text-blue-700 transition-colors'
+          >
+            Read More
+            <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
-        <Link
-          to={`/news/${article.id}`}
-          className='text-blue-600 hover:underline'
-        >
-          Read More
-        </Link>
       </div>
     </div>
   );
