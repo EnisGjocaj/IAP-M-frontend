@@ -17,10 +17,23 @@ export const NewsDetail = () => {
         const newsData = response.data.message;
         setNews(newsData);
 
-        // Update meta tags with new domain
+        // Format the description properly
+        const formattedDescription = newsData.content
+          .split('\n')
+          .filter(line => line.trim())
+          .slice(0, 3)
+          .join(' ');
+
+        // Ensure image URL is absolute
+        const fullImageUrl = newsData.imageUrl.startsWith('http') 
+          ? newsData.imageUrl 
+          : `https://iap-m.com${newsData.imageUrl}`;
+
+        // Update meta tags
+        document.querySelector('meta[property="og:type"]').setAttribute('content', 'article');
         document.querySelector('meta[property="og:title"]').setAttribute('content', newsData.title);
-        document.querySelector('meta[property="og:description"]').setAttribute('content', newsData.content.slice(0, 150) + '...');
-        document.querySelector('meta[property="og:image"]').setAttribute('content', newsData.imageUrl || `https://iap-m.com/iapm-banner.jpg`);
+        document.querySelector('meta[property="og:description"]').setAttribute('content', formattedDescription);
+        document.querySelector('meta[property="og:image"]').setAttribute('content', fullImageUrl);
         document.querySelector('meta[property="og:url"]').setAttribute('content', `https://iap-m.com/news/${id}`);
 
       } catch (error) {
@@ -46,6 +59,12 @@ export const NewsDetail = () => {
       </div>
     );
   }
+
+  const formattedDescription = news.content
+    .split('\n')
+    .filter(line => line.trim()) // Remove empty lines
+    .slice(0, 3)  // Take first 3 paragraphs
+    .join('\n\n'); // Join with double newline for better formatting
 
   return (
     <motion.article 
@@ -106,8 +125,8 @@ export const NewsDetail = () => {
               <SocialShare
                 url={`https://iap-m.com/news/${id}`}
                 title={news.title}
-                description={news.content.slice(0, 150)}
-                imageUrl={news.imageUrl}
+                description={formattedDescription}
+                imageUrl={news.imageUrl.startsWith('http') ? news.imageUrl : `https://iap-m.com${news.imageUrl}`}
               />
             </motion.div>
           )}
@@ -160,8 +179,8 @@ export const NewsDetail = () => {
               <SocialShare
                 url={`https://iap-m.com/news/${id}`}
                 title={news.title}
-                description={news.content.slice(0, 150)}
-                imageUrl={news.imageUrl}
+                description={formattedDescription}
+                imageUrl={news.imageUrl.startsWith('http') ? news.imageUrl : `https://iap-m.com${news.imageUrl}`}
               />
             </div>
           </div>
@@ -188,8 +207,8 @@ export const NewsDetail = () => {
               <SocialShare
                 url={`https://iap-m.com/news/${id}`}
                 title={news.title}
-                description={news.content.slice(0, 150)}
-                imageUrl={news.imageUrl}
+                description={formattedDescription}
+                imageUrl={news.imageUrl.startsWith('http') ? news.imageUrl : `https://iap-m.com${news.imageUrl}`}
               />
             </div>
           </div>

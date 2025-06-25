@@ -39,31 +39,34 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
 
   const handleShare = (platform) => {
     if (platform === 'facebook') {
-      // Always use the fallback URL if FB SDK is not loaded or not available
-      const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
-        app_id: '1838811733657078',
-        href: url,
+      // Create a properly formatted share object
+      const shareObject = {
+        method: 'share',  // Changed from 'feed' to 'share'
+        href: url,        // The URL to share
         hashtag: '#IAPM',
+        // The quote parameter will show up as the user's message
         quote: `${title}\n\n${description}`,
-        display: 'popup'
-      }).toString()}`;
+        // Display as popup to maintain consistent UX
+        display: 'popup',
+      };
 
       // Try FB SDK share if available
       if (window.FB && isFBSDKLoaded) {
         try {
-          window.FB.ui({
-            method: 'feed',
-            link: url,
-            caption: title,
-            description: description,
-            picture: imageUrl,
-            quote: `${title}\n\n${description}`,
-          }, function(response) {
+          window.FB.ui(shareObject, function(response) {
             if (response && !response.error_message) {
               console.log('Shared successfully');
             } else {
               console.error('Error sharing:', response);
               // Fallback to URL sharing if FB UI fails
+              const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
+                app_id: '1838811733657078',
+                href: url,
+                hashtag: '#IAPM',
+                quote: `${title}\n\n${description}`,
+                display: 'popup'
+              }).toString()}`;
+
               window.open(fbUrl, 'facebook-share-dialog', 
                 `width=550,height=450,left=${(window.screen.width - 550) / 2},top=${(window.screen.height - 450) / 2}`
               );
@@ -72,12 +75,28 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
         } catch (error) {
           console.error('FB SDK error:', error);
           // Fallback to URL sharing if FB SDK throws error
+          const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
+            app_id: '1838811733657078',
+            href: url,
+            hashtag: '#IAPM',
+            quote: `${title}\n\n${description}`,
+            display: 'popup'
+          }).toString()}`;
+
           window.open(fbUrl, 'facebook-share-dialog', 
             `width=550,height=450,left=${(window.screen.width - 550) / 2},top=${(window.screen.height - 450) / 2}`
           );
         }
       } else {
         // Use URL sharing if FB SDK is not available
+        const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
+          app_id: '1838811733657078',
+          href: url,
+          hashtag: '#IAPM',
+          quote: `${title}\n\n${description}`,
+          display: 'popup'
+        }).toString()}`;
+
         window.open(fbUrl, 'facebook-share-dialog', 
           `width=550,height=450,left=${(window.screen.width - 550) / 2},top=${(window.screen.height - 450) / 2}`
         );
