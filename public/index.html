@@ -1,24 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: http://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
+    <meta name="description" content="IAP-M" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <title>IAP-M</title>
 
-    <title>React App</title>
+    <!-- Facebook Open Graph tags -->
+    <meta property="fb:app_id" content="1838811733657078" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="IAP-M" />
+    <meta property="og:title" content="IAP-M News" />
+    <meta property="og:description" content="Latest news from IAP-M" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="https://iap-m.com" data-dynamic="true" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="fb-root"></div>
     <div id="root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId: '1838811733657078',
+          xfbml: true,
+          version: 'v18.0',
+          cookie: true
+        });
+      };
 
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
   </body>
 </html>
 

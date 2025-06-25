@@ -48,70 +48,98 @@ const AccountingModal = ({ isOpen, onClose }) => {
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto relative"
+            className="bg-white rounded-2xl w-full max-w-[500px] relative"
             onClick={e => e.stopPropagation()}
           >
-            <button 
-              onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <FaTimes size={24} />
-            </button>
-
-            <div className="text-center mb-8">
-              <FaGraduationCap className="mx-auto text-blue-600 mb-4" size={40} />
-              <h2 className="text-2xl font-bold text-gray-800">
-                Apply for Accounting Training
-              </h2>
-              <p className="text-gray-500 mt-2">Fill in your details to start your journey</p>
+            {/* Header */}
+            <div className="bg-blue-600 rounded-t-2xl p-6 relative">
+              <button 
+                onClick={onClose}
+                className="absolute right-4 top-4 text-white/80 hover:text-white transition-colors"
+              >
+                <FaTimes size={20} />
+              </button>
+              <div className="text-center">
+                <FaGraduationCap className="mx-auto text-white mb-3" size={32} />
+                <h2 className="text-xl font-bold text-white">
+                  Apply for Accounting Training
+                </h2>
+                <p className="text-white/80 text-sm mt-1">Fill in your details to start your journey</p>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  First Name
-                </label>
-                <input
-                  {...register('name', { required: 'First name is required' })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your first name"
-                />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Name Fields Row */}
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-1">
+                    First Name
+                  </label>
+                  <input
+                    {...register('name', { required: 'Required' })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    placeholder="Enter first name"
+                  />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    {...register('surname', { required: 'Required' })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    placeholder="Enter last name"
+                  />
+                  {errors.surname && <p className="text-red-500 text-xs mt-1">{errors.surname.message}</p>}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Last Name
-                </label>
-                <input
-                  {...register('surname', { required: 'Last name is required' })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your last name"
-                />
-                {errors.surname && <p className="text-red-500 text-sm mt-1">{errors.surname.message}</p>}
+              {/* Contact Fields */}
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    {...register('email', {
+                      required: 'Required',
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: 'Invalid email',
+                      },
+                    })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    placeholder="Enter email"
+                  />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    {...register('phoneNumber', {
+                      required: 'Required',
+                      pattern: {
+                        value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                        message: 'Invalid format'
+                      }
+                    })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    placeholder="Enter phone number"
+                  />
+                  {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Email Address
-                </label>
-                <input
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: 'Invalid email address',
-                    },
-                  })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your email"
-                />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-              </div>
-
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-sm"
               >
                 Submit Application
               </button>

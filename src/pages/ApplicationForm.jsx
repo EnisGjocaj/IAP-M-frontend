@@ -118,6 +118,32 @@ const onSubmit = async (data) => {
             </div>
 
             <div>
+              <label htmlFor='phoneNumber' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
+                Phone Number
+              </label>
+              <input
+                id='phoneNumber'
+                type='tel'
+                {...register('phoneNumber', { 
+                  required: 'Phone number is required',
+                  pattern: {
+                    value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                    message: 'Invalid phone number format'
+                  }
+                })}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
+                  errors.phoneNumber ? 'border-red-400' : 'border-gray-300'
+                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
+                placeholder="Enter your phone number"
+              />
+              {errors.phoneNumber && (
+                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
+                  {errors.phoneNumber.message}
+                </p>
+              )}
+            </div>
+
+            <div>
               <label htmlFor='type' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
                 Training Type
               </label>

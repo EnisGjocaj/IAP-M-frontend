@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 
 import { deleteApplication, getAllApplications } from '../../api/application';
@@ -33,13 +32,14 @@ const DashboardApplications = () => {
       }
   };
 
-  const headers = ['ID', 'Name', 'Surname', 'Email', 'Type'];
+  const headers = ['ID', 'Name', 'Surname', 'Email', 'Phone', 'Type'];
 
   const tableData = applications.map((app) => ({
     id: app.id,
     name: app.name,
     surname: app.surname,
     email: app.email.toLowerCase(),
+    phone: app.phoneNumber || 'N/A',
     type: app.type,
   }));
 
