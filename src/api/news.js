@@ -1,16 +1,16 @@
 import api from "./api";
 
 // Fetch all news
-export const getAllNews = () => api.get('/news');
+export const getAllNews = () => api.get('/api/news');
 
 // Fetch news by ID
-export const getNewsById = (id) => api.get(`/news/${id}`);
+export const getNewsById = (id) => api.get(`/api/news/${id}`);
 
 // Create news
-export const createNews = (values) => api.post('/news', values);
+export const createNews = (values) => api.post('/api/news', values);
 
 // Update news
-export const updateNews = (id, values) => api.put(`/news/${id}`, values);
+export const updateNews = (id, values) => api.put(`/api/news/${id}`, values);
 
 // Delete news
-export const deleteNews = (id) => api.delete(`/news/${id}`);
+export const deleteNews = (id) => api.delete(`/api/news/${id}`);

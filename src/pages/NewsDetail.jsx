@@ -17,32 +17,13 @@ export const NewsDetail = () => {
         const newsData = response.data.message;
         setNews(newsData);
 
-        // Format the description properly
-        const formattedDescription = newsData.content
-          .split('\n')
-          .filter(line => line.trim())
-          .slice(0, 3)
-          .join(' ');
-
-        // Ensure image URL is absolute
-        const fullImageUrl = newsData.imageUrl.startsWith('http') 
-          ? newsData.imageUrl 
-          : `https://iap-m.com${newsData.imageUrl}`;
-
-        // Update meta tags
-        document.querySelector('meta[property="og:type"]').setAttribute('content', 'article');
-        document.querySelector('meta[property="og:title"]').setAttribute('content', newsData.title);
-        document.querySelector('meta[property="og:description"]').setAttribute('content', formattedDescription);
-        document.querySelector('meta[property="og:image"]').setAttribute('content', fullImageUrl);
-        document.querySelector('meta[property="og:url"]').setAttribute('content', `https://iap-m.com/news/${id}`);
-
+        updateMetaTags(newsData);
       } catch (error) {
         console.error('Error fetching news:', error);
       }
     };
     fetchNews();
 
-    // Cleanup function
     return () => {
       // Reset meta tags to defaults with new domain
       document.querySelector('meta[property="og:title"]').setAttribute('content', 'IAP-M News');
@@ -51,6 +32,31 @@ export const NewsDetail = () => {
       document.querySelector('meta[property="og:url"]').setAttribute('content', 'https://iap-m.com');
     };
   }, [id]);
+
+  const updateMetaTags = (newsData) => {
+    // Get the first few sentences for description
+    const description = newsData.content
+      .split('\n')
+      .filter(line => line.trim())
+      .slice(0, 3)
+      .join(' ');
+
+    // Ensure image URL is absolute
+    const fullImageUrl = newsData.imageUrl.startsWith('http') 
+      ? newsData.imageUrl 
+      : `https://iap-m.com${newsData.imageUrl}`;
+
+    // Update meta tags
+    document.querySelector('meta[property="og:title"]').setAttribute('content', newsData.title);
+    document.querySelector('meta[property="og:description"]').setAttribute('content', description);
+    document.querySelector('meta[property="og:image"]').setAttribute('content', fullImageUrl);
+    document.querySelector('meta[property="og:url"]').setAttribute('content', `https://iap-m.com/news/${id}`);
+    
+    // Also update Twitter meta tags
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', newsData.title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', description);
+    document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', fullImageUrl);
+  };
 
   if (!news) {
     return (

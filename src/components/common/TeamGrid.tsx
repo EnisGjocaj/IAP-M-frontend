@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaLinkedin, FaTwitter, FaFacebook, FaFilePdf, FaArrowRight } from 'react-icons/fa';
 import config from '../../config';
 
+
 interface TeamMember {
   id: string;
   fullName: string;
@@ -23,10 +24,14 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
   const navigate = useNavigate();
 
   const getFullUrl = (path: string) => {
-    if (path.startsWith('http')) {
-      return path;
+    if (!path) return '';
+    const trimmed = path.trim().replace(/^"+|"+$/g, ''); // remove spaces and quotes
+    console.log('DEBUG imagePath:', path, '->', trimmed);
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
     }
-    return `${config.API_URL}${path}`;
+    // Only prepend API_URL for local images
+    return `${config.API_URL.replace(/\/$/, '')}/${trimmed.replace(/^\//, '')}`;
   };
 
   const handleReadMore = (id: string) => {
@@ -38,17 +43,12 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
       {members.map((member) => (
         <div key={member.id} className="w-full bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="flex flex-col h-full group">
-            {/* Image Container */}
             <div className="relative w-full h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-100">
               {member.imagePath && (
                 <img
                   src={getFullUrl(member.imagePath)}
-                  alt=""
+                  alt={member.fullName}
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

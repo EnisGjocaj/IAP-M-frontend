@@ -31,7 +31,6 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
       initFacebookSDK();
     }
 
-    // Add event listener for FB SDK load
     window.fbAsyncInit = function() {
       initFacebookSDK();
     };
@@ -39,14 +38,16 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
 
   const handleShare = (platform) => {
     if (platform === 'facebook') {
+      const isLocal = window.location.hostname === "localhost";
+      const baseUrl = isLocal ? "http://localhost:4000" : "https://iap-m.com";
+      const shareUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+      
       // Create a properly formatted share object
       const shareObject = {
-        method: 'share',  // Changed from 'feed' to 'share'
-        href: url,        // The URL to share
+        method: 'share',
+        href: shareUrl,
         hashtag: '#IAPM',
-        // The quote parameter will show up as the user's message
         quote: `${title}\n\n${description}`,
-        // Display as popup to maintain consistent UX
         display: 'popup',
       };
 
@@ -58,10 +59,10 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
               console.log('Shared successfully');
             } else {
               console.error('Error sharing:', response);
-              // Fallback to URL sharing if FB UI fails
+              // Fallback to URL sharing
               const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
                 app_id: '1838811733657078',
-                href: url,
+                href: shareUrl,
                 hashtag: '#IAPM',
                 quote: `${title}\n\n${description}`,
                 display: 'popup'
@@ -74,10 +75,10 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
           });
         } catch (error) {
           console.error('FB SDK error:', error);
-          // Fallback to URL sharing if FB SDK throws error
+          // Fallback to URL sharing
           const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
             app_id: '1838811733657078',
-            href: url,
+            href: shareUrl,
             hashtag: '#IAPM',
             quote: `${title}\n\n${description}`,
             display: 'popup'
@@ -91,7 +92,7 @@ const SocialShare = ({ url, title, description, imageUrl }) => {
         // Use URL sharing if FB SDK is not available
         const fbUrl = `https://www.facebook.com/dialog/share?${new URLSearchParams({
           app_id: '1838811733657078',
-          href: url,
+          href: shareUrl,
           hashtag: '#IAPM',
           quote: `${title}\n\n${description}`,
           display: 'popup'

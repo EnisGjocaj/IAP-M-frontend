@@ -1,14 +1,14 @@
-const getImageUrl = (imagePath: string | null | undefined): string => {
-  if (!imagePath) return '/default-profile.png';
-
-  // Development environment
-  if (process.env.NODE_ENV === 'development') {
-    return `http://localhost:4000${imagePath}`;
+function getImageUrl(path) {
+  if (!path) return '';
+  const trimmed = path.trim();
+  
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
   }
 
-  // Production environment
-  const API_URL = process.env.REACT_APP_API_URL || 'https://api.iap-m.com';
-  return `${API_URL}${imagePath}`;
-};
+  return trimmed;
+}
 
 export { getImageUrl }; 
+
+//WE HAD THE BACKEND API_URL IN THE IMAGE PATH, BUT NOW WE HAVE THE SUPABASE BASE URL, DO WE HAVE CHANGED THIS , I DONT REALLY CARE ANYWATS TBH!!!!
