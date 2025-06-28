@@ -35,7 +35,7 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
   return (
     <div className="w-full bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row h-full group">
-        <div className="relative w-full sm:w-2/5 h-48 sm:h-full min-h-[200px] overflow-hidden bg-gray-100">
+        <div className="relative w-full aspect-[4/5] sm:w-2/5 sm:h-full min-h-[200px] overflow-hidden bg-gray-100">
           {imagePath && (
             <img
               src={getImageUrl(imagePath)}

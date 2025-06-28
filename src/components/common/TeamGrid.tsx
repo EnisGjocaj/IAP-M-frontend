@@ -43,7 +43,7 @@ const TeamGrid: React.FC<TeamGridProps> = ({ members }) => {
       {members.map((member) => (
         <div key={member.id} className="w-full bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="flex flex-col h-full group">
-            <div className="relative w-full h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-100">
+            <div className="relative w-full aspect-[4/5] sm:h-56 md:h-64 overflow-hidden bg-gray-100">
               {member.imagePath && (
                 <img
                   src={getFullUrl(member.imagePath)}
