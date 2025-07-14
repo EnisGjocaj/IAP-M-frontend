@@ -58,7 +58,7 @@ const TeamMemberCard: React.FC<TeamMemberProps> = ({
       onClick={() => navigate(`/bord/team/${id}`)}
     >
      
-      <div className="relative h-40 sm:h-48 md:h-56 lg:h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="relative h-72 sm:h-48 md:h-56 lg:h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         {!imageError && imagePath && (
           <motion.img
             src={getImageUrl(imagePath)}
