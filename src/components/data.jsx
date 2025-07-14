@@ -14,9 +14,9 @@ export const testimonialData = [
       rating: 4.9,
       description:
         "Ky institut me ka ndihmuar shume ne aftesimin tim profesional.",
-      name: "Studenti 1",
+      name: "Enis Gjocaj",
       profession: "Kontabilitet",
-      img: "https://pagedone.io/asset/uploads/1696229969.png",
+      img: "iap-m-logo.jpg",
     },
     {
       id: 2,
@@ -24,26 +24,26 @@ export const testimonialData = [
       description:
         "Instituti IAPM ka bere ndryshimin me te madh ne aftersimin tim si student.",
       name: "Enis Gjocaj",
-      profession: "Programer",
-      img: "#",
+      profession: "Programim",
+      img: "iap-m-logo.jpg",
     },
     {
       id: 3,
       rating: 4.8,
       description:
         "Trajnimet nga instituti kane qene mjaft te nevojshme dhe te rendesishme per karieren time.",
-      name: "Student",
-      profession: "Designer",
-      img: "#",
+      name: "Elona Berisha",
+      profession: "Dizajn",
+      img: "iap-m-logo.jpg",
     },
     {
       id: 4,
       rating: 4.7,
       description:
         "Behuni pjese edhe ju e trajnimeve te institutit nese deshironi te keni sukses.",
-      name: "Studenti 3",
-      profession: "Lider",
-      img: "#",
+      name: "Valjona Molliqaj",
+      profession: "Marketing",
+      img: "iap-m-logo.jpg",
     },
   ];
   

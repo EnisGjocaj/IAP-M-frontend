@@ -19,18 +19,10 @@ export const Home = () => {
 
   const { user } = useAuth(); 
 
-  const isArdit = user && (user.email === 'arditbobi@gmail.com');
 
   return (
     <>
 
-      {isArdit && (
-        <div className="text-center mb-4">
-          <NavLink to="/admin" className="px-4 py-2 bg-blue-500 rounded-lg text-white font-semibold text-center">
-            Go to Admin page
-          </NavLink>
-        </div>
-      )}
       <HomeContent />
       <AccountingCTA />
       <About />

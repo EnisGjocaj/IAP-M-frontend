@@ -11,22 +11,12 @@ export const LinkData = [
   },
   {
     id: 3,
-    title: "courses",
+    title: "Courses",
     url: "/courses",
   },
   {
-    id: 4,
-    title: "Instructor",
-    url: "/instructor",
-  },
-  {
-    id: 5,
-    title: "blog",
-    url: "/blog",
-  },
-  {
     id: 6,
-    title: "news",
+    title: "News",
     url: "/news",
   },
   {

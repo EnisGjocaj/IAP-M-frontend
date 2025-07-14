@@ -1,59 +1,65 @@
 import React from "react"
 import { FaGraduationCap, FaUsers, FaBook } from "react-icons/fa"
-import { GiEvilBook, GiWorld } from "react-icons/gi"
+import { GiWorld } from "react-icons/gi"
+import CountUp from 'react-countup'
 
 export const Instructor = () => {
   return (
     <>
-      <section className='instructor mb-16'>
-        <div className='container'>
-          <div className='heading py-12 text-center w-2/3 m-auto md:w-full'>
-            <h1 className='text-3xl font-semibold text-black'>IAP-M</h1>
-            <span className='text-[14px] mt-2 block'>Qëllimi i Institutit IAPM eshte trajnimi dhe certifikimi i studentëve dhe individëve për sukses në karrierë.</span>
+      <section className='instructor mb-16 relative overflow-hidden'>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-50" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-200 rounded-full blur-3xl opacity-20" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-200 rounded-full blur-3xl opacity-20" />
+        
+        <div className='container relative'>
+          <div className='heading py-16 text-center max-w-2xl mx-auto'>
+            <h1 className='text-4xl md:text-5xl font-bold text-gray-800 mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent'>
+              IAP-M
+            </h1>
+            <span className='text-lg text-gray-600 leading-relaxed block'>
+              Qëllimi i Institutit IAPM eshte trajnimi dhe certifikimi i studentëve dhe individëve për sukses në karrierë.
+            </span>
           </div>
-          <div className='content grid grid-cols-1 sm:grid-cols-2 gap-5'>
-  <div className='images rounded-lg relative overflow-hidden h-60 sm:h-72 w-full'>
-    <img 
-      src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-1.jpg' 
-      alt='Image 1' 
-      className='rounded-t-lg object-cover w-full h-full'
-    />
-    <div className='categ flex flex-col gap-4 absolute inset-0 m-3 p-4 sm:p-8 items-center justify-center text-center bg-black bg-opacity-50'>
-      <h2 className='text-xl sm:text-3xl text-white font-semibold'>
-        Mesoni ne menyre profesionale
-      </h2>
-      <button className='text-sm sm:text-base py-2 px-4 border border-gray-200 rounded-md text-white'>
-        Start a class today
-      </button>
-    </div>
-  </div>
-  <div className='images rounded-lg relative overflow-hidden h-60 sm:h-72 w-full'>
-    <img 
-      src='https://bdevs.net/wp/educal/wp-content/uploads/2021/09/what-2.jpg' 
-      alt='Image 2' 
-      className='rounded-t-lg object-cover w-full h-full'
-    />
-    <div className='categ flex flex-col gap-4 absolute inset-0 m-3 p-4 sm:p-8 items-center justify-center text-center bg-black bg-opacity-50'>
-      <h2 className='text-xl sm:text-3xl text-white font-semibold'>
-        Behuni instruktore
-      </h2>
-      <button className='text-sm sm:text-base py-2 px-4 border border-gray-200 rounded-md text-white'>
-        Join us today
-      </button>
-    </div>
-  </div>
-</div>
 
-          <div className='content'>
-            <div className='heading py-12 text-center w-2/3 m-auto md:w-full'>
-              <h1 className='text-3xl font-semibold text-black'>Ne jemi krenare</h1>
-              <span className='text-[14px] mt-2 block'>Instituti yne ka arritje te larta ne trajnimin dhe mbeshtetjen e studenteve.</span>
+          <div className='content relative z-10'>
+            <div className='heading py-12 text-center max-w-2xl mx-auto'>
+              <h2 className='text-3xl md:text-4xl font-bold text-gray-800 mb-4'>
+                Ne jemi krenare
+              </h2>
+              <span className='text-lg text-gray-600 leading-relaxed block'>
+                Instituti yne ka arritje te larta ne trajnimin dhe mbeshtetjen e studenteve.
+              </span>
             </div>
-            <div className='content grid grid-cols-4 gap-5 md:grid-cols-2'>
-              <InstructorCard color='text-red-500' icon={<FaUsers size={40} />} title='63' desc='Studente ne trajnime' />
-              <InstructorCard color='text-orange-500' icon={<FaBook size={40} />} title='20' desc='Trajnime totale' />
-              <InstructorCard color='text-purple-500' icon={<FaGraduationCap size={40} />} title='11' desc='Pjestare te bordit' />
-              <InstructorCard color='text-indigo-500' icon={<GiWorld size={40} />} title='4' desc='Trajnime te perfunduare' />
+
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 py-12'>
+              <CountUpCard
+                end={63}
+                color="text-red-500"
+                icon={<FaUsers className="w-14 h-14" />}
+                title="Studente ne trajnime"
+                gradient="from-red-500/10 to-red-600/10"
+              />
+              <CountUpCard
+                end={20}
+                color="text-orange-500"
+                icon={<FaBook className="w-14 h-14" />}
+                title="Trajnime totale"
+                gradient="from-orange-500/10 to-orange-600/10"
+              />
+              <CountUpCard
+                end={11}
+                color="text-purple-500"
+                icon={<FaGraduationCap className="w-14 h-14" />}
+                title="Pjestare te bordit"
+                gradient="from-purple-500/10 to-purple-600/10"
+              />
+              <CountUpCard
+                end={4}
+                color="text-indigo-500"
+                icon={<GiWorld className="w-14 h-14" />}
+                title="Trajnime te perfunduare"
+                gradient="from-indigo-500/10 to-indigo-600/10"
+              />
             </div>
           </div>
         </div>
@@ -61,14 +67,27 @@ export const Instructor = () => {
     </>
   )
 }
-export const InstructorCard = (props) => {
+
+const CountUpCard = ({ end, color, icon, title, gradient }) => {
   return (
-    <div className={`box p-5 py-5 rounded-md`}>
-      <div className={`${props.color}`}>{props.icon}</div>
-      <div className='text mt-2'>
-        <h4 className='text-lg font-semibold text-black'>{props.title}</h4>
-        <p className='text-[15px]'>{props.desc}</p>
+    <div 
+      className={`flex flex-col items-center justify-center p-8 rounded-2xl bg-white shadow-xl 
+        transform transition-all duration-500 hover:scale-105 hover:shadow-2xl
+        bg-gradient-to-br ${gradient} backdrop-blur-sm`}
+    >
+      <div className={`${color} mb-6 transform transition-transform duration-500 group-hover:scale-110`}>
+        {icon}
       </div>
+      <CountUp
+        end={end}
+        duration={2.5}
+        enableScrollSpy
+        scrollSpyOnce
+        className={`text-5xl font-bold mb-3 ${color}`}
+      />
+      <p className="text-gray-700 text-center font-medium text-lg">{title}</p>
     </div>
   )
 }
+
+export default Instructor

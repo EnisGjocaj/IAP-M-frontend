@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { createApplication } from '../api/application';
-
+import { motion } from 'framer-motion';
 import {ReactTyped} from 'react-typed';
 import { toast } from 'react-toastify';
 
@@ -12,175 +12,221 @@ const applicationTypes = [
   { value: 'MARKETING', label: 'Marketing' },
 ];
 
+const formAnimations = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
+
 const ApplicationForm = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-const onSubmit = async (data) => {
-  try {
-    await createApplication(data);
-    toast.success('Application submitted successfully! Expect to hear from us soon.', {
-      position: "top-center", 
-      autoClose: 5000,
-      closeButton: true,
-      icon: '✅',
-    });
-    reset(); 
-  } catch (error) {
-    console.error('Error submitting application:', error);
-    toast.error('Failed to submit application. Please try again.', {
-      position: "top-center",
-      autoClose: 5000,
-      closeButton: true,
-    });
-  }
-};
+  const onSubmit = async (data) => {
+    try {
+      await createApplication(data);
+      toast.success('Application submitted successfully! Expect to hear from us soon.', {
+        position: "top-center", 
+        autoClose: 5000,
+        closeButton: true,
+        icon: '✅',
+      });
+      reset(); 
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      toast.error('Failed to submit application. Please try again.', {
+        position: "top-center",
+        autoClose: 5000,
+        closeButton: true,
+      });
+    }
+  };
 
   return (
-    <section className='py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-gray-50'>
-      <div className='container mx-auto px-4'>
-        <div className='max-w-3xl mx-auto bg-white p-5 sm:p-8 lg:p-10 rounded-lg shadow-lg'>
-          <h2 className='text-2xl sm:text-3xl font-extrabold mb-4 sm:mb-6 text-center text-blue-700'>
-            <ReactTyped
-              strings={["Study Programming", "Study Agrobusiness", "Study Accounting", "Study Marketing"]}
-              typeSpeed={100}
-              backSpeed={50}
-              loop
-            />
-          </h2>
-          <p className='text-gray-500 text-sm sm:text-base text-center mb-6 sm:mb-8'>
-            Fill in your details to apply for our training programs.
-          </p>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className='space-y-4 sm:space-y-6'>
-            <div>
-              <label htmlFor='name' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
-                First Name
-              </label>
-              <input
-                id='name'
-                type='text'
-                {...register('name', { required: 'First name is required' })}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
-                  errors.name ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
-                placeholder="Enter your first name"
-              />
-              {errors.name && (
-                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor='surname' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
-                Last Name
-              </label>
-              <input
-                id='surname'
-                type='text'
-                {...register('surname', { required: 'Last name is required' })}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
-                  errors.surname ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
-                placeholder="Enter your last name"
-              />
-              {errors.surname && (
-                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
-                  {errors.surname.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor='email' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
-                Email Address
-              </label>
-              <input
-                id='email'
-                type='email'
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Invalid email address',
-                  },
-                })}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
-                  errors.email ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
-                placeholder="Enter your email"
-              />
-              {errors.email && (
-                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor='phoneNumber' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
-                Phone Number
-              </label>
-              <input
-                id='phoneNumber'
-                type='tel'
-                {...register('phoneNumber', { 
-                  required: 'Phone number is required',
-                  pattern: {
-                    value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
-                    message: 'Invalid phone number format'
-                  }
-                })}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
-                  errors.phoneNumber ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base`}
-                placeholder="Enter your phone number"
-              />
-              {errors.phoneNumber && (
-                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
-                  {errors.phoneNumber.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor='type' className='block text-gray-600 text-sm font-semibold mb-1.5 sm:mb-2'>
-                Training Type
-              </label>
-              <select
-                id='type'
-                {...register('type', { required: 'Training type is required' })}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border ${
-                  errors.type ? 'border-red-400' : 'border-gray-300'
-                } rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in-out text-sm sm:text-base bg-white`}
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-primary/10 dark:via-neutral-900 dark:to-secondary/10 py-12 sm:px-6 lg:px-8 flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white/80 dark:bg-neutral-850/80 backdrop-blur-sm w-full max-w-2xl rounded-2xl shadow-shadow2 overflow-hidden"
+      >
+        <div className="px-8 py-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10 pointer-events-none" />
+          
+          <div className="relative">
+            <div className="text-center mb-10">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-6 py-2 mb-6 bg-primary/10 rounded-full"
               >
-                <option value=''>Select a training type</option>
-                {applicationTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-              {errors.type && (
-                <p className='text-red-500 text-xs sm:text-sm italic mt-1 sm:mt-2'>
-                  {errors.type.message}
-                </p>
-              )}
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span className="text-secondary font-medium">Application Form</span>
+              </motion.div>
+
+              <motion.h2 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-4xl font-bold mb-4"
+              >
+                <ReactTyped
+                  strings={["Study Programming", "Study Agrobusiness", "Study Accounting", "Study Marketing"]}
+                  typeSpeed={100}
+                  backSpeed={50}
+                  loop
+                  className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+                />
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-gray-600 dark:text-gray-400"
+              >
+                Start your journey to success with us
+              </motion.p>
             </div>
 
-            <button
-              type='submit'
-              className='w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
-                transition duration-300 ease-in-out text-sm sm:text-base
-                mt-6 sm:mt-8 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]'
+            <motion.form 
+              className="space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
             >
-              Submit Application
-            </button>
-          </form>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                  <input
+                    {...register('name', { required: 'First name is required' })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Enter your first name"
+                  />
+                  {errors.name && (
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-red-500 text-xs italic mt-1"
+                    >
+                      {errors.name.message}
+                    </motion.p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                  <input
+                    {...register('surname', { required: 'Last name is required' })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Enter your last name"
+                  />
+                  {errors.surname && (
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-red-500 text-xs italic mt-1"
+                    >
+                      {errors.surname.message}
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                <input
+                  type="email"
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Invalid email address',
+                    },
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="email@example.com"
+                />
+                {errors.email && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs italic mt-1"
+                  >
+                    {errors.email.message}
+                  </motion.p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
+                <input
+                  type="tel"
+                  {...register('phoneNumber', {
+                    required: 'Phone number is required',
+                    pattern: {
+                      value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                      message: 'Invalid phone number format'
+                    }
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="+1 (234) 567-8900"
+                />
+                {errors.phoneNumber && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs italic mt-1"
+                  >
+                    {errors.phoneNumber.message}
+                  </motion.p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Training Type</label>
+                <div className="relative">
+                  <select
+                    {...register('type', { required: 'Training type is required' })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none"
+                  >
+                    <option value="">Select your training program</option>
+                    {applicationTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                  </div>
+                </div>
+                {errors.type && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs italic mt-1"
+                  >
+                    {errors.type.message}
+                  </motion.p>
+                )}
+              </div>
+
+              <motion.button
+                type="submit"
+                className="w-full py-3 px-4 bg-primary text-secondary font-semibold rounded-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                Submit Application
+              </motion.button>
+            </motion.form>
+          </div>
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </div>
   );
 };
 

@@ -15,15 +15,19 @@ const SocialShareButton: React.FC<SocialShareButtonProps> = ({
   role,
 }) => {
   const getShareUrl = () => {
+   
+    const isLocal = window.location.hostname === "localhost";
+    const baseUrl = isLocal ? "http://localhost:4000" : "https://iap-m.com";
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
     const text = `Check out ${name}, ${role} at IAPM`;
     
     switch (platform) {
       case 'linkedin':
-        return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+        return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(fullUrl)}&title=${encodeURIComponent(text)}`;
       case 'twitter':
-        return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}`;
       case 'facebook':
-        return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}&quote=${encodeURIComponent(text)}`;
       default:
         return url;
     }

@@ -25,29 +25,21 @@ import ProfileDetails from "./components/common/ProfileDetails"
 import TeamMemberProfile from "./pages/TeamMemberProfile"
 import JobListings from "./pages/JobListings.tsx"
 
+import { ProtectedAdminRoute } from './components/common/ProtectedAdminRoute';
+import StudentLeaderboard from "./components/student-leaderboard"
+import StudentSuccessPage from "./pages/student-sucess"
+import StudentTestimonialCarousel from "./components/student-testimonial-section"
+import StudentProfile from "./pages/student-profile"
+import { ProtectedStudentRoute } from './components/common/ProtectedStudentRoute';
+import FeaturedStudents from "./pages/FeaturedStudents.tsx"
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
+    <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route
-            path='/'
-            element={
-              <Layout>
-                <Home />
-              </Layout>
-            }
-          />
-          <Route
-            path='/about'
-            element={
-              <Layout>
-                <About />
-              </Layout>
-            }
-          />
+          <Route path='/' element={<Layout><Home /></Layout>} />
+          <Route path='/about' element={<Layout><About /></Layout>} />
           <Route
             path='/courses'
             element={
@@ -88,22 +80,47 @@ function App() {
           <Route path='/application' element={<Layout><ApplicationForm />
              </Layout>} />
             
-          <Route path='/admin/*' element={<AdminDashboard /> } />
-          {/* <Route path='/admin' element={<Layout><AdminDashboard /></Layout>} />  */}
-
-          <Route path='/bord' element={<Layout><TeamSection />  </Layout>} />
-
-          <Route path="/signup" element={<Layout><Signup /> </Layout>}/>
-
-          <Route path="/bord/team/:id" element={<Layout><TeamMemberProfile /> </Layout>} />
-
+          <Route 
+            path='/dashboard/*' 
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            } 
+          />
+          
+          <Route path='/bord' element={<Layout><TeamSection /></Layout>} />
+          <Route path="/signup" element={<Layout><Signup /></Layout>} />
+          <Route path="/bord/team/:id" element={<Layout><TeamMemberProfile /></Layout>} />
           <Route path="/jobs" element={<Layout><JobListings /></Layout>} />
+
+          <Route path="/leaderboard" element={<Layout><StudentLeaderboard /></Layout>} />
+          <Route path="/testimonials" element={<Layout><StudentTestimonialCarousel /></Layout>} />
+          <Route path="/success-stories" element={<Layout><StudentSuccessPage /></Layout>} />
+          {/* Protected student profile route */}
+          <Route 
+            path="/student-profile/:userId" 
+            element={
+              <ProtectedStudentRoute>
+                <Layout>
+                  <StudentProfile />
+                </Layout>
+              </ProtectedStudentRoute>
+            } 
+          />
+          <Route 
+            path="/featured-students" 
+            element={
+              <Layout>
+                <FeaturedStudents />
+              </Layout>
+            } 
+          />
         </Routes>
         <ToastContainer />
-        </AuthProvider>
-      </BrowserRouter>
-    </>
-  )
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

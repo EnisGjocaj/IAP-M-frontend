@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getAllJobListings, JobListing, JobType, SortBy } from '../api/jobListing.ts';
+import { getAllJobListings, JobListing, JobType, SortBy } from '../api/jobListing';
 import { Search, Briefcase, MapPin, Clock, Filter } from 'lucide-react';
 import { toast } from 'react-toastify';
 import debounce from 'lodash/debounce';

@@ -1,58 +1,107 @@
-import React , { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import DashbaordApplications from './DashboardApplications';
-import DashboardNews from './DashboardNews'; 
-import Sidebar from './Sidebar';
-import CreateApplicationForm from './CreateApplicationForm';
-import CreateNewsForm from './CreateNewsForm';
-import DashboardTeamMembers from './DashboardTeamMembers';
-import CreateTeamMemberForm from './CreateTeamMemberForm';
-import DashboardUsers from './DashboardUsers';
-import CreateUserForm from './CreateUserForm';
-import DashboardJobListings from './DashboardJobListings';
-import CreateJobListingForm from './CreateJobListingForm';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import DashboardForAdmin from './DashboardForAdmin';
-import { HiMenu } from 'react-icons/hi';
+import { AppSidebar } from '../../components/improved-dashboard/app-sidebar';
+import { SidebarProvider } from '../../components/ui/sidebar';
+
+// Main Dashboard
+import DashboardPage from '../../components/improved-dashboard/main-page';
+
+// Applications
+import ApplicationsPage from '../../components/improved-dashboard/applications/applications-list';
+import NewApplicationPage from '../../components/improved-dashboard/applications/application-form';
+
+// Users
+import UsersPage from '../../components/improved-dashboard/users/users-list';
+import NewUserPage from '../../components/improved-dashboard/users/users-form';
+
+// Board Members
+import BoardMembersPage from '../../components/improved-dashboard/board-members/board-member-list';
+import NewBoardMemberPage from '../../components/improved-dashboard/board-members/board-member-form';
+
+// News
+import NewsPage from '../../components/improved-dashboard/news/news-list';
+import NewNewsPage from '../../components/improved-dashboard/news/news-form';
+
+// Jobs
+import JobsPage from '../../components/improved-dashboard/jobs/jobs-list';
+import NewJobPage from '../../components/improved-dashboard/jobs/jobs-form';
+
+// Featured Students
+import FeaturedStudentsPage from '../../components/improved-dashboard/featured-students/featured-students-list';
+import NewFeaturedStudentPage from '../../components/improved-dashboard/featured-students/featured-students-form';
+
+// Students
+import StudentsPage from '../../components/improved-dashboard/students/students-list';
+// import StudentProfilePage from '../../components/improved-dashboard/students/student-profile';
+// import EditStudentPage from '../../components/improved-dashboard/students/edit-student';
+
+// Training Management
+import TrainingsPage from '../../components/improved-dashboard/trainings/training-list';
+import NewTrainingPage from '../../components/improved-dashboard/trainings/training-form';
+
+const DashboardLayout = ({ children }) => {
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <div className="relative flex min-h-screen w-full">
+        <AppSidebar />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {children}
+        </div>
+        <ToastContainer />
+      </div>
+    </SidebarProvider>
+  );
+};
 
 const AdminDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-    
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'ml-0'}`}>
-        <button 
-          className="lg:hidden p-4 focus:outline-none" 
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          <HiMenu size={24} />
-        </button>
+    <DashboardLayout>
+      <Routes>
+        {/* Main Dashboard */}
+        <Route path="/" element={<DashboardPage />} />
 
-        <div className="flex-1 overflow-y-auto bg-gray-100 p-8">
-          <Routes>
-            <Route path="/" element={<DashboardForAdmin />} />
-            <Route path="dashboard-applications" element={<DashbaordApplications />} />
-            <Route path="dashboard-news" element={<DashboardNews />} />
-            <Route path="create-application" element={<CreateApplicationForm />} />
-            <Route path="create-news" element={<CreateNewsForm />} />
-            <Route path="dashboard-team-members" element={<DashboardTeamMembers />} />
-            <Route path="create-team-member" element={<CreateTeamMemberForm />} />
-            <Route path="dashboard-users" element={<DashboardUsers />} />
-            <Route path="create-user" element={<CreateUserForm />} />
-            <Route path="edit-user/:id" element={<CreateUserForm />} />
-            <Route path="edit-team-member/:id" element={<CreateTeamMemberForm />} />
-            <Route path="edit-news/:id" element={<CreateNewsForm />} />
-            
-            <Route path="dashboard-job-listings" element={<DashboardJobListings />} />
-            <Route path="create-job-listing" element={<CreateJobListingForm />} />
-            <Route path="edit-job-listing/:id" element={<CreateJobListingForm />} />
-          </Routes>
-        </div>
-      </div>
-      <ToastContainer />
-    </div>
+        {/* Users Management */}
+        <Route path="users" element={<UsersPage />} />
+        <Route path="users/new" element={<NewUserPage />} />
+        <Route path="users/:id/edit" element={<NewUserPage />} />
+
+        {/* Board Members */}
+        <Route path="board-members" element={<BoardMembersPage />} />
+        <Route path="board-members/new" element={<NewBoardMemberPage />} />
+        <Route path="board-members/:id/edit" element={<NewBoardMemberPage />} />
+
+        {/* News & Articles */}
+        <Route path="news" element={<NewsPage />} />
+        <Route path="news/new" element={<NewNewsPage />} />
+        <Route path="news/:id/edit" element={<NewNewsPage />} />
+
+        {/* Applications */}
+        <Route path="applications" element={<ApplicationsPage />} />
+        <Route path="applications/new" element={<NewApplicationPage />} />
+        <Route path="applications/:id/edit" element={<NewApplicationPage />} />
+
+        {/* Job Listings */}
+        <Route path="jobs" element={<JobsPage />} />
+        <Route path="jobs/new" element={<NewJobPage />} />
+        <Route path="jobs/:id/edit" element={<NewJobPage />} />
+
+        {/* Featured Students */}
+        <Route path="featured-students" element={<FeaturedStudentsPage />} />
+        <Route path="featured-students/new" element={<NewFeaturedStudentPage />} />
+        <Route path="featured-students/:id/edit" element={<NewFeaturedStudentPage />} />
+
+        {/* Students */}
+        <Route path="students" element={<StudentsPage />} />
+        {/* <Route path="students/:id" element={<StudentProfilePage />} />
+        <Route path="students/:id/edit" element={<EditStudentPage />} /> */}
+
+        {/* Training Management */}
+        <Route path="trainings" element={<TrainingsPage />} />
+        <Route path="trainings/new" element={<NewTrainingPage />} />
+        <Route path="trainings/:id/edit" element={<NewTrainingPage />} />
+      </Routes>
+    </DashboardLayout>
   );
 };
 

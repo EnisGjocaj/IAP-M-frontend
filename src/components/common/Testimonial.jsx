@@ -1,83 +1,102 @@
 import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/autoplay";
-import { Autoplay, Pagination } from "swiper/modules";
-
+import { cn } from "../../lib/utils";
+import { Marquee } from "../magicui/marquee";
 import { testimonialData } from "../data";
+import { FaQuoteLeft } from "react-icons/fa";
+
+const firstRow = testimonialData.slice(0, testimonialData.length / 2);
+const secondRow = testimonialData.slice(testimonialData.length / 2);
+
+const TestimonialCard = ({ img, name, profession, description, rating }) => {
+  return (
+    <figure
+      className={cn(
+        "relative h-full w-80 mx-1 cursor-pointer overflow-hidden rounded-xl border p-6",
+        "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]"
+      )}
+    >
+      <div className="flex items-center mb-4 gap-1">
+        {[...Array(5)].map((_, i) => (
+          <svg
+            key={i}
+            className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+
+      <blockquote className="mt-4 text-sm text-gray-600 dark:text-gray-300 line-clamp-4">
+        {description}
+      </blockquote>
+
+      <div className="flex flex-row items-center gap-3 mt-6 pt-4 border-t border-gray-950/[.1] dark:border-gray-50/[.1]">
+        <img 
+          className="rounded-full" 
+          width="40" 
+          height="40" 
+          alt={name} 
+          src={img}
+        />
+        <div className="flex flex-col">
+          <figcaption className="text-sm font-medium dark:text-white">
+            {name}
+          </figcaption>
+          <p className="text-xs font-medium text-gray-500 dark:text-white/40">
+            {profession}
+          </p>
+        </div>
+      </div>
+    </figure>
+  );
+};
 
 const Testimonial = () => {
-    return (
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <span className="text-sm text-gray-500 font-medium block mb-2">
-              TESTIMONIAL
-            </span>
-            <h2 className="text-4xl font-bold text-gray-900">
-              Studentet Tone!
-            </h2>
-          </div>
-  
-          <Swiper
-            className="mySwiper"
-            slidesPerView={1}
-            spaceBetween={32}
-            loop={true}
-            centeredSlides={true}
-            pagination={{ clickable: true }}
-            autoplay={{
-              delay: 2500,
-              disableOnInteraction: false,
-            }}
-            breakpoints={{
-              640: { slidesPerView: 1, spaceBetween: 32 },
-              768: { slidesPerView: 2, spaceBetween: 32 },
-              1024: { slidesPerView: 3, spaceBetween: 32 },
-            }}
-            modules={[Autoplay, Pagination]}
-          >
-            
-            {testimonialData.map((testimonial) => (
-              <SwiperSlide key={testimonial.id}>
-                <div className="group bg-white border border-solid border-gray-300 rounded-xl p-6 transition-all duration-500 hover:border-indigo-600 hover:shadow-sm">
-                  <div className="flex items-center mb-7 gap-2 text-amber-500">
-                    <svg className="w-5 h-5" viewBox="0 0 18 17" fill="none">
-                      <path
-                        d="M8.10326 1.31699C8.47008 0.57374 9.52992 0.57374 9.89674 1.31699L11.7063 4.98347C11.8519 5.27862 12.1335 5.48319 12.4592 5.53051L16.5054 6.11846C17.3256 6.23765 17.6531 7.24562 17.0596 7.82416L14.1318 10.6781C13.8961 10.9079 13.7885 11.2389 13.8442 11.5632L14.5353 15.5931C14.6754 16.41 13.818 17.033 13.0844 16.6473L9.46534 14.7446C9.17402 14.5915 8.82598 14.5915 8.53466 14.7446L4.91562 16.6473C4.18199 17.033 3.32456 16.41 3.46467 15.5931L4.15585 11.5632C4.21148 11.2389 4.10393 10.9079 3.86825 10.6781L0.940384 7.82416C0.346867 7.24562 0.674378 6.23765 1.4946 6.11846L5.54081 5.53051C5.86652 5.48319 6.14808 5.27862 6.29374 4.98347L8.10326 1.31699Z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                    <span className="text-base font-semibold text-indigo-600">
-                      {testimonial.rating}
-                    </span>
-                  </div>
-                  <p className="text-base text-gray-600 leading-6 pb-8 group-hover:text-gray-800">
-                    {testimonial.description}
-                  </p>
-                  <div className="flex items-center gap-5 border-t border-solid border-gray-200 pt-5">
-                    <img
-                      className="rounded-full h-10 w-10 object-cover"
-                      src={testimonial.img}
-                      alt={testimonial.name}
-                    />
-                    <div>
-                      <h5 className="text-gray-900 font-medium mb-1">
-                        {testimonial.name}
-                      </h5>
-                      <span className="text-sm text-gray-500">
-                        {testimonial.profession}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
-    );
-  };
+  return (
+    <section className="py-24 relative">
+    
+      <div className="text-center mb-16">
+        <span className="text-sm font-medium inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full mb-4 dark:bg-indigo-900/30 dark:text-indigo-300">
+          TESTIMONIALS
+        </span>
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          Studentet Tone!
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Degjojeni nga studentet tane se si eksperienca e tyre me IAP-M ka ndryshuar karrieren e tyre.
+        </p>
+      </div>
+
+      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden gap-8">
+        <Marquee 
+          pauseOnHover 
+          className="w-full"
+          duration={40}
+        >
+          {firstRow.map((testimonial) => (
+            <TestimonialCard key={testimonial.id} {...testimonial} />
+          ))}
+        </Marquee>
+
+        <Marquee 
+          reverse 
+          pauseOnHover 
+          className="w-full"
+          duration={40}
+        >
+          {secondRow.map((testimonial) => (
+            <TestimonialCard key={testimonial.id} {...testimonial} />
+          ))}
+        </Marquee>
+
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-gray-950"></div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-gray-950"></div>
+      </div>
+    </section>
+  );
+};
 
 export default Testimonial;

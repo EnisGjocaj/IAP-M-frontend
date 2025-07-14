@@ -1,4 +1,4 @@
-function getImageUrl(path) {
+function getImageUrl(path: string) {
   if (!path) return '';
   const trimmed = path.trim();
   

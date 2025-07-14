@@ -16,3 +16,13 @@ export const updateUser = (id, values) => api.put(`/manageUsers/${id}`, values);
 export const deleteUser = (id) => api.delete(`/manageUsers/${id}`);
 
 // Update user
+
+export const getAllStudents = async () => {
+  try {
+    const response = await api.get('/manageUsers/students');
+    return response;
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    throw error;
+  }
+};
