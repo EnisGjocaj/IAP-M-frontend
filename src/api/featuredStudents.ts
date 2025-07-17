@@ -1,6 +1,17 @@
 import api from "./api";
 import { setAuthorizationHeader } from "./api";
 
+interface TrainingReview {
+  id: number;
+  content: string;
+  rating: number;
+  training: {
+    title: string;
+    category: string;
+    level: string;
+  };
+}
+
 interface FeaturedStudentData {
   name: string;
   surname: string;
@@ -17,21 +28,40 @@ interface FeaturedStudentData {
   isActive?: boolean;
   cvPath?: string;  
   studentProfileId?: number;
+  trainingReviews?: TrainingReview[];
 }
 
 export const getAllFeaturedStudents = async () => {
   try {
-    const response = await api.get('/featured-students');
-    console.log('Featured students response:', response.data); 
+    // Get auth token if it exists
+    const userStr = localStorage.getItem('user');
+    const user = JSON.parse(userStr || '{}');
+    const token = user?.token;
+
+    // Make the request with auth header if token exists
+    const response = await api.get('/featured-students', {
+      headers: token ? {
+        'Authorization': `Bearer ${token}`
+      } : {}
+    });
+    
+    console.log('Raw API response:', response); // Add this debug log
+    
+    // Ensure we're always returning the data in the same format
+    const students = Array.isArray(response.data) ? response.data : 
+                    Array.isArray(response.data.message) ? response.data.message : 
+                    [];
+    
+    console.log('Processed students data:', students);
+    
     return {
-      data: response.data
+      data: students
     };
   } catch (error) {
     console.error('Error fetching featured students:', error);
     throw error;
   }
 };
-// Fetch featured student by ID
 export const getFeaturedStudentById = async (id: number) => {
   try {
     const userStr = localStorage.getItem('user');
@@ -48,7 +78,7 @@ export const getFeaturedStudentById = async (id: number) => {
       }
     });
     
-    console.log('API Response:', response); // Debug log
+    console.log('API Response:', response); 
     return response;
   } catch (error) {
     console.error('Error in getFeaturedStudentById:', error);
@@ -58,7 +88,6 @@ export const getFeaturedStudentById = async (id: number) => {
 
 // Create featured student with image upload
 export const createFeaturedStudent = async (formData: FormData) => {
-  // Get the token directly from localStorage
   const userStr = localStorage.getItem('user');
   const user = JSON.parse(userStr || '{}');
   const token = user?.token;
@@ -108,8 +137,32 @@ export const updateFeaturedStudent = async (id: number, formData: FormData) => {
 };
 
 // Delete featured student
-export const deleteFeaturedStudent = (id: number) => 
-  api.delete(`/featured-students/${id}`);
+export const deleteFeaturedStudent = async (id: number) => {
+  try {
+    // Get auth token
+    const userStr = localStorage.getItem('user');
+    const user = JSON.parse(userStr || '{}');
+    const token = user?.token;
+
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    // Make the request with auth header
+    const response = await api.delete(`/featured-students/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('Delete response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error deleting featured student:', error);
+    throw error;
+  }
+};
 
 // Get featured students by course type
 export const getFeaturedStudentsByCourse = (courseType: string) => 

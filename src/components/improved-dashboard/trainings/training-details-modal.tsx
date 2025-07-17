@@ -21,6 +21,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AddStudentsModal } from './add-students-modal'
 import { ManageStudentModal } from "./ManageStudentModal"
 import { createFeaturedStudent, createFeaturedStudentFormData } from "../../../api/featuredStudents";
+import { FaStar } from 'react-icons/fa';
 
 interface TrainingDetailsModalProps {
   trainingId: string | null
@@ -320,16 +321,41 @@ export function TrainingDetailsModal({ trainingId, isOpen, onClose }: TrainingDe
                                         Grade: {enrollment.grade}
                                       </p>
                                     )}
+                                    
+                                    {enrollment.trainingReviews && enrollment.trainingReviews.length > 0 && (
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex items-center">
+                                          {[...Array(5)].map((_, index) => {
+                                            const rating = enrollment.trainingReviews[0]?.rating || 0;
+                                            return (
+                                              <FaStar
+                                                key={index}
+                                                size={14}
+                                                className={
+                                                  index < rating
+                                                    ? "text-yellow-400"
+                                                    : "text-gray-300"
+                                                }
+                                              />
+                                            );
+                                          })}
+                                        </div>
+                                        <span className="text-sm text-muted-foreground">
+                                          ({enrollment.trainingReviews[0]?.rating || 0}/5)
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                   {enrollment.profile?.university && (
                                     <p className="text-sm text-muted-foreground mt-1">
                                       {enrollment.profile.university} • {enrollment.profile.faculty}
                                     </p>
                                   )}
-                                  {enrollment.feedback && (
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      Feedback: {enrollment.feedback}
-                                    </p>
+                                  {/* Add Review Content if exists */}
+                                  {enrollment.trainingReviews && enrollment.trainingReviews.length > 0 && enrollment.trainingReviews[0]?.content && (
+                                    <div className="mt-2 text-sm text-muted-foreground italic">
+                                      "{enrollment.trainingReviews[0].content}"
+                                    </div>
                                   )}
                                 </div>
                               </div>

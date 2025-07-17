@@ -38,6 +38,7 @@ interface FeaturedStudent {
   cvPath?: string  // Only keep this
   studentProfileId?: number;
   trainingReviews?: TrainingReview[];
+  grade?: number; // Added grade field
 }
 
 const FeaturedStudents = () => {
@@ -54,43 +55,51 @@ const FeaturedStudents = () => {
     { id: "MARKETING", label: "Marketing" }
   ]
 
-  const fetchStudentReviews = async (student: FeaturedStudent) => {
-    if (!student.studentProfileId) return student;
-    
-    try {
-      const reviews = await getStudentTrainingReviews(student.studentProfileId);
-      return {
-        ...student,
-        trainingReviews: reviews.message
-      };
-    } catch (error) {
-      console.error(`Error fetching reviews for student ${student.id}:`, error);
-      return student;
-    }
+  const calculateStars = (rating: number): number => {
+    return Math.min(5, Math.max(0, Math.floor(rating)));
+  };
+
+  const fetchStudentReviews = async (student: any) => {
+    console.log('Processing student reviews for:', student.id); // Debug log
+    return {
+      ...student,
+      trainingReviews: student.trainingReviews || []
+    };
   };
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        setLoading(true)
-        const response = await getAllFeaturedStudents()
+        setLoading(true);
+        const response = await getAllFeaturedStudents();
+        console.log('Initial API response:', response); 
+
         if (response.data) {
-          // Fetch reviews for each student
+          
+          const processedStudents = response.data.map(student => ({
+            ...student,
+            trainingReviews: student.trainingReviews || []
+          }));
+          
+          console.log('Processed students:', processedStudents);
+          
           const studentsWithReviews = await Promise.all(
-            response.data.map(fetchStudentReviews)
+            processedStudents.map(fetchStudentReviews)
           );
+          
+          console.log('Final students with reviews:', studentsWithReviews); 
           setStudents(studentsWithReviews);
         }
       } catch (error) {
-        console.error("Error fetching featured students:", error)
-        toast.error("Failed to load featured students")
+        console.error("Error fetching featured students:", error);
+        toast.error("Failed to load featured students");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchStudents()
-  }, [])
+    fetchStudents();
+  }, []);
 
   const filteredStudents = activeFilter === "all" 
     ? students 
@@ -370,53 +379,51 @@ const FeaturedStudents = () => {
                   </div>
 
                   {student.trainingReviews && student.trainingReviews.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 group-hover:text-white/90 mb-2">
-                        Training Reviews
-                      </h4>
-                      <div className="space-y-2">
-                        {student.trainingReviews.map((review) => (
-                          <div 
-                            key={review.id}
-                            className="bg-gray-50 group-hover:bg-white/10 rounded-lg p-3 transition-colors duration-500"
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <div>
-                                <span className="text-xs text-gray-600 group-hover:text-white/80 font-medium">
-                                  {review.training.title}
-                                </span>
-                                <span className="text-xs text-gray-500 group-hover:text-white/60 ml-2">
-                                  {review.training.level}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <FaStar
-                                    key={i}
-                                    size={12}
-                                    className={`${
-                                      i < review.rating
-                                        ? 'text-yellow-400'
-                                        : 'text-gray-300 group-hover:text-white/20'
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-500 group-hover:text-white/70 line-clamp-2">
+                    student.trainingReviews.map((review) => (
+                      <div 
+                        key={review.id}
+                        className="mt-4 space-y-2"
+                      >
+                        {/* Rating Stars */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, index) => {
+                              const ratingValue = Number(review.rating) || 0;
+                              return (
+                                <FaStar
+                                  key={index}
+                                  size={16}
+                                  className={
+                                    index < ratingValue
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }
+                                />
+                              );
+                            })}
+                            <span className="text-xs text-gray-500 group-hover:text-white/60 ml-2">
+                              {review.rating}/5
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Review Content */}
+                        {review.content && (
+                          <div className="bg-white/50 group-hover:bg-white/5 rounded border border-gray-100 group-hover:border-white/10 p-2">
+                            <p className="text-xs text-gray-600 group-hover:text-white/70">
                               {review.content}
                             </p>
                           </div>
-                        ))}
+                        )}
                       </div>
-                    </div>
+                    ))
                   )}
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100 group-hover:border-white/10 transition-colors duration-500">
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1.5 bg-yellow-50 group-hover:bg-white/10 text-yellow-600 group-hover:text-yellow-300 px-2 py-1 rounded-full transition-colors duration-500">
+                      <div className="flex items-center gap-1.5 bg-yellow-50 group-hover:bg-white/10 text-yellow-600 group-hover:text-yellow-300 px-2 py-1 rounded-full">
                         <FaStar size={12} />
-                        <span className="text-sm font-medium">{student.score}</span>
+                        <span className="text-sm font-medium">{student.grade || student.score}%</span>
                       </div>
                     </div>
                     {student.linkedinUrl && (

@@ -87,15 +87,30 @@ export default function FeaturedStudentsPage() {
   const handleDeleteStudent = async (id: number) => {
     if (window.confirm('Are you sure you want to remove this student from featured list?')) {
       try {
-        await deleteFeaturedStudent(id)
-        toast.success('Student removed from featured list')
-        fetchStudents()
-      } catch (error) {
-        toast.error('Failed to remove student')
-        console.error('Error removing student:', error)
+        console.log('Attempting to delete student with ID:', id);
+        
+        const userStr = localStorage.getItem('user');
+        const user = JSON.parse(userStr || '{}');
+        if (!user?.token) {
+          toast.error('You must be logged in to perform this action');
+          return;
+        }
+
+        const response = await deleteFeaturedStudent(id);
+        console.log('Delete response:', response);
+        
+        toast.success('Student removed from featured list');
+        await fetchStudents(); 
+      } catch (error: any) {
+        console.error('Delete error:', error);
+        if (error.response?.status === 401) {
+          toast.error('You are not authorized to perform this action. Please log in again.');
+        } else {
+          toast.error(error.response?.data?.message || 'Failed to remove student');
+        }
       }
     }
-  }
+  };
 
   const filteredStudents = students.filter(student => 
     student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

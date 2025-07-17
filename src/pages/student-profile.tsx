@@ -51,6 +51,11 @@ import type { BlobProviderParams } from '@react-pdf/renderer';
 import CVTemplate from '../components/CVTemplate';
 import { TrainingReviewModal } from "../components/improved-dashboard/featured-students/TrainingReviewModal"
 
+const calculateRating = (grade: number | null | undefined): number => {
+  if (!grade && grade !== 0) return 0;
+  return Math.min(5, Math.max(0, Math.floor(grade / 20)));
+};
+
 export default function StudentProfile() {
   const [activeTab, setActiveTab] = useState("overview")
   const [loading, setLoading] = useState(true)
@@ -65,7 +70,6 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-    // Render edit buttons only if it's the user's own profile
   const canEdit = user?.id?.toString() === userId?.toString();
   console.log('Can edit check:', { 
     userId, 
@@ -165,19 +169,16 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     }
   };
 
-  // Add new state for CV upload
   const [cvUploadState, setCvUploadState] = useState({
     isLoading: false,
     error: null as string | null,
   });
 
-  // Update the handleCVUpload function with better state management
   const handleCVUpload = async (file: File) => {
     try {
       setCvUploadState({ isLoading: true, error: null });
 
-      // Validate file size
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) { 
         setCvUploadState({ 
           isLoading: false, 
           error: "CV file size must be less than 5MB" 
@@ -186,7 +187,6 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
         return;
       }
 
-      // Validate file type
       const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!allowedTypes.includes(file.type)) {
         setCvUploadState({ 
@@ -205,7 +205,7 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
       if (response.status === 200) {
         setCvUploadState({ isLoading: false, error: null });
         toast.success("CV uploaded successfully");
-        setActiveTab("cv"); // Switch to CV tab
+        setActiveTab("cv");
         await fetchStudentProfile();
       } else {
         throw new Error('Upload failed');
@@ -281,7 +281,7 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
             progress: enrollment.progress || 0,
             attendance: enrollment.attendance || 0,
             grade: enrollment.grade || 'N/A',
-            rating: Math.floor((enrollment.grade || 0) / 20), // Convert grade back to 5-star rating
+            rating: calculateRating(enrollment.grade), 
             enrollmentDate: enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString() : 'N/A',
             completionDate: enrollment.completionDate ? new Date(enrollment.completionDate).toLocaleDateString() : 'N/A',
             certificateUrl: enrollment.certificateUrl || null,
@@ -337,12 +337,12 @@ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
           subjects: data.academicSubjects || [],
         },
         trainingData: {
-          completed: mappedTrainings.completed.map(training => ({
+          completed: (mappedTrainings.completed || []).map(training => ({
             ...training,
             profileId: data.id 
           })),
-          ongoing: mappedTrainings.ongoing,
-          upcoming: mappedTrainings.upcoming,
+          ongoing: mappedTrainings.ongoing || [],
+          upcoming: mappedTrainings.upcoming || [],
         },
         skillsAndBadges: {
           skills: data.skills || [],
@@ -1077,7 +1077,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {studentData.skillsAndBadges.badges.slice(0, 3).map((badge, index) => (
+                  {(studentData.skillsAndBadges.badges || []).slice(0, 3).map((badge, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg"
@@ -1105,7 +1105,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {studentData.academicData.subjects.map((subject, index) => (
+                    {(studentData.academicData.subjects || []).map((subject, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div>
                           <h4 className="font-medium">{subject.name}</h4>
@@ -1157,14 +1157,16 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {studentData.trainingData.completed.map((training, index) => (
+                  {(studentData.trainingData.completed || []).map((training, index) => (
                     <div key={index} className="p-4 border border-green-200 bg-green-50 rounded-lg">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-medium">{training.title}</h4>
                         <div className="flex items-center gap-2">
-                          <BadgeComponent variant="outline" className="text-green-600 border-green-600">
-                            {training.grade || 'N/A'}
-                          </BadgeComponent>
+                          {/* grade percentage display */}
+                          <div className="flex items-center gap-1.5 bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full">
+                            <Star size={12} />
+                            <span className="text-sm font-medium">{training.grade || 'N/A'}</span>
+                          </div>
                           {training.certificateUrl && (
                             <Button 
                               size="sm" 
@@ -1179,6 +1181,13 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                         </div>
                       </div>
                       <div className="space-y-2 text-sm text-gray-600">
+                        {/* grade progress bar */}
+                        <div className="flex items-center justify-between">
+                          <span>Nota:</span>
+                          <span className="font-medium">{training.grade}%</span>
+                        </div>
+                        <Progress value={training.grade} className="h-2" />
+                        
                         <div className="flex items-center justify-between">
                           <span>Pjesëmarrja:</span>
                           <span className="font-medium">{training.attendance}%</span>
@@ -1200,7 +1209,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                       </div>
                     </div>
                   ))}
-                  {studentData.trainingData.completed.length === 0 && (
+                  {(studentData.trainingData.completed || []).length === 0 && (
                     <div className="text-center py-6 text-gray-500">
                       Nuk ka trajnime të përfunduara
                     </div>
@@ -1217,7 +1226,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {studentData.trainingData.ongoing.map((training, index) => (
+                    {(studentData.trainingData.ongoing || []).map((training, index) => (
                       <div key={index} className="p-4 border border-blue-200 bg-blue-50 rounded-lg">
                         <h4 className="font-medium mb-2">{training.title}</h4>
                         <div className="space-y-2">
@@ -1243,7 +1252,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                         </div>
                       </div>
                     ))}
-                    {studentData.trainingData.ongoing.length === 0 && (
+                    {(studentData.trainingData.ongoing || []).length === 0 && (
                       <div className="text-center py-6 text-gray-500">
                         Nuk ka trajnime në vazhdim
                       </div>
@@ -1259,7 +1268,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {studentData.trainingData.upcoming.map((training, index) => (
+                    {(studentData.trainingData.upcoming || []).map((training, index) => (
                       <div key={index} className="p-4 border border-purple-200 bg-purple-50 rounded-lg">
                         <h4 className="font-medium mb-2">{training.title}</h4>
                         <div className="space-y-1 text-sm text-gray-600">
@@ -1273,7 +1282,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                         </div>
                       </div>
                     ))}
-                    {studentData.trainingData.upcoming.length === 0 && (
+                    {(studentData.trainingData.upcoming || []).length === 0 && (
                       <div className="text-center py-6 text-gray-500">
                         Nuk ka trajnime të ardhshme
                       </div>
@@ -1294,7 +1303,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {studentData.skillsAndBadges.skills.map((skill, index) => (
+                  {(studentData.skillsAndBadges.skills || []).map((skill, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between">
                         <span className="font-medium">{skill.name}</span>
@@ -1314,7 +1323,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {studentData.skillsAndBadges.badges.map((badge, index) => (
+                  {(studentData.skillsAndBadges.badges || []).map((badge, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200"
@@ -1369,7 +1378,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {studentData.trainingData.completed.map((training) => (
+                {(studentData.trainingData.completed || []).map((training) => (
                   <div
                     key={training.id}
                     className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200"
@@ -1392,7 +1401,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                         {(training.rating || training.grade) && (
                           <>
                             <div className="flex gap-1 mb-2">
-                              {[...Array(training.rating || Math.floor((training.grade || 0) / 20))].map((_, i) => (
+                              {Array.from({ length: calculateRating(training.grade) }).map((_, i) => (
                                 <Star
                                   key={i}
                                   className="w-4 h-4 fill-yellow-400 text-yellow-400"
@@ -1411,7 +1420,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     </div>
                   </div>
                 ))}
-                {studentData.trainingData.completed.length === 0 && (
+                {(studentData.trainingData.completed || []).length === 0 && (
                   <div className="text-center py-12">
                     <MessageSquare className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Yet</h3>
