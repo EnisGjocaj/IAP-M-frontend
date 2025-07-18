@@ -25,6 +25,9 @@ import {
 } from "../../../components/ui/breadcrumb"
 import { Separator } from "../../../components/ui/separator"
 import { SidebarTrigger } from "../../../components/ui/sidebar"
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Image, X, GripVertical, Star, StarOff } from 'lucide-react';
+
 
 const formSchema = z.object({
   title: z.string().min(5, {
@@ -36,16 +39,24 @@ const formSchema = z.object({
   status: z.string({
     message: "Please select a status.",
   }),
-  image: z.any().optional(),
+  images: z.any().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
 
+interface ImagePreview {
+  url: string;
+  file?: File;
+  isMain: boolean;
+}
+
 export default function NewsFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string>("")
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const isEditMode = !!id
 
   const form = useForm<FormValues>({
@@ -61,58 +72,159 @@ export default function NewsFormPage() {
     if (isEditMode) {
       const fetchNewsData = async () => {
         try {
-          const response = await getNewsById(id)
-          const newsData = response.data.message
+          setIsUploading(true);
+          const response = await getNewsById(id);
+          const newsData = response.data.message;
+          
           
           form.reset({
             title: newsData.title,
             content: newsData.content,
             status: newsData.status || 'draft'
-          })
+          });
 
+          
+          const initialPreviews: ImagePreview[] = [];
+
+          
           if (newsData.imageUrl) {
-            setImagePreview(newsData.imageUrl)
+            initialPreviews.push({
+              url: newsData.imageUrl,
+              isMain: true,
+              
+            });
           }
-        } catch (error) {
-          toast.error('Failed to fetch news data')
-          console.error('Error fetching news:', error)
-        }
-      }
-      fetchNewsData()
-    }
-  }, [id, isEditMode, form])
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setImageFile(file)
-      setImagePreview(URL.createObjectURL(file))
+          
+          if (newsData.images && Array.isArray(newsData.images)) {
+            const additionalImages = newsData.images
+              .filter(img => img.url !== newsData.imageUrl)
+              .map(img => ({
+                url: img.url,
+                isMain: img.isMain || false,
+                
+              }));
+
+            initialPreviews.push(...additionalImages);
+          }
+
+          
+          setImagePreviews(initialPreviews);
+
+        } catch (error) {
+          console.error('Error fetching news data:', error);
+          toast.error('Failed to fetch news data');
+        } finally {
+          setIsUploading(false);
+        }
+      };
+
+      fetchNewsData();
     }
-  }
+  }, [id, isEditMode, form]);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setIsUploading(true);
+      const files = Array.from(e.target.files || []);
+      
+      if (files.length === 0) return;
+
+      const newPreviews: ImagePreview[] = files.map((file, index) => ({
+        url: URL.createObjectURL(file),
+        file,
+        isMain: imagePreviews.length === 0 && index === 0
+      }));
+
+      setImagePreviews(prev => [...prev, ...newPreviews]);
+    } catch (error) {
+      console.error('Error processing images:', error);
+      toast.error('Failed to process images. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImagePreviews(prev => {
+      const newPreviews = prev.filter((_, i) => i !== index);
+      
+      if (prev[index].isMain && newPreviews.length > 0) {
+        newPreviews[0].isMain = true;
+      }
+      
+      if (!prev[index].file) {
+        
+        const deletedImageUrl = prev[index].url;
+       
+      }
+      return newPreviews;
+    });
+  };
+
+  const toggleMainImage = (index: number) => {
+    setImagePreviews(prev => 
+      prev.map((preview, i) => ({
+        ...preview,
+        isMain: i === index
+      }))
+    );
+  };
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(imagePreviews);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setImagePreviews(items);
+  };
 
   async function onSubmit(values: FormValues) {
     try {
-      const formData = new FormData()
-      formData.append('title', values.title)
-      formData.append('content', values.content)
-      formData.append('status', values.status)
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('title', values.title);
+      formData.append('content', values.content);
+      formData.append('status', values.status);
       
-      if (imageFile) {
-        formData.append('image', imageFile)
-      }
+     
+      const existingImages = imagePreviews
+        .filter(img => !img.file)
+        .map(img => ({
+          url: img.url,
+          isMain: img.isMain
+        }));
+      
+      formData.append('existingImages', JSON.stringify(existingImages));
+
+      
+      const newImages = imagePreviews.filter(img => img.file);
+      const mainNewImage = newImages.find(img => img.isMain);
+      const otherNewImages = newImages.filter(img => !img.isMain);
+      const orderedNewImages = mainNewImage ? [mainNewImage, ...otherNewImages] : newImages;
+
+      orderedNewImages.forEach(preview => {
+        if (preview.file) {
+          formData.append('images', preview.file);
+        }
+      });
 
       if (isEditMode) {
-        await updateNews(id, formData)
-        toast.success('News article updated successfully')
+        await updateNews(id, formData);
+        toast.success('News article updated successfully');
       } else {
-        await createNews(formData)
-        toast.success('News article created successfully')
+        await createNews(formData);
+        toast.success('News article created successfully');
       }
       
-      navigate('/dashboard/news')
+      navigate('/dashboard/news');
     } catch (error) {
-      toast.error('Failed to submit. Please try again.')
-      console.error('Error submitting news:', error)
+      console.error('Error submitting news:', error);
+      toast.error('Failed to submit. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -223,33 +335,162 @@ export default function NewsFormPage() {
 
                       <FormField
                         control={form.control}
-                        name="image"
+                        name="images"
                         render={({ field: { value, ...field } }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-700 font-medium">Featured Image</FormLabel>
+                          <FormItem className="col-span-2">
+                            <FormLabel className="text-gray-700 font-medium">Images</FormLabel>
                             <FormControl>
                               <div className="space-y-4">
-                                {imagePreview && (
-                                  <div className="w-32 h-32 rounded-lg overflow-hidden">
-                                    <img
-                                      src={imagePreview}
-                                      alt="Preview"
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                )}
-                                <div className="flex items-center gap-4">
-                                  <Input 
-                                    type="file" 
-                                    accept="image/*" 
-                                    className="h-11" 
+                                {/* Drag and drop zone */}
+                                <div 
+                                  className={`border-2 border-dashed rounded-lg p-6 text-center relative ${
+                                    isDragging ? 'border-primary bg-primary/5' : 'border-gray-300'
+                                  }`}
+                                  onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                                  onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsDragging(true);
+                                  }}
+                                  onDragLeave={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsDragging(false);
+                                  }}
+                                  onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsDragging(false);
+                                    const files = Array.from(e.dataTransfer.files);
+                                    if (files.some(file => !file.type.startsWith('image/'))) {
+                                      toast.error('Only image files are allowed');
+                                      return;
+                                    }
+                                    const newPreviews = files.map(file => ({
+                                      url: URL.createObjectURL(file),
+                                      file,
+                                      isMain: imagePreviews.length === 0
+                                    }));
+                                    setImagePreviews(prev => [...prev, ...newPreviews]);
+                                  }}
+                                >
+                                  {isUploading && (
+                                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center backdrop-blur-sm">
+                                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                    </div>
+                                  )}
+                                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                  <p className="mt-2 text-sm text-gray-600">
+                                    {isUploading ? 'Processing images...' : 'Drag and drop images here, or click to select files'}
+                                  </p>
+                                  <Input
+                                    id="image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
                                     onChange={handleImageChange}
                                     {...field}
                                   />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="mt-4"
+                                    onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                                  >
+                                    Select Files
+                                  </Button>
                                 </div>
+
+                                
+                                {imagePreviews.length > 0 && (
+                                  <DragDropContext onDragEnd={handleDragEnd}>
+                                    <Droppable droppableId="images">
+                                      {(provided) => (
+                                        <div
+                                          {...provided.droppableProps}
+                                          ref={provided.innerRef}
+                                          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                                        >
+                                          {imagePreviews.map((preview, index) => (
+                                            <Draggable
+                                              key={preview.url}
+                                              draggableId={preview.url}
+                                              index={index}
+                                              isDragDisabled={isUploading}
+                                            >
+                                              {(provided) => (
+                                                <div
+                                                  ref={provided.innerRef}
+                                                  {...provided.draggableProps}
+                                                  className={`relative group rounded-lg overflow-hidden border-2 ${
+                                                    preview.isMain ? 'border-primary' : 'border-transparent'
+                                                  }`}
+                                                >
+                                                  <img
+                                                    src={preview.url}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className="w-full h-40 object-cover"
+                                                    onError={() => {
+                                                      toast.error(`Failed to load preview for image ${index + 1}`);
+                                                    }}
+                                                  />
+                                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => toggleMainImage(index)}
+                                                      className="p-1 rounded-full bg-white/20 hover:bg-white/40 transition-colors"
+                                                      title={preview.isMain ? "Main image" : "Set as main image"}
+                                                    >
+                                                      {preview.isMain ? (
+                                                        <Star className="h-5 w-5 text-yellow-400" />
+                                                      ) : (
+                                                        <StarOff className="h-5 w-5 text-white" />
+                                                      )}
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => removeImage(index)}
+                                                      className="p-1 rounded-full bg-white/20 hover:bg-white/40 transition-colors"
+                                                    >
+                                                      <X className="h-5 w-5 text-white" />
+                                                    </button>
+                                                    
+                                                    {imagePreviews.length > 1 && (
+                                                      <div
+                                                        {...provided.dragHandleProps}
+                                                        className="p-1 rounded-full bg-white/20 hover:bg-white/40 transition-colors cursor-move"
+                                                      >
+                                                        <GripVertical className="h-5 w-5 text-white" />
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                  
+                                                  {!preview.file && (
+                                                    <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                                                      Existing
+                                                    </div>
+                                                  )}
+                                                  {preview.isMain && (
+                                                    <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                                                      Main Image
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              )}
+                                            </Draggable>
+                                          ))}
+                                          {provided.placeholder}
+                                        </div>
+                                      )}
+                                    </Droppable>
+                                  </DragDropContext>
+                                )}
                               </div>
                             </FormControl>
-                            <FormDescription>Upload a featured image for the article</FormDescription>
+                            <FormDescription>
+                              Upload images for the article. Drag to reorder. Star icon sets the main image.
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}

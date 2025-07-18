@@ -4,7 +4,11 @@ import api from "./api";
 export const getAllNews = () => api.get('/api/news');
 
 // Fetch news by ID
-export const getNewsById = (id) => api.get(`/api/news/${id}`);
+export const getNewsById = (id) => api.get(`/api/news/${id}`, {
+  params: {
+    include_images: true 
+  }
+});
 
 // Create news
 export const createNews = (values) => api.post('/api/news', values);
