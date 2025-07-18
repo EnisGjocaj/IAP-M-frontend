@@ -37,19 +37,28 @@ const SocialShare = ({ url, title, description, imageUrl, isProfile = false }) =
   }, []);
 
   const handleShare = (platform) => {
-    // Ensure URL is absolute
     const isLocal = window.location.hostname === "localhost";
     const baseUrl = isLocal ? "http://localhost:4000" : "https://iap-m.com";
     const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
     
+    // Format image URL for sharing
+    const formattedImageUrl = imageUrl.includes('supabase.co') 
+      ? `${imageUrl.split('?')[0]}?width=1200&height=630&fit=contain&position=center`
+      : imageUrl;
+
     if (platform === 'facebook') {
-      // Force a fresh scrape of the URL before sharing
-      fetch(`https://graph.facebook.com/?id=${encodeURIComponent(fullUrl)}&scrape=true`, {
-        method: 'POST'
+      // Force a fresh scrape with the properly formatted image
+      const timestamp = Date.now();
+      fetch(`https://graph.facebook.com/?id=${encodeURIComponent(fullUrl)}&scrape=true&_=${timestamp}`, {
+        method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
       }).then(() => {
         const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({
           u: fullUrl,
           quote: `${title}\n\n${description}`,
+          display: 'popup'
         }).toString()}`;
 
         window.open(
