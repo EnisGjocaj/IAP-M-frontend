@@ -123,7 +123,8 @@ const SocialShare = ({ url, title, description, imageUrl, isProfile = false }) =
       <span className="text-sm font-medium text-gray-600">
         {isProfile ? 'Share this profile' : 'Share this article'}
       </span>
-      <div className="flex gap-2">
+
+      <div className="flex gap-2 mb-4">
         {shareButtons.map(({ platform, icon: Icon, color, label }) => (
           <motion.button
             key={platform}
@@ -137,6 +138,42 @@ const SocialShare = ({ url, title, description, imageUrl, isProfile = false }) =
             <Icon size={20} />
           </motion.button>
         ))}
+      </div>
+
+      {/*We added therese direct share links for better mobile compatibiity */}
+      <div className="grid grid-cols-3 gap-3 w-full">
+        <motion.a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ y: -2 }}
+          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 transition-colors"
+        >
+          <FaFacebook className="w-5 h-5 text-[#1877F2]" />
+          <span className="text-xs font-medium text-gray-700">Facebook</span>
+        </motion.a>
+
+        <motion.a
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ y: -2 }}
+          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 transition-colors"
+        >
+          <FaTwitter className="w-5 h-5 text-[#1DA1F2]" />
+          <span className="text-xs font-medium text-gray-700">Twitter</span>
+        </motion.a>
+
+        <motion.a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ y: -2 }}
+          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-colors"
+        >
+          <FaLinkedin className="w-5 h-5 text-[#0A66C2]" />
+          <span className="text-xs font-medium text-gray-700">LinkedIn</span>
+        </motion.a>
       </div>
     </motion.div>
   );
