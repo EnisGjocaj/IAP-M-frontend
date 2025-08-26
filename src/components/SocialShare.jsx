@@ -47,26 +47,24 @@ const SocialShare = ({ url, title, description, imageUrl, isProfile = false }) =
       : imageUrl;
 
     if (platform === 'facebook') {
-      // Force a fresh scrape with the properly formatted image
-      const timestamp = Date.now();
-      fetch(`https://graph.facebook.com/?id=${encodeURIComponent(fullUrl)}&scrape=true&_=${timestamp}`, {
-        method: 'POST',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      }).then(() => {
-        const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({
-          u: fullUrl,
-          quote: `${title}\n\n${description}`,
-          display: 'popup'
-        }).toString()}`;
+      // Disabled temporary rescrape to avoid OAuthException (requires access_token). Keeping for reference:
+      // const timestamp = Date.now();
+      // fetch(`https://graph.facebook.com/?id=${encodeURIComponent(fullUrl)}&scrape=true&_=${timestamp}`, {
+      //   method: 'POST',
+      //   headers: { 'Cache-Control': 'no-cache' }
+      // });
 
-        window.open(
-          fbShareUrl,
-          'facebook-share-dialog',
-          `width=626,height=436,left=${(window.screen.width - 626) / 2},top=${(window.screen.height - 436) / 2}`
-        );
-      });
+      const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({
+        u: fullUrl,
+        quote: `${title}\n\n${description}`,
+        display: 'popup'
+      }).toString()}`;
+
+      window.open(
+        fbShareUrl,
+        'facebook-share-dialog',
+        `width=626,height=436,left=${(window.screen.width - 626) / 2},top=${(window.screen.height - 436) / 2}`
+      );
       return;
     }
 
