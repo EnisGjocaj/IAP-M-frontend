@@ -29,6 +29,20 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Image, X, GripVertical, Star, StarOff } from 'lucide-react';
 
 
+// const formSchema = z.object({
+//   title: z.string().min(5, {
+//     message: "Title must be at least 5 characters.",
+//   }),
+//   content: z.string().min(20, {
+//     message: "Content must be at least 20 characters.",
+//   }),
+//   status: z.string({
+//     message: "Please select a status.",
+//   }),
+//   images: z.any().optional(),
+// })
+
+
 const formSchema = z.object({
   title: z.string().min(5, {
     message: "Title must be at least 5 characters.",
@@ -36,11 +50,22 @@ const formSchema = z.object({
   content: z.string().min(20, {
     message: "Content must be at least 20 characters.",
   }),
-  status: z.string({
-    message: "Please select a status.",
+  type: z.enum(["ARTICLE", "REPORT"], {
+    message: "Please select a valid type.",
   }),
+  reportDate: z.string().optional(),
+  reportCategory: z.string().optional(),
   images: z.any().optional(),
-})
+  pdfFile: z.any().optional(),
+}).refine((data) => {
+  if (data.type === "REPORT") {
+    return data.reportDate && data.reportCategory;
+  }
+  return true;
+}, {
+  message: "Report date and category are required for reports",
+  path: ["reportDate", "reportCategory"]
+});
 
 type FormValues = z.infer<typeof formSchema>
 
@@ -53,20 +78,44 @@ interface ImagePreview {
 export default function NewsFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const isEditMode = !!id
 
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    console.log('PDF file selected:', file);
+    if (file && file.type === 'application/pdf') {
+      setPdfFile(file);
+      // Update the form field value
+      form.setValue('pdfFile', file);
+      console.log('PDF file set in form:', file);
+    } else {
+      toast.error('Please select a valid PDF file');
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       content: "",
-      status: "draft",
+      type: 'ARTICLE',
+      reportDate: "",
+      reportCategory: "",
+      images: [],
+      pdfFile: null,
     },
   })
+
+  // Watch for type field changes
+  const watchedType = form.watch('type');
 
   useEffect(() => {
     if (isEditMode) {
@@ -80,10 +129,12 @@ export default function NewsFormPage() {
           form.reset({
             title: newsData.title,
             content: newsData.content,
-            status: newsData.status || 'draft'
+            type: newsData.type || 'ARTICLE',
+            reportDate: newsData.reportDate || '',
+            reportCategory: newsData.reportCategory || ''
           });
 
-          
+
           const initialPreviews: ImagePreview[] = [];
 
           
@@ -184,10 +235,20 @@ export default function NewsFormPage() {
   async function onSubmit(values: FormValues) {
     try {
       setIsUploading(true);
+             
+      
       const formData = new FormData();
       formData.append('title', values.title);
       formData.append('content', values.content);
-      formData.append('status', values.status);
+      formData.append('type', values.type);
+
+      if (values.type === 'REPORT') {
+        if (values.reportDate) formData.append('reportDate', values.reportDate);
+        if (values.reportCategory) formData.append('reportCategory', values.reportCategory);
+        if (values.pdfFile) {
+          formData.append('pdfFile', values.pdfFile);
+        }
+      }
       
      
       const existingImages = imagePreviews
@@ -211,6 +272,8 @@ export default function NewsFormPage() {
         }
       });
 
+
+      
       if (isEditMode) {
         await updateNews(id, formData);
         toast.success('News article updated successfully');
@@ -309,29 +372,36 @@ export default function NewsFormPage() {
                       )}
                     />
 
-                    <div className="grid grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="status"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-700 font-medium">Status</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="h-11">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="draft">Draft</SelectItem>
-                                <SelectItem value="published">Published</SelectItem>
-                                <SelectItem value="archived">Archived</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+
+                  <div className="grid grid-cols-2 gap-6">
+                            <FormField
+                              control={form.control}
+                              name="type"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-700 font-medium">Type</FormLabel>
+                                                                     <Select onValueChange={(value) => {
+                                     field.onChange(value);
+                                   }} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className="h-11">
+                                        <SelectValue placeholder="Select type" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="ARTICLE">Article</SelectItem>
+                                      <SelectItem value="REPORT">Report</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                    </div>
+
+                    
+
+                    <div>
 
                       <FormField
                         control={form.control}
@@ -487,6 +557,8 @@ export default function NewsFormPage() {
                                   </DragDropContext>
                                 )}
                               </div>
+
+                              
                             </FormControl>
                             <FormDescription>
                               Upload images for the article. Drag to reorder. Star icon sets the main image.
@@ -497,6 +569,108 @@ export default function NewsFormPage() {
                       />
                     </div>
 
+
+                                         {watchedType === 'REPORT' && (
+                       <div className="grid grid-cols-2 gap-6">
+                         <FormField
+                           control={form.control}
+                           name="reportDate"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel className="text-gray-700 font-medium">Report Date</FormLabel>
+                               <FormControl>
+                                 <Input type="date" className="h-11" {...field} />
+                               </FormControl>
+                               <FormMessage />
+                             </FormItem>
+                           )}
+                         />
+
+                         <FormField
+                           control={form.control}
+                           name="reportCategory"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel className="text-gray-700 font-medium">Report Category</FormLabel>
+                               <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                 <FormControl>
+                                   <SelectTrigger className="h-11">
+                                     <SelectValue placeholder="Select category" />
+                                   </SelectTrigger>
+                                 </FormControl>
+                                 <SelectContent>
+                                   <SelectItem value="Annual">Annual Report</SelectItem>
+                                   <SelectItem value="Financial">Financial Report</SelectItem>
+                                   <SelectItem value="Academic">Academic Report</SelectItem>
+                                   <SelectItem value="Research">Research Report</SelectItem>
+                                   <SelectItem value="General">General Report</SelectItem>
+                                 </SelectContent>
+                               </Select>
+                               <FormMessage />
+                             </FormItem>
+
+                         )}
+                         />
+                         </div>
+                         )}
+
+                   {/* PDF Upload for reports */}
+                   {watchedType === 'REPORT' && (
+                  <FormField
+                  control={form.control}
+                  name="pdfFile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700 font-medium">Report PDF</FormLabel>
+                      <FormControl>
+                        <div className="space-y-4">
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-600">
+                              Upload the report PDF document
+                            </p>
+                            <Input
+                              type="file"
+                              accept=".pdf"
+                              className="hidden"
+                              onChange={handlePdfChange}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="mt-4"
+                              onClick={() => document.querySelector<HTMLInputElement>('input[accept=".pdf"]')?.click()}
+                            >
+                              Select PDF
+                            </Button>
+                                      </div>
+                                      {pdfFile && (
+                                        <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                                          <span className="text-green-600">✓</span>
+                                          <span className="text-sm text-green-800">{pdfFile.name}</span>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                              setPdfFile(null);
+                                              form.setValue('pdfFile', null);
+                                            }}
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </FormControl>
+                                  <FormDescription>
+                                    Upload the PDF document for this report
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
                     <div className="flex gap-4 pt-6">
                       <Button
                         type="submit"

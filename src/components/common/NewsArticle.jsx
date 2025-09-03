@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 
 const NewsArticle = ({ article }) => {
   const imageUrl = article.imageUrl || '/placeholder-image.jpg';
+  const isReport = article.type === 'REPORT';
+
   
   return (
     <motion.div 
@@ -23,7 +25,13 @@ const NewsArticle = ({ article }) => {
             e.target.src = '/placeholder-image.jpg';
           }}
         />
-       
+
+        {isReport && (
+          <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+            Report
+          </div>
+        )}
+        
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
       <div className='p-4 sm:p-6'>
@@ -32,6 +40,11 @@ const NewsArticle = ({ article }) => {
             <FaCalendarAlt className='mr-2 text-secondary' />
             {new Date(article.createdAt).toLocaleDateString()}
           </span>
+          {isReport && article.reportCategory && (
+            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+              {article.reportCategory}
+            </span>
+          )}
         </div>
         <h3 className='text-lg sm:text-xl font-bold text-neutral-850 mb-2 sm:mb-3 line-clamp-2 group-hover:text-secondary transition-colors duration-300'>
           {article.title}
@@ -39,11 +52,25 @@ const NewsArticle = ({ article }) => {
         <p className='text-sm sm:text-base text-gray-600 mb-4 line-clamp-2 sm:line-clamp-3'>
           {article.content}
         </p>
+
+        {isReport && article.reportPdfPath && (
+          <div className="mb-4">
+            <a
+              href={article.reportPdfPath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm"
+            >
+              📄 Download Report PDF
+            </a>
+          </div>
+        )}
+
         <Link
           to={`/news/${article.id}`}
           className='inline-flex items-center text-secondary font-semibold hover:text-blue-700 transition-colors text-sm sm:text-base'
         >
-          Read More
+          {isReport ? 'View Report' : 'Read More'}
           <svg 
             className="w-4 h-4 ml-1 transform transition-transform group-hover:translate-x-1" 
             viewBox="0 0 24 24" 

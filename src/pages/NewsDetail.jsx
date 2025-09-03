@@ -21,6 +21,7 @@ export const NewsDetail = () => {
       try {
         const response = await getNewsById(id);
         const newsData = response.data.message;
+
         setNews(newsData);
 
         updateMetaTags(newsData);
@@ -80,7 +81,8 @@ export const NewsDetail = () => {
     .slice(0, 3)  
     .join('\n\n');
 
-  // Modified helper function to get main image
+  const isReport = news.type === 'REPORT';
+
   const getMainImageDisplay = () => {
     const mainImage = news.images?.find(img => img.isMain)?.url || news.imageUrl;
     
@@ -157,13 +159,23 @@ export const NewsDetail = () => {
               </h1>
               <div className='flex flex-wrap items-center gap-2 sm:gap-4 text-white/90'>
                 <div className='flex items-center gap-2 bg-black/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm text-xs sm:text-sm'>
-                  <FaCalendarAlt className='text-secondary h-3 w-3 sm:h-4 sm:w-4' />
+                  <FaCalendarAlt className='text-secondary h-3 w-3 sm:h-4 sm:h-4' />
                   <span>{new Date(news.createdAt).toLocaleDateString('sq-AL', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                   })}</span>
                 </div>
+                {isReport && (
+                  <div className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm text-xs sm:text-sm font-medium">
+                    Report
+                  </div>
+                )}
+                {isReport && news.reportCategory && (
+                  <div className="bg-blue-100 text-blue-800 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm text-xs sm:text-sm font-medium">
+                    {news.reportCategory}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -280,6 +292,94 @@ export const NewsDetail = () => {
           )}
 
         
+
+
+          {/* Report Information Section */}
+          {isReport && (
+            <div className="mb-8 sm:mb-12">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 sm:p-8 shadow-lg">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-blue-900">Report Information</h3>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  {news.reportDate && (
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="text-sm font-semibold text-blue-700 uppercase tracking-wide">Report Date</div>
+                      </div>
+                      <div className="text-lg sm:text-xl font-bold text-blue-900">
+                        {new Date(news.reportDate).toLocaleDateString('sq-AL', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {news.reportCategory && (
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                          </svg>
+                        </div>
+                        <div className="text-sm font-semibold text-blue-700 uppercase tracking-wide">Category</div>
+                      </div>
+                      <div className="text-lg sm:text-xl font-bold text-blue-900">
+                        {news.reportCategory}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* PDF Download Section */}
+                {news.reportPdfPath && (
+                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-blue-200 shadow-lg">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-gray-900 mb-1">Download Report</div>
+                          <div className="text-sm text-gray-600">PDF Document • Ready for download</div>
+                        </div>
+                      </div>
+                      <a
+                        href={news.reportPdfPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-105"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Download PDF</span>
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className='prose prose-sm sm:prose-base lg:prose-lg max-w-none 
             px-1 sm:px-0' 
           >
