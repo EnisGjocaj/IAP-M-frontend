@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { ArrowLeft, Upload } from "lucide-react"
 import { createNews, getNewsById, updateNews } from "../../../api/news"
 import { toast } from "react-toastify"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 import { Button } from "../../../components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form"
@@ -79,6 +79,8 @@ export default function NewsFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
 
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -93,7 +95,6 @@ export default function NewsFormPage() {
     console.log('PDF file selected:', file);
     if (file && file.type === 'application/pdf') {
       setPdfFile(file);
-      // Update the form field value
       form.setValue('pdfFile', file);
       console.log('PDF file set in form:', file);
     } else {
@@ -416,7 +417,7 @@ export default function NewsFormPage() {
                                   className={`border-2 border-dashed rounded-lg p-6 text-center relative ${
                                     isDragging ? 'border-primary bg-primary/5' : 'border-gray-300'
                                   }`}
-                                  onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                                  onClick={() => imageInputRef.current?.click()}
                                   onDragOver={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -453,7 +454,7 @@ export default function NewsFormPage() {
                                   <p className="mt-2 text-sm text-gray-600">
                                     {isUploading ? 'Processing images...' : 'Drag and drop images here, or click to select files'}
                                   </p>
-                                  <Input
+                                  {/* <Input
                                     id="image-upload"
                                     type="file"
                                     accept="image/*"
@@ -461,12 +462,21 @@ export default function NewsFormPage() {
                                     className="hidden"
                                     onChange={handleImageChange}
                                     {...field}
+                                  /> */}
+                                  <Input
+                                      ref={imageInputRef}
+                                      id="image-upload"
+                                      type="file"
+                                      accept="image/*"
+                                      multiple
+                                      className="hidden"
+                                      onChange={handleImageChange}
                                   />
                                   <Button
                                     type="button"
                                     variant="outline"
                                     className="mt-4"
-                                    onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                                    onClick={() => imageInputRef.current?.click()}
                                   >
                                     Select Files
                                   </Button>
