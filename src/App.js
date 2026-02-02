@@ -33,11 +33,37 @@ import StudentProfile from "./pages/student-profile"
 import { ProtectedStudentRoute } from './components/common/ProtectedStudentRoute';
 import FeaturedStudents from "./pages/FeaturedStudents.tsx"
 
+
+//AI
+import { AILayout } from "./components/ai/AILayout";
+import AIDashboard from "./pages/ai/AIDashboard";
+import MaterialsPage from "./pages/ai/MaterialsPage";
+import AskAIPage from "./pages/ai/AskAIPage";
+import SummarizePage from "./pages/ai/SummarizePage";
+import ExamEnginePage from "./pages/ai/ExamEnginePage";
+import AdvisorPage from "./pages/ai/AdvisorPage";
+import HelpPage from "./pages/ai/HelpPage";
+import SettingsPage from "./pages/ai/SettingsPage";
+import IndexPage from "./pages/ai/IndexPage"
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+
+         <Route path="/ai-entry" element={<IndexPage />} />
+         <Route path="/ai" element={<AILayout />}>
+            <Route index element={<AIDashboard />} />
+            <Route path="materials" element={<MaterialsPage />} />
+            <Route path="ask" element={<AskAIPage />} />
+            <Route path="summarize" element={<SummarizePage />} />
+            <Route path="exam" element={<ExamEnginePage />} />
+            <Route path="advisor" element={<AdvisorPage />} />
+            <Route path="help" element={<HelpPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+
           <Route path='/' element={<Layout><Home /></Layout>} />
           <Route path='/about' element={<Layout><About /></Layout>} />
           <Route

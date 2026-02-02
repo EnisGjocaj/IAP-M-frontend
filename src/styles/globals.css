@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* @layer base {
   :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -32,6 +32,58 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  } */
+
+
+  @layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 219 40% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 219 40% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 219 40% 15%;
+
+    --primary: 51 100% 50%;
+    --primary-foreground: 219 100% 15%;
+
+    --secondary: 219 100% 28%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 219 80% 92%;
+    --accent-foreground: 219 100% 28%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 51 100% 50%;
+
+    --radius: 0.625rem;
+
+    /* Status */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* AI */
+    --ai-glow: 51 100% 50%;
+    --ai-surface: 219 30% 97%;
+
+    /* Sidebar */
+    --sidebar-background: 219 100% 28%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 51 100% 50%;
+    --sidebar-primary-foreground: 219 100% 15%;
+    --sidebar-accent: 219 80% 35%;
+    --sidebar-border: 219 80% 35%;
+    --sidebar-ring: 51 100% 50%;
   }
 
   .dark {
@@ -66,6 +118,21 @@
   .theme {
     --animate-marquee: marquee var(--duration) infinite linear;
     --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  }
+}
+
+@layer components {
+  .ai-card {
+    @apply bg-card rounded-lg border border-border shadow-sm transition-all;
+    @apply hover:shadow-lg hover:border-primary/30;
+  }
+
+  .glass {
+    @apply bg-background/80 backdrop-blur-lg border border-border/50;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
 }
 
