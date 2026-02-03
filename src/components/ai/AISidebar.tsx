@@ -61,8 +61,13 @@ export const AISidebar: React.FC = () => {
     >
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-sidebar-primary-foreground" />
+           <div className="relative flex h-10 w-10 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+            <img
+              src="/iap-m-logo.jpg"
+              alt="IAP-M"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
@@ -73,7 +78,7 @@ export const AISidebar: React.FC = () => {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="px-2 py-4  overflow-x-hidden">
         <SidebarGroup>
           {!isCollapsed && (
             <SidebarGroupLabel className="text-sidebar-foreground/60 text-xs uppercase tracking-wider mb-2 px-2">
@@ -137,10 +142,10 @@ export const AISidebar: React.FC = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-3">
-        <div className="flex items-center justify-between">
+      <SidebarFooter className="border-t border-sidebar-border p-3 overflow-x-hidden">
+        <div className="flex items-center justify-between  overflow-x-hidden">
           {!isCollapsed && (
-            <span className="text-xs text-sidebar-foreground/60">
+            <span className="text-xs text-sidebar-foreground/60  overflow-x-hidden whitespace-nowrap">
               Faculty of Business
             </span>
           )}
@@ -148,7 +153,7 @@ export const AISidebar: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent h-8 w-8"
+            className="text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent h-8 w-8  overflow-x-hidden"
           >
             <ChevronLeft className={cn(
               "w-4 h-4 transition-transform",
