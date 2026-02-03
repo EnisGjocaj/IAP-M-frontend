@@ -13,41 +13,41 @@ module.exports = {
   	extend: {
   		colors: {
   			primary: {
-  				DEFAULT: '#FFD700',
-  				foreground: 'var(--primary-foreground)'
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
-  				DEFAULT: '#00308F',
-  				foreground: 'var(--secondary-foreground)'
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			backbg: 'rgba(43, 78, 255, 0.7)',
   			neutral: {
   				'850': '#1f2937'
   			},
-  			border: 'var(--border)',
-  			input: 'var(--input)',
-  			ring: 'var(--ring)',
-  			background: 'var(--background)',
-  			foreground: 'var(--foreground)',
+  			border: 'hsl(var(--border))',
+  			input: 'hsl(var(--input))',
+  			ring: 'hsl(var(--ring))',
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))',
   			destructive: {
-  				DEFAULT: 'var(--destructive)',
-  				foreground: 'var(--destructive-foreground)'
+  				DEFAULT: 'hsl(var(--destructive))',
+  				foreground: 'hsl(var(--destructive-foreground))'
   			},
   			muted: {
-  				DEFAULT: 'var(--muted)',
-  				foreground: 'var(--muted-foreground)'
+  				DEFAULT: 'hsl(var(--muted))',
+  				foreground: 'hsl(var(--muted-foreground))'
   			},
   			accent: {
-  				DEFAULT: 'var(--accent)',
-  				foreground: 'var(--accent-foreground)'
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accent-foreground))'
   			},
   			popover: {
-  				DEFAULT: 'var(--popover)',
-  				foreground: 'var(--popover-foreground)'
+  				DEFAULT: 'hsl(var(--popover))',
+  				foreground: 'hsl(var(--popover-foreground))'
   			},
   			card: {
-  				DEFAULT: 'var(--card)',
-  				foreground: 'var(--card-foreground)'
+  				DEFAULT: 'hsl(var(--card))',
+  				foreground: 'hsl(var(--card-foreground))'
   			},
   			sidebar: {
   				DEFAULT: 'hsl(var(--sidebar-background))',
@@ -63,7 +63,8 @@ module.exports = {
   		boxShadow: {
   			shadow1: '0px 30px 40px 0px rgba(1, 11, 60, 0.1)',
   			shadow2: '0px 30px 60px 0px rgba(0, 4, 48, 0.3)',
-  			card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+  			card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  			'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
   		},
   		typography: {
   			DEFAULT: {
@@ -78,44 +79,44 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		keyframes: {
-  			'accordion-down': {
-  				from: {
-  					height: 0
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
-  			},
-  			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: 0
-  				}
-  			},
-  			// Add these new keyframes for the marquee animation
-  			marquee: {
-  				'0%': { transform: 'translateX(0%)' },
-  				'100%': { transform: 'translateX(-100%)' }
-  			},
-  			'marquee-vertical': {
-  				'0%': { transform: 'translateY(0%)' },
-  				'100%': { transform: 'translateY(-100%)' }
-  			},
-  			'marquee-reverse': {
-  				'0%': { transform: 'translateX(-100%)' },
-  				'100%': { transform: 'translateX(0%)' }
-  			}
-  		},
-  		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out',
-  			// Add these new animations
-  			'marquee': 'marquee var(--duration, 40s) linear infinite',
-  			'marquee-reverse': 'marquee-reverse var(--duration, 40s) linear infinite',
-  			'marquee-vertical': 'marquee-vertical var(--duration, 40s) linear infinite'
-  		}
+			'accordion-down': {
+				from: {
+					height: 0
+				},
+				to: {
+					height: 'var(--radix-accordion-content-height)'
+				}
+			},
+			'accordion-up': {
+				from: {
+					height: 'var(--radix-accordion-content-height)'
+				},
+				to: {
+					height: 0
+				}
+			},
+			// Add these new keyframes for the marquee animation
+			marquee: {
+				'0%': { transform: 'translateX(0%)' },
+				'100%': { transform: 'translateX(-100%)' }
+			},
+			'marquee-vertical': {
+				'0%': { transform: 'translateY(0%)' },
+				'100%': { transform: 'translateY(-100%)' }
+			},
+			'marquee-reverse': {
+				'0%': { transform: 'translateX(-100%)' },
+				'100%': { transform: 'translateX(0%)' }
+			}
+		},
+		animation: {
+			'accordion-down': 'accordion-down 0.2s ease-out',
+			'accordion-up': 'accordion-up 0.2s ease-out',
+			// Add these new animations
+			'marquee': 'marquee var(--duration, 40s) linear infinite',
+			'marquee-reverse': 'marquee-reverse var(--duration, 40s) linear infinite',
+			'marquee-vertical': 'marquee-vertical var(--duration, 40s) linear infinite'
+		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

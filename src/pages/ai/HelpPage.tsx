@@ -5,7 +5,6 @@ import {
   MessageCircle, 
   Video, 
   FileQuestion,
-  ExternalLink,
   Mail,
   Search,
 } from "lucide-react";
@@ -17,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 
 const faqItems = [
   {
@@ -42,79 +42,84 @@ const faqItems = [
 ];
 
 const resourceLinks = [
-  { title: "Getting Started Guide", description: "Learn the basics of using the AI features", icon: Book },
-  { title: "Video Tutorials", description: "Watch step-by-step walkthroughs", icon: Video },
-  { title: "FAQ", description: "Find answers to common questions", icon: FileQuestion },
-  { title: "Contact Support", description: "Get help from our team", icon: Mail },
+  { title: "Getting Started", description: "Learn the basics", icon: Book },
+  { title: "Video Tutorials", description: "Step-by-step guides", icon: Video },
+  { title: "FAQ", description: "Common questions", icon: FileQuestion },
+  { title: "Contact Support", description: "Get help", icon: Mail },
 ];
 
 export const HelpPage: React.FC = () => {
   return (
-    <div className="space-y-6 animate-fade-in-up max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
+      
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
-          Help Center
-          <HelpCircle className="w-6 h-6 text-primary" />
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Find answers and learn how to get the most out of the AI Academic Assistant
+        <h1 className="text-xl font-semibold text-foreground">Help Center</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Find answers and learn how to use the AI Academic Assistant
         </p>
       </div>
 
+
       <div className="relative max-w-xl mx-auto">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Search for help..."
-          className="pl-10 h-12 text-lg"
+          className="pl-10"
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {resourceLinks.map((link) => (
-          <div
+          <Card
             key={link.title}
-            className="ai-card border border-border p-5 hover:shadow-card-hover transition-all duration-300 cursor-pointer group"
+            className="hover:shadow-md transition-shadow cursor-pointer"
           >
-            <link.icon className="w-8 h-8 text-secondary mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold text-foreground">{link.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{link.description}</p>
-          </div>
+            <CardContent className="pt-5 pb-4">
+              <link.icon className="w-6 h-6 text-secondary mb-2" />
+              <h3 className="font-medium text-sm text-foreground">{link.title}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">{link.description}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      <div className="ai-card border border-border p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <FileQuestion className="w-5 h-5 text-secondary" />
-          Frequently Asked Questions
-        </h2>
-        <Accordion type="single" collapsible className="w-full">
-          {faqItems.map((item, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left">
-                {item.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                {item.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </div>
 
-      <div className="ai-card-premium p-6 rounded-xl text-center">
-        <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-secondary-foreground mb-2">
-          Still need help?
-        </h3>
-        <p className="text-secondary-foreground/80 mb-4">
-          Our support team is ready to assist you with any questions.
-        </p>
-        {/* @ts-ignore */}
-        <Button variant="ai-primary" size="lg">
-          <Mail className="w-4 h-4 mr-2" />
-          Contact Support
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-medium">Frequently Asked Questions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            {faqItems.map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="text-left text-sm">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-muted/50">
+        <CardContent className="py-6 text-center">
+          <MessageCircle className="w-10 h-10 text-secondary mx-auto mb-3" />
+          <h3 className="font-medium text-foreground mb-1">
+            Still need help?
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Our support team is ready to assist you.
+          </p>
+          <Button>
+            <Mail className="w-4 h-4 mr-2" />
+            Contact Support
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import { 
   Brain, 
-  Sparkles, 
   TrendingUp,
   Target,
   Calendar,
   BookOpen,
   Award,
-  ArrowRight,
   RefreshCw,
   Download,
   CheckCircle,
   AlertCircle,
   ChevronRight,
-  Lightbulb,
   Clock,
-  BarChart3,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -29,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
+import { Link } from "react-router-dom";
 
 const skillGaps = [
   { skill: "Financial Ratios", proficiency: 45, trend: "improving", priority: "high" },
@@ -104,59 +101,52 @@ export const AdvisorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            Academic Advisor
-            <Brain className="w-6 h-6 text-primary" />
-          </h1>
-          <p className="text-muted-foreground mt-1">Personalized study recommendations powered by AI</p>
+          <h1 className="text-xl font-semibold text-foreground">Academic Advisor</h1>
+          <p className="text-sm text-muted-foreground mt-1">Personalized study recommendations</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className={cn("w-4 h-4 mr-2", isRefreshing && "animate-spin")} />
             Refresh
           </Button>
-          {/* @ts-ignore */}
-          <Button variant="ai" size="sm">
+          <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             Export Plan
           </Button>
         </div>
       </div>
 
-      <div className="ai-card-premium p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row md:items-center gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <span className="text-sm text-secondary-foreground/80">AI Insight</span>
+      {/* Summary Banner */}
+      <Card className="bg-muted/50">
+        <CardContent className="py-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Study Insight</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                You're on track for your Marketing exam. Focusing on Financial Ratios this week will improve your readiness.
+              </p>
             </div>
-            <h2 className="text-xl font-bold text-secondary-foreground mb-2">
-              You're on track for your Marketing exam!
-            </h2>
-            <p className="text-secondary-foreground/80">
-              Based on your study patterns and quiz performance, focusing on Financial Ratios this week will increase your readiness by 15%.
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary">78%</span>
+            <div className="flex items-center gap-3">
+              <div className="text-center">
+                <p className="text-2xl font-semibold text-foreground">78%</p>
+                <p className="text-xs text-muted-foreground">Readiness</p>
+              </div>
             </div>
-            <span className="text-sm text-secondary-foreground/80">Overall Readiness</span>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="ai-card border-border">
+          {/* Skill Gap Analysis */}
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-secondary" />
-                Skill Gap Analysis
-              </CardTitle>
+              <CardTitle className="text-base font-medium">Skill Gap Analysis</CardTitle>
               <CardDescription>Your proficiency across key subject areas</CardDescription>
             </CardHeader>
             <CardContent>
@@ -165,9 +155,9 @@ export const AdvisorPage: React.FC = () => {
                   <div key={skill.skill} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-foreground">{skill.skill}</span>
+                        <span className="text-sm font-medium text-foreground">{skill.skill}</span>
                         {skill.priority === "high" && (
-                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
+                          <Badge variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
                             Priority
                           </Badge>
                         )}
@@ -175,14 +165,13 @@ export const AdvisorPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "text-xs",
-                          skill.trend === "improving" ? "text-success" :
-                          skill.trend === "declining" ? "text-destructive" :
+                          skill.trend === "improving" ? "text-green-600" :
+                          skill.trend === "declining" ? "text-red-600" :
                           "text-muted-foreground"
                         )}>
                           {skill.trend === "improving" && "↑"}
                           {skill.trend === "declining" && "↓"}
                           {skill.trend === "stable" && "→"}
-                          {" "}{skill.trend}
                         </span>
                         <span className="text-sm font-medium text-foreground">{skill.proficiency}%</span>
                       </div>
@@ -190,10 +179,10 @@ export const AdvisorPage: React.FC = () => {
                     <Progress
                       value={skill.proficiency}
                       className={cn(
-                        "h-2",
-                        skill.proficiency < 50 ? "[&>div]:bg-destructive" :
-                        skill.proficiency < 70 ? "[&>div]:bg-warning" :
-                        "[&>div]:bg-success"
+                        "h-1.5",
+                        skill.proficiency < 50 ? "[&>div]:bg-red-500" :
+                        skill.proficiency < 70 ? "[&>div]:bg-amber-500" :
+                        "[&>div]:bg-green-500"
                       )}
                     />
                   </div>
@@ -202,23 +191,20 @@ export const AdvisorPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="ai-card border-border">
+          {/* Recommendations */}
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-primary" />
-                Personalized Recommendations
-              </CardTitle>
-              <CardDescription>AI-generated suggestions based on your performance</CardDescription>
+              <CardTitle className="text-base font-medium">Recommendations</CardTitle>
+              <CardDescription>Suggestions based on your performance</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recommendations.map((rec) => (
                   <div
                     key={rec.id}
                     className={cn(
-                      "p-4 rounded-lg border transition-all duration-200 hover:shadow-card cursor-pointer",
-                      rec.priority === "high" ? "border-destructive/30 bg-destructive/5" :
-                      rec.priority === "medium" ? "border-warning/30 bg-warning/5" :
+                      "p-4 rounded-lg border transition-colors",
+                      rec.priority === "high" ? "border-red-200 bg-red-50/50" :
                       "border-border"
                     )}
                   >
@@ -226,18 +212,19 @@ export const AdvisorPage: React.FC = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           {rec.priority === "high" ? (
-                            <AlertCircle className="w-4 h-4 text-destructive" />
+                            <AlertCircle className="w-4 h-4 text-red-500" />
                           ) : (
-                            <CheckCircle className="w-4 h-4 text-success" />
+                            <CheckCircle className="w-4 h-4 text-green-500" />
                           )}
-                          <h4 className="font-medium text-foreground">{rec.title}</h4>
+                          <h4 className="font-medium text-sm text-foreground">{rec.title}</h4>
                         </div>
                         <p className="text-sm text-muted-foreground">{rec.description}</p>
                       </div>
-                      {/* @ts-ignore */}
-                      <Button variant="ai-outline" size="sm">
-                        {rec.action}
-                        <ChevronRight className="w-4 h-4 ml-1" />
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={rec.href}>
+                          {rec.action}
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -247,16 +234,18 @@ export const AdvisorPage: React.FC = () => {
           </Card>
         </div>
 
+        {/* Right Column - Study Plan & Achievements */}
         <div className="space-y-6">
-          <Card className="ai-card border-border">
+          {/* Weekly Study Plan */}
+          <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Calendar className="w-4 h-4 text-secondary" />
-                Weekly Study Plan
+              <CardTitle className="text-base font-medium flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                Weekly Plan
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-64">
+              <ScrollArea className="h-56">
                 <div className="space-y-4">
                   {studyPlan.map((day) => (
                     <div key={day.day}>
@@ -265,24 +254,21 @@ export const AdvisorPage: React.FC = () => {
                         {day.tasks.map((task, index) => (
                           <div
                             key={index}
-                            className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                            className="flex items-center gap-2 p-2 rounded bg-muted/50"
                           >
                             <div className={cn(
-                              "w-2 h-2 rounded-full",
+                              "w-1.5 h-1.5 rounded-full",
                               task.type === "review" ? "bg-secondary" :
                               task.type === "practice" ? "bg-primary" :
-                              task.type === "quiz" ? "bg-success" :
+                              task.type === "quiz" ? "bg-green-500" :
                               "bg-muted-foreground"
                             )} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">
-                                {task.title}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="w-3 h-3" />
+                            <span className="flex-1 text-sm text-foreground truncate">
+                              {task.title}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
                               {task.duration}
-                            </div>
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -290,18 +276,17 @@ export const AdvisorPage: React.FC = () => {
                   ))}
                 </div>
               </ScrollArea>
-              {/* @ts-ignore */}
-              <Button variant="ai-outline" className="w-full mt-4" size="sm">
-                <Calendar className="w-4 h-4 mr-2" />
+              <Button variant="outline" className="w-full mt-4" size="sm">
                 View Full Schedule
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="ai-card border-border">
+          {/* Achievements */}
+          <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Award className="w-4 h-4 text-primary" />
+              <CardTitle className="text-base font-medium flex items-center gap-2">
+                <Award className="w-4 h-4 text-muted-foreground" />
                 Recent Achievements
               </CardTitle>
             </CardHeader>
@@ -310,11 +295,11 @@ export const AdvisorPage: React.FC = () => {
                 {achievements.map((achievement, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-primary/5 to-transparent"
+                    className="flex items-center gap-3 p-2 rounded bg-muted/50"
                   >
-                    <span className="text-2xl">{achievement.icon}</span>
+                    <span className="text-xl">{achievement.icon}</span>
                     <div>
-                      <p className="font-medium text-sm text-foreground">{achievement.title}</p>
+                      <p className="text-sm font-medium text-foreground">{achievement.title}</p>
                       <p className="text-xs text-muted-foreground">{achievement.description}</p>
                     </div>
                   </div>
@@ -323,17 +308,22 @@ export const AdvisorPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="ai-card border border-border p-4 text-center">
-              <TrendingUp className="w-6 h-6 text-success mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">+12%</p>
-              <p className="text-xs text-muted-foreground">Weekly Progress</p>
-            </div>
-            <div className="ai-card border border-border p-4 text-center">
-              <Target className="w-6 h-6 text-secondary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">4/5</p>
-              <p className="text-xs text-muted-foreground">Goals Met</p>
-            </div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-3">
+            <Card>
+              <CardContent className="pt-4 pb-3 text-center">
+                <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                <p className="text-lg font-semibold text-foreground">+12%</p>
+                <p className="text-xs text-muted-foreground">Weekly</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3 text-center">
+                <Target className="w-5 h-5 text-secondary mx-auto mb-1" />
+                <p className="text-lg font-semibold text-foreground">4/5</p>
+                <p className="text-xs text-muted-foreground">Goals</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

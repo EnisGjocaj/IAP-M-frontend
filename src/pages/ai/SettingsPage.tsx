@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { 
-  Settings, 
   User, 
   Bell, 
   Shield, 
@@ -28,6 +27,7 @@ import {
   TabsTrigger,
 } from "../../components/ui/tabs";
 import { Separator } from "../../components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 
 export const SettingsPage: React.FC = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -36,41 +36,28 @@ export const SettingsPage: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   return (
-    <div className="space-y-6 animate-fade-in-up max-w-4xl">
+    <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          Settings
-          <Settings className="w-6 h-6 text-primary" />
-        </h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage your account and preferences
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="bg-muted/50 mb-6">
-          <TabsTrigger value="profile" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <User className="w-4 h-4 mr-2" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <Bell className="w-4 h-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <Palette className="w-4 h-4 mr-2" />
-            Appearance
-          </TabsTrigger>
-          <TabsTrigger value="privacy" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <Shield className="w-4 h-4 mr-2" />
-            Privacy
-          </TabsTrigger>
+        <TabsList className="mb-6">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
-          <div className="ai-card border border-border p-6 space-y-6">
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Personal Information</h3>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-medium">Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
@@ -89,10 +76,7 @@ export const SettingsPage: React.FC = () => {
                   <Input id="studentId" placeholder="STU-12345" defaultValue="STU-2024-001" />
                 </div>
               </div>
-            </div>
-            <Separator />
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Academic Information</h3>
+              <Separator className="my-4" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="program">Program</Label>
@@ -122,106 +106,104 @@ export const SettingsPage: React.FC = () => {
                   </Select>
                 </div>
               </div>
-            </div>
-            <div className="flex justify-end">
-            {/* @ts-ignore */}
-              <Button variant="ai">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </div>
+              <div className="flex justify-end pt-4">
+                <Button>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="notifications">
-          <div className="ai-card border border-border p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Email Notifications</h4>
-                <p className="text-sm text-muted-foreground">Receive updates via email</p>
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-foreground">Email Notifications</p>
+                  <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                </div>
+                <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
               </div>
-              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Exam Reminders</h4>
-                <p className="text-sm text-muted-foreground">Get notified about upcoming exams</p>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-foreground">Exam Reminders</p>
+                  <p className="text-sm text-muted-foreground">Get notified about upcoming exams</p>
+                </div>
+                <Switch checked={examReminders} onCheckedChange={setExamReminders} />
               </div>
-              <Switch checked={examReminders} onCheckedChange={setExamReminders} />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Study Tips</h4>
-                <p className="text-sm text-muted-foreground">Receive personalized study recommendations</p>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-foreground">Study Tips</p>
+                  <p className="text-sm text-muted-foreground">Receive personalized recommendations</p>
+                </div>
+                <Switch checked={studyTips} onCheckedChange={setStudyTips} />
               </div>
-              <Switch checked={studyTips} onCheckedChange={setStudyTips} />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="appearance">
-          <div className="ai-card border border-border p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {darkMode ? <Moon className="w-5 h-5 text-secondary" /> : <Sun className="w-5 h-5 text-primary" />}
-                <div>
-                  <h4 className="font-medium text-foreground">Dark Mode</h4>
-                  <p className="text-sm text-muted-foreground">Switch between light and dark themes</p>
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {darkMode ? <Moon className="w-5 h-5 text-muted-foreground" /> : <Sun className="w-5 h-5 text-muted-foreground" />}
+                  <div>
+                    <p className="font-medium text-sm text-foreground">Dark Mode</p>
+                    <p className="text-sm text-muted-foreground">Switch between light and dark themes</p>
+                  </div>
                 </div>
+                <Switch checked={darkMode} onCheckedChange={setDarkMode} />
               </div>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <Label>Language</Label>
-              <Select defaultValue="en">
-                <SelectTrigger className="w-full md:w-64">
-                  <Globe className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+              <Separator />
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <Select defaultValue="en">
+                  <SelectTrigger className="w-full md:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="fr">Français</SelectItem>
+                    <SelectItem value="de">Deutsch</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="privacy">
-          <div className="ai-card border border-border p-6 space-y-6">
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Data & Privacy</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Control how your data is used and stored
-              </p>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Share Analytics</h4>
-                <p className="text-sm text-muted-foreground">Help improve the AI by sharing anonymized usage data</p>
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-foreground">Share Analytics</p>
+                  <p className="text-sm text-muted-foreground">Help improve the AI with anonymized data</p>
+                </div>
+                <Switch defaultChecked />
               </div>
-              <Switch defaultChecked />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Public Profile</h4>
-                <p className="text-sm text-muted-foreground">Make your study achievements visible to others</p>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-foreground">Public Profile</p>
+                  <p className="text-sm text-muted-foreground">Make achievements visible to others</p>
+                </div>
+                <Switch />
               </div>
-              <Switch />
-            </div>
-            <Separator />
-            <div className="pt-4">
-              <Button variant="outline" className="text-destructive hover:bg-destructive/10">
-                Delete Account Data
-              </Button>
-            </div>
-          </div>
+              <Separator />
+              <div className="pt-2">
+                <Button variant="outline" className="text-destructive hover:bg-destructive/10">
+                  Delete Account Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

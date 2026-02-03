@@ -9,7 +9,6 @@ import {
   Plus,
   FileText,
   FileIcon,
-  X,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -65,17 +64,16 @@ export const MaterialsPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Materials</h1>
-          <p className="text-muted-foreground mt-1">Upload and manage your study materials</p>
+          <h1 className="text-xl font-semibold text-foreground">Materials</h1>
+          <p className="text-sm text-muted-foreground mt-1">Upload and manage your study materials</p>
         </div>
         <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
           <DialogTrigger asChild>
-            {/* @ts-ignore */}
-            <Button variant="ai">
-              <Plus className="w-4 h-4" />
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
               Upload Material
             </Button>
           </DialogTrigger>
@@ -89,16 +87,16 @@ export const MaterialsPage: React.FC = () => {
             <div className="space-y-4 py-4">
               <div
                 className={cn(
-                  "border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300",
+                  "border-2 border-dashed rounded-lg p-8 text-center transition-colors",
                   dragOver 
-                    ? "border-primary bg-primary/5" 
-                    : "border-border hover:border-primary/50"
+                    ? "border-secondary bg-secondary/5" 
+                    : "border-border hover:border-muted-foreground"
                 )}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={() => setDragOver(false)}
               >
-                <Upload className="w-10 h-10 mx-auto text-muted-foreground mb-4" />
+                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-3" />
                 <p className="text-sm font-medium text-foreground">
                   Drag and drop files here
                 </p>
@@ -141,8 +139,7 @@ export const MaterialsPage: React.FC = () => {
               <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>
                 Cancel
               </Button>
-              {/* @ts-ignore */}
-              <Button variant="ai" onClick={() => setUploadDialogOpen(false)}>
+              <Button onClick={() => setUploadDialogOpen(false)}>
                 Upload
               </Button>
             </DialogFooter>
@@ -151,14 +148,12 @@ export const MaterialsPage: React.FC = () => {
       </div>
 
       <Tabs defaultValue="my-materials">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="my-materials" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <FolderOpen className="w-4 h-4 mr-2" />
+        <TabsList>
+          <TabsTrigger value="my-materials">
             My Materials
-            <Badge variant="secondary" className="ml-2 bg-secondary/20">{sampleMaterials.length}</Badge>
+            <Badge variant="secondary" className="ml-2">{sampleMaterials.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="public" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-            <FileIcon className="w-4 h-4 mr-2" />
+          <TabsTrigger value="public">
             Public Library
           </TabsTrigger>
         </TabsList>
@@ -176,7 +171,6 @@ export const MaterialsPage: React.FC = () => {
             </div>
             <Select value={filterCourse} onValueChange={setFilterCourse}>
               <SelectTrigger className="w-full sm:w-48">
-                <Filter className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Filter by course" />
               </SelectTrigger>
               <SelectContent>
@@ -186,7 +180,7 @@ export const MaterialsPage: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <div className="flex border rounded-md overflow-hidden">
+            <div className="flex border border-border rounded-md overflow-hidden">
               <Button
                 variant={viewMode === "grid" ? "secondary" : "ghost"}
                 size="icon"
@@ -219,7 +213,7 @@ export const MaterialsPage: React.FC = () => {
 
           {filteredMaterials.length === 0 && (
             <div className="text-center py-12">
-              <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <FileText className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
               <h3 className="font-medium text-foreground">No materials found</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Try adjusting your search or filters
@@ -230,7 +224,7 @@ export const MaterialsPage: React.FC = () => {
 
         <TabsContent value="public" className="mt-6">
           <div className="text-center py-12">
-            <FileIcon className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <FileIcon className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
             <h3 className="font-medium text-foreground">Public Library</h3>
             <p className="text-sm text-muted-foreground mt-1">
               Browse materials shared by faculty and other students

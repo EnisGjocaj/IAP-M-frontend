@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
+import { Card, CardContent } from "../../../components/ui/card";
 
 interface MaterialCardProps {
   id: string;
@@ -25,17 +26,17 @@ interface MaterialCardProps {
   onDelete?: () => void;
 }
 
-const typeColors = {
-  pdf: "bg-destructive/10 text-destructive",
-  ppt: "bg-warning/10 text-warning",
-  docx: "bg-info/10 text-info",
-  xlsx: "bg-success/10 text-success",
+const typeLabels = {
+  pdf: "PDF",
+  ppt: "PPT",
+  docx: "DOC",
+  xlsx: "XLS",
 };
 
-const statusColors = {
-  approved: "bg-success/10 text-success border-success/20",
-  pending: "bg-warning/10 text-warning border-warning/20",
-  rejected: "bg-destructive/10 text-destructive border-destructive/20",
+const statusStyles = {
+  approved: "bg-green-50 text-green-600 border-green-200",
+  pending: "bg-amber-50 text-amber-600 border-amber-200",
+  rejected: "bg-red-50 text-red-600 border-red-200",
 };
 
 export const MaterialCard: React.FC<MaterialCardProps> = ({
@@ -51,69 +52,71 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="ai-card border border-border p-4 hover:shadow-card-hover transition-all duration-300">
-      <div className="flex items-start gap-4">
-        <div className={cn(
-          "w-12 h-12 rounded-lg flex items-center justify-center shrink-0",
-          typeColors[type]
-        )}>
-          <FileText className="w-6 h-6" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <h4 className="font-medium text-foreground truncate">
-                {title}
-              </h4>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {course}
-              </p>
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded bg-muted flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h4 className="font-medium text-sm text-foreground truncate">
+                  {title}
+                </h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {course}
+                </p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="shrink-0 h-7 w-7">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onView}>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDownload}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onView}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  View
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onDownload}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <Badge variant="outline" className={cn("text-xs", statusColors[status])}>
-              {status}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              {visibility === "private" ? (
-                <><Lock className="w-3 h-3 mr-1" /> Private</>
-              ) : (
-                <><Globe className="w-3 h-3 mr-1" /> Public</>
-              )}
-            </Badge>
-            <span className="text-xs text-muted-foreground ml-auto">
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <Badge variant="outline" className="text-xs">
+                {typeLabels[type]}
+              </Badge>
+              <Badge variant="outline" className={cn("text-xs", statusStyles[status])}>
+                {status}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {visibility === "private" ? (
+                  <><Lock className="w-3 h-3 mr-1" /> Private</>
+                ) : (
+                  <><Globe className="w-3 h-3 mr-1" /> Public</>
+                )}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
               {size} • {uploadedAt}
-            </span>
+            </p>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

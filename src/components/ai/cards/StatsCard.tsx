@@ -1,89 +1,41 @@
 import React from "react";
-import { LucideIcon } from "lucide-react";
-import { cn } from "../../../lib/utils";
+import { Card, CardContent } from "../../../components/ui/card";
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon: LucideIcon;
   trend?: {
     value: number;
     isPositive: boolean;
   };
-  variant?: "default" | "primary" | "secondary" | "accent";
 }
-
-const variantStyles = {
-  default: {
-    card: "bg-card border-border",
-    icon: "bg-muted text-muted-foreground",
-    value: "text-foreground",
-  },
-  primary: {
-    card: "bg-primary/5 border-primary/20",
-    icon: "bg-primary text-primary-foreground",
-    value: "text-foreground",
-  },
-  secondary: {
-    card: "bg-secondary/5 border-secondary/20",
-    icon: "bg-secondary text-secondary-foreground",
-    value: "text-foreground",
-  },
-  accent: {
-    card: "bg-accent border-accent/50",
-    icon: "bg-secondary text-secondary-foreground",
-    value: "text-foreground",
-  },
-};
 
 export const StatsCard: React.FC<StatsCardProps> = ({
   title,
   value,
   subtitle,
-  icon: Icon,
   trend,
-  variant = "default",
 }) => {
-  const styles = variantStyles[variant];
-
   return (
-    <div className={cn(
-      "ai-card p-5 border transition-all duration-300 hover:shadow-card-hover",
-      styles.card
-    )}>
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-muted-foreground">
-            {title}
+    <Card>
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-semibold text-foreground">
+            {value}
           </span>
-          <div className="flex items-baseline gap-2">
-            <span className={cn("text-3xl font-bold", styles.value)}>
-              {value}
-            </span>
-            {trend && (
-              <span className={cn(
-                "text-xs font-medium",
-                trend.isPositive ? "text-success" : "text-destructive"
-              )}>
-                {trend.isPositive ? "+" : ""}{trend.value}%
-              </span>
-            )}
-          </div>
-          {subtitle && (
-            <span className="text-xs text-muted-foreground mt-1">
-              {subtitle}
+          {trend && (
+            <span className={trend.isPositive ? "text-xs text-green-600" : "text-xs text-red-600"}>
+              {trend.isPositive ? "+" : ""}{trend.value}%
             </span>
           )}
         </div>
-        <div className={cn(
-          "w-12 h-12 rounded-lg flex items-center justify-center",
-          styles.icon
-        )}>
-          <Icon className="w-6 h-6" />
-        </div>
-      </div>
-    </div>
+        <p className="text-sm font-medium text-foreground mt-1">{title}</p>
+        {subtitle && (
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

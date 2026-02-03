@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { 
   Send, 
-  Sparkles, 
   BookOpen, 
   Copy, 
   ThumbsUp, 
@@ -11,20 +10,13 @@ import {
   X,
   Plus,
   History,
-  Lightbulb,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { Badge } from "../../components/ui/badge";
 import { cn } from "../../lib/utils";
 import { ScrollArea } from "../../components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
+import { Card, CardContent } from "../../components/ui/card";
 
 interface Message {
   id: string;
@@ -35,11 +27,10 @@ interface Message {
 }
 
 const suggestedQueries = [
-  "Explain this slide like I'm 18",
+  "Explain this concept simply",
   "What are likely exam questions?",
-  "Summarize this lecture in bullet points",
+  "Summarize in bullet points",
   "Compare these two concepts",
-  "Create flashcards for key terms",
 ];
 
 const availableMaterials = [
@@ -139,74 +130,69 @@ export const AskAIPage: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col animate-fade-in-up">
+    <div className="h-[calc(100vh-8rem)] flex flex-col">
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            Ask AI
-            <Sparkles className="w-5 h-5 text-primary" />
-          </h1>
-          <p className="text-muted-foreground mt-1">Query your academic materials with AI assistance</p>
+          <h1 className="text-xl font-semibold text-foreground">Ask AI</h1>
+          <p className="text-sm text-muted-foreground mt-1">Query your academic materials</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
             <History className="w-4 h-4 mr-2" />
             History
           </Button>
-          {/* @ts-ignore */}
-          <Button variant="ai-outline" size="sm" onClick={() => setMessages([])}>
+          <Button variant="outline" size="sm" onClick={() => setMessages([])}>
             <RotateCcw className="w-4 h-4 mr-2" />
             New Chat
           </Button>
         </div>
       </div>
 
-      <div className="ai-card border border-border p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-4 h-4 text-secondary" />
-          <span className="font-medium text-sm text-foreground">Selected Materials</span>
-          <span className="text-xs text-muted-foreground">({selectedMaterials.length} selected)</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {availableMaterials.map((material) => (
-            <Badge
-              key={material.id}
-              variant={selectedMaterials.includes(material.id) ? "default" : "outline"}
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                selectedMaterials.includes(material.id)
-                  ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  : "hover:bg-secondary/10"
-              )}
-              onClick={() => toggleMaterial(material.id)}
-            >
-              <FileText className="w-3 h-3 mr-1" />
-              {material.name}
-              {selectedMaterials.includes(material.id) && (
-                <X className="w-3 h-3 ml-1" />
-              )}
+      <Card className="mb-4">
+        <CardContent className="py-3">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">Selected Materials</span>
+            <span className="text-xs text-muted-foreground">({selectedMaterials.length})</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableMaterials.map((material) => (
+              <Badge
+                key={material.id}
+                variant={selectedMaterials.includes(material.id) ? "secondary" : "outline"}
+                className="cursor-pointer transition-colors"
+                onClick={() => toggleMaterial(material.id)}
+              >
+                <FileText className="w-3 h-3 mr-1" />
+                {material.name}
+                {selectedMaterials.includes(material.id) && (
+                  <X className="w-3 h-3 ml-1" />
+                )}
+              </Badge>
+            ))}
+            <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+              <Plus className="w-3 h-3 mr-1" />
+              Add More
             </Badge>
-          ))}
-          <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-            <Plus className="w-3 h-3 mr-1" />
-            Add More
-          </Badge>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="flex-1 ai-card border border-border overflow-hidden flex flex-col">
+
+      <Card className="flex-1 overflow-hidden flex flex-col">
         <ScrollArea className="flex-1 p-4">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-secondary" />
+                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-semibold text-lg text-foreground">Start a conversation</h3>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                  Ask questions about your study materials. I can explain concepts, generate summaries, or help you prepare for exams.
+                <h3 className="font-medium text-foreground">Start a conversation</h3>
+                <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+                  Ask questions about your study materials.
                 </p>
-                <div className="flex flex-wrap justify-center gap-2 mt-6">
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
                   {suggestedQueries.map((query, index) => (
                     <Button
                       key={index}
@@ -215,7 +201,6 @@ export const AskAIPage: React.FC = () => {
                       className="text-xs"
                       onClick={() => setInput(query)}
                     >
-                      <Lightbulb className="w-3 h-3 mr-1" />
                       {query}
                     </Button>
                   ))}
@@ -227,28 +212,28 @@ export const AskAIPage: React.FC = () => {
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-4",
+                  "flex gap-3",
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
                 {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                    <Sparkles className="w-4 h-4 text-secondary-foreground" />
+                  <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-secondary-foreground" />
                   </div>
                 )}
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-lg p-4",
+                    "max-w-[80%] rounded-lg p-3",
                     message.role === "user"
                       ? "bg-secondary text-secondary-foreground"
                       : "bg-muted"
                   )}
                 >
-                  <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap">
+                  <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap text-sm">
                     {message.content}
                   </div>
                   {message.sources && (
-                    <div className="mt-3 pt-3 border-t border-border/50">
+                    <div className="mt-2 pt-2 border-t border-border/50">
                       <span className="text-xs text-muted-foreground">Sources:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {message.sources.map((source, index) => (
@@ -260,37 +245,37 @@ export const AskAIPage: React.FC = () => {
                     </div>
                   )}
                   {message.role === "assistant" && (
-                    <div className="flex gap-2 mt-3">
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                    <div className="flex gap-1 mt-2">
+                      <Button variant="ghost" size="sm" className="h-6 px-2">
                         <Copy className="w-3 h-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Button variant="ghost" size="sm" className="h-6 px-2">
                         <ThumbsUp className="w-3 h-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Button variant="ghost" size="sm" className="h-6 px-2">
                         <ThumbsDown className="w-3 h-3" />
                       </Button>
                     </div>
                   )}
                 </div>
                 {message.role === "user" && (
-                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <span className="text-sm font-medium text-primary-foreground">S</span>
+                  <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                    <span className="text-xs font-medium text-muted-foreground">S</span>
                   </div>
                 )}
               </div>
             ))}
 
             {isLoading && (
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                  <Sparkles className="w-4 h-4 text-secondary-foreground animate-spin-slow" />
+              <div className="flex gap-3">
+                <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center shrink-0">
+                  <BookOpen className="w-4 h-4 text-secondary-foreground" />
                 </div>
-                <div className="bg-muted rounded-lg p-4">
+                <div className="bg-muted rounded-lg p-3">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <div className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <div className="w-2 h-2 rounded-full bg-secondary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>
@@ -299,32 +284,31 @@ export const AskAIPage: React.FC = () => {
           </div>
         </ScrollArea>
 
-        <div className="border-t border-border p-4 bg-background">
-          <div className="flex gap-3">
+        <div className="border-t border-border p-3 bg-background">
+          <div className="flex gap-2">
             <Textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a question about your materials..."
-              className="min-h-[44px] max-h-32 resize-none"
+              className="min-h-[40px] max-h-24 resize-none text-sm"
               rows={1}
             />
-            {/* @ts-ignore */}
-            <Button variant="ai"
+            <Button
               size="icon"
-              className="shrink-0 h-11 w-11"
+              className="shrink-0 h-10 w-10"
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
             >
               <Send className="w-4 h-4" />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-1.5">
             Press Enter to send, Shift+Enter for new line
           </p>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

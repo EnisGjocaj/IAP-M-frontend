@@ -41,9 +41,10 @@ const benefits = [
   "Track your progress and identify weak areas",
 ];
 
-const IndexPage = () => {
+const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-primary/5" />
         <div className="container mx-auto px-4 py-20 relative">
@@ -62,9 +63,8 @@ const IndexPage = () => {
               Transform your study experience with intelligent tools designed for business students. 
               Query materials, generate summaries, and prepare for exams with AI.
             </p>
-            {/* @ts-ignore */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                {/* @ts-ignore */}
+              {/* @ts-ignore */}
               <Button variant="ai" size="xl" asChild>
                 <Link to="/ai">
                   <Sparkles className="w-5 h-5" />
@@ -175,4 +175,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default Index;

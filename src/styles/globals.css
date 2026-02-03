@@ -124,7 +124,7 @@
 @layer components {
   .ai-card {
     @apply bg-card rounded-lg border border-border shadow-sm transition-all;
-    @apply hover:shadow-lg hover:border-primary/30;
+    @apply hover:shadow-lg hover:border-border;
   }
 
   .glass {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { AISidebar } from "./AISidebar";
-import AIHeader from "./AIHeader";
+import { AIHeader } from "./AIHeader";
 import { SidebarProvider, SidebarInset } from "../../components/ui/sidebar";
 
 export const AILayout: React.FC = () => {

@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
+/* * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -16,6 +16,18 @@ body {
 .container {
   max-width: 70%;
   margin: auto;
+} */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Poppins", sans-serif;
+  }
 }
 
 ul,
@@ -52,7 +64,7 @@ header .container {
     left: 0;
     width: 100%;
     height: 30vh;
-    background-color: #fff;
+    background-color: hsl(var(--background));
     z-index: 55;
   }
   header .mobile-view ul {
