@@ -2,6 +2,51 @@ import config from '../config';
 import axios from 'axios';
 const axiosInstance = axios.create({ baseURL: config.API_URL });
 
+axiosInstance.interceptors.request.use(
+  (requestConfig) => {
+    try {
+      const userStr = localStorage.getItem('user');
+      const user = JSON.parse(userStr || '{}');
+      const token = user?.token;
+
+      if (typeof token === 'string' && token.trim().length > 0) {
+        const headers = requestConfig.headers || {};
+        const existing = headers.Authorization || headers.authorization;
+        if (!existing) {
+          headers.Authorization = `Bearer ${token}`;
+          requestConfig.headers = headers;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    return requestConfig;
+  },
+  (error) => Promise.reject(error)
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 401 || status === 403) {
+      try {
+        localStorage.removeItem('user');
+      } catch {
+        // ignore
+      }
+
+      const path = window.location?.pathname || '';
+      if (path.startsWith('/ai') || path.startsWith('/dashboard')) {
+        window.location.href = '/';
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export const fetcher = (url) =>
   axiosInstance.get(url).then((res) => {
     if (res) {

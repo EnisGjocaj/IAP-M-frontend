@@ -25,11 +25,11 @@ const faqItems = [
   },
   {
     question: "What file formats are supported for upload?",
-    answer: "We support PDF, PowerPoint (PPT/PPTX), Word documents (DOC/DOCX), and Excel files (XLS/XLSX). Files can be up to 50MB in size.",
+    answer: "For this MVP, we support PDF files only. Files can be up to 50MB in size.",
   },
   {
     question: "Are my materials secure and private?",
-    answer: "Yes, all uploaded materials are encrypted and stored securely. You control the visibility of your materials - they can be kept private or shared with the public library.",
+    answer: "Your uploaded materials are stored securely and are only used to provide AI responses in the app. Public sharing controls are not included in this MVP.",
   },
   {
     question: "How accurate are the AI-generated practice exams?",

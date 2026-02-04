@@ -52,8 +52,22 @@ function App() {
       <AuthProvider>
         <Routes>
 
-         <Route path="/ai-entry" element={<IndexPage />} />
-         <Route path="/ai" element={<AILayout />}>
+         <Route
+           path="/ai-entry"
+           element={
+             <ProtectedStudentRoute>
+               <IndexPage />
+             </ProtectedStudentRoute>
+           }
+         />
+         <Route
+           path="/ai"
+           element={
+             <ProtectedStudentRoute>
+               <AILayout />
+             </ProtectedStudentRoute>
+           }
+         >
             <Route index element={<AIDashboard />} />
             <Route path="materials" element={<MaterialsPage />} />
             <Route path="ask" element={<AskAIPage />} />

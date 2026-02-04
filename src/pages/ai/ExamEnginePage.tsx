@@ -9,12 +9,14 @@ import {
   BookOpen,
   Download,
   History,
+  Plus,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
 import { cn } from "../../lib/utils";
+import { generateExamSaved, getAiChunk, getAiConversation, getMyMaterials, listAiConversations } from "../../api/ai";
 import {
   Select,
   SelectContent,
@@ -26,13 +28,15 @@ import { Slider } from "../../components/ui/slider";
 import { Label } from "../../components/ui/label";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { ReferencePreviewModal } from "../../components/ai/ReferencePreviewModal";
 
-const courses = [
-  { id: "marketing", name: "Marketing Management" },
-  { id: "finance", name: "Financial Accounting" },
-  { id: "statistics", name: "Business Statistics" },
-  { id: "strategy", name: "Business Strategy" },
-];
+type AiMaterial = {
+  id: number;
+  title: string;
+  courseName?: string | null;
+  courseType?: string | null;
+  isApproved: boolean;
+};
 
 const examTypes = [
   { id: "multiple-choice", name: "Multiple Choice", description: "Test with MCQs" },
@@ -41,87 +45,172 @@ const examTypes = [
   { id: "oral-prep", name: "Oral Exam Prep", description: "Verbal practice" },
 ];
 
-const recentExams = [
-  { id: "1", course: "Marketing", type: "Multiple Choice", score: 85, date: "2 days ago", questions: 20 },
-  { id: "2", course: "Finance", type: "Case Study", score: 78, date: "4 days ago", questions: 5 },
-  { id: "3", course: "Statistics", type: "Short Answer", score: 92, date: "1 week ago", questions: 10 },
-];
-
-const sampleQuestions = [
-  {
-    id: "1",
-    question: "According to Porter's Five Forces model, which of the following is NOT a competitive force?",
-    options: [
-      "Threat of new entrants",
-      "Bargaining power of suppliers",
-      "Market segmentation strategy",
-      "Competitive rivalry"
-    ],
-    correctAnswer: 2,
-    explanation: "Market segmentation strategy is a marketing approach, not one of Porter's Five Forces.",
-    source: "Marketing Strategy Lecture 5 - Slide 15",
-  },
-  {
-    id: "2",
-    question: "A company's Unique Selling Proposition (USP) should primarily focus on:",
-    options: [
-      "Matching competitor prices",
-      "Differentiation from competitors",
-      "Reducing operational costs",
-      "Expanding product lines"
-    ],
-    correctAnswer: 1,
-    explanation: "A USP differentiates a company from competitors by highlighting unique benefits.",
-    source: "Marketing Strategy Lecture 5 - Slide 22",
-  },
-];
 
 export const ExamEnginePage: React.FC = () => {
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [materials, setMaterials] = useState<AiMaterial[]>([]);
+  const [selectedMaterial, setSelectedMaterial] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("multiple-choice");
   const [questionCount, setQuestionCount] = useState([10]);
   const [difficulty, setDifficulty] = useState<string>("medium");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showExam, setShowExam] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [showResults, setShowResults] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [examText, setExamText] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      setIsGenerating(false);
-      setShowExam(true);
-      setCurrentQuestion(0);
-      setAnswers({});
-      setShowResults(false);
-    }, 2000);
-  };
+  const [activeReferences, setActiveReferences] = useState<
+    Array<{
+      sourceNo: number;
+      chunkId: number;
+      materialTitle: string;
+      pageStart: number | null;
+      pageEnd: number | null;
+    }>
+  >([]);
 
-  const handleAnswer = () => {
-    if (selectedAnswer === null) return;
-    setAnswers((prev) => ({
-      ...prev,
-      [sampleQuestions[currentQuestion].id]: selectedAnswer,
-    }));
-    setSelectedAnswer(null);
-    if (currentQuestion < sampleQuestions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
-    } else {
-      setShowResults(true);
+  const [examConversations, setExamConversations] = useState<any[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+
+  const [refOpen, setRefOpen] = useState(false);
+  const [refTitle, setRefTitle] = useState<string | null>(null);
+  const [refUrl, setRefUrl] = useState<string | null>(null);
+  const [refPage, setRefPage] = useState<number | null>(null);
+  const [refText, setRefText] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const load = async () => {
+      setError(null);
+      try {
+        const data = (await getMyMaterials()) as any[];
+        const list = Array.isArray(data) ? (data as AiMaterial[]) : [];
+        const approved = list.filter((m) => m.isApproved);
+        setMaterials(approved);
+      } catch (e: any) {
+        setError(e?.message || "Failed to load materials");
+      }
+    };
+
+    load();
+  }, []);
+
+  React.useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const convos = (await listAiConversations()) as any[];
+        const list = Array.isArray(convos) ? convos : [];
+        setExamConversations(list.filter((c) => c.type === "EXAM"));
+      } catch {
+        // ignore
+      }
+    };
+
+    loadHistory();
+  }, []);
+
+  const refreshHistory = async () => {
+    try {
+      const convos = (await listAiConversations()) as any[];
+      const list = Array.isArray(convos) ? convos : [];
+      setExamConversations(list.filter((c) => c.type === "EXAM"));
+    } catch {
+      // ignore
     }
   };
 
-  const getScore = () => {
-    let correct = 0;
-    Object.entries(answers).forEach(([id, answer]) => {
-      const question = sampleQuestions.find((q) => q.id === id);
-      if (question && question.correctAnswer === answer) {
-        correct++;
+  const openExamConversation = async (id: number) => {
+    setError(null);
+    try {
+      const convo = (await getAiConversation(id)) as any;
+      setActiveConversationId(convo?.id || id);
+      const msgs = Array.isArray(convo?.messages) ? convo.messages : [];
+      const lastAssistant = [...msgs].reverse().find((m: any) => String(m.role).toUpperCase() === "ASSISTANT");
+      setExamText(lastAssistant?.content || "");
+      setActiveReferences(Array.isArray(lastAssistant?.references) ? lastAssistant.references : []);
+      setShowExam(true);
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || "Failed to load exam");
+    }
+  };
+
+  const handleNewExam = () => {
+    setActiveConversationId(null);
+    setExamText("");
+    setActiveReferences([]);
+    setShowExam(false);
+    setError(null);
+  };
+
+  const openReference = async (chunkId: number, pageStart: number | null) => {
+    try {
+      const chunk = (await getAiChunk(chunkId)) as any;
+      const title = chunk?.material?.title || "Reference";
+      const url = chunk?.material?.cloudinaryUrl || null;
+      setRefTitle(title);
+      setRefUrl(url);
+      setRefPage(pageStart ?? chunk?.pageStart ?? null);
+      setRefText(chunk?.text || null);
+      setRefOpen(true);
+    } catch {
+      // ignore
+    }
+  };
+
+  const splitExamSections = (text: string) => {
+    const normalized = String(text || "");
+    const lines = normalized.split(/\r?\n/);
+
+    const findIndex = (re: RegExp) => lines.findIndex((l) => re.test(l.trim()));
+    const qIdx = findIndex(/^(questions|exam questions)\b/i);
+    const aIdx = findIndex(/^(answers|answer key)\b/i);
+    const rIdx = findIndex(/^(references|sources)\b/i);
+
+    const slice = (start: number, end: number) =>
+      start >= 0 ? lines.slice(start + 1, end >= 0 ? end : undefined).join("\n").trim() : "";
+
+    if (qIdx >= 0 || aIdx >= 0 || rIdx >= 0) {
+      const starts = [qIdx, aIdx, rIdx].filter((n) => n >= 0).sort((x, y) => x - y);
+      const nextOf = (idx: number) => {
+        const after = starts.find((s) => s > idx);
+        return typeof after === "number" ? after : -1;
+      };
+
+      return {
+        questions: slice(qIdx, nextOf(qIdx)),
+        answers: slice(aIdx, nextOf(aIdx)),
+        references: slice(rIdx, nextOf(rIdx)),
+        raw: normalized.trim(),
+      };
+    }
+
+    return { questions: normalized.trim(), answers: "", references: "", raw: normalized.trim() };
+  };
+
+  const handleGenerate = async () => {
+    const materialId = Number(selectedMaterial);
+    if (Number.isNaN(materialId)) {
+      setError("Please select a material.");
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const res = (await generateExamSaved({
+        materialIds: [materialId],
+        count: questionCount[0],
+        conversationId: activeConversationId || undefined,
+      })) as any;
+      setExamText(res?.exam || "");
+      setShowExam(true);
+      if (typeof res?.conversationId === "number") {
+        setActiveConversationId(res.conversationId);
       }
-    });
-    return Math.round((correct / sampleQuestions.length) * 100);
+      setActiveReferences(Array.isArray(res?.references) ? res.references : []);
+      refreshHistory();
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || "Failed to generate exam");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -132,30 +221,62 @@ export const ExamEnginePage: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Generate practice exams from your study materials</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <History className="w-4 h-4 mr-2" />
-            History
+          <Button variant="outline" size="sm" onClick={handleNewExam}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Exam
           </Button>
         </div>
       </div>
 
-      {!showExam ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <Card className="lg:col-span-1 h-fit">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <History className="w-4 h-4" />
+              History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {examConversations.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No exams yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {examConversations.slice(0, 12).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => openExamConversation(Number(c.id))}
+                    className={cn(
+                      "w-full text-left rounded-md border px-3 py-2 text-sm transition-colors",
+                      activeConversationId === c.id ? "bg-muted" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="font-medium text-foreground truncate">{c.title}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {new Date(c.updatedAt).toLocaleDateString()}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {!showExam ? (
+          <Card className="lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-base font-medium">Create Practice Exam</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Course</Label>
-                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                <Label>Material</Label>
+                <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a course" />
+                    <SelectValue placeholder="Select a material" />
                   </SelectTrigger>
                   <SelectContent>
-                    {courses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.name}
+                    {materials.map((m) => (
+                      <SelectItem key={m.id} value={String(m.id)}>
+                        {m.title}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -218,7 +339,7 @@ export const ExamEnginePage: React.FC = () => {
               <Button
                 className="w-full"
                 onClick={handleGenerate}
-                disabled={!selectedCourse || isGenerating}
+                disabled={!selectedMaterial || isGenerating}
               >
                 {isGenerating ? (
                   <>
@@ -232,159 +353,120 @@ export const ExamEnginePage: React.FC = () => {
                   </>
                 )}
               </Button>
+
+              {error && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
             </CardContent>
           </Card>
-
-          <div className="space-y-6">
+        ) : (
+          <div className="lg:col-span-3 space-y-4">
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">Recent Exams</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {recentExams.map((exam) => (
-                    <div
-                      key={exam.id}
-                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+              <div className="p-4 bg-muted/50 border-b border-border">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground">Generated Exam</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {activeConversationId ? `Conversation #${activeConversationId}` : ""}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(examText);
+                      }}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm text-foreground">{exam.course}</span>
-                        <span className={cn(
-                          "text-xs font-medium",
-                          exam.score >= 80 ? "text-green-600" :
-                          exam.score >= 60 ? "text-amber-600" : "text-red-600"
-                        )}>
-                          {exam.score}%
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{exam.type}</span>
-                        <span>{exam.questions}q • {exam.date}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-5">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Average Score</span>
-                    <span className="text-xl font-semibold text-foreground">85%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Exams Taken</span>
-                    <span className="text-lg font-medium text-foreground">24</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Streak</span>
-                    <span className="text-lg font-medium text-foreground">7 days</span>
+                      Copy
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleNewExam}>
+                      <Plus className="w-4 h-4 mr-1" />
+                      New
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      ) : showResults ? (
-        <Card className="max-w-2xl mx-auto">
-          <CardContent className="py-8 text-center">
-            <div className={cn(
-              "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center",
-              getScore() >= 80 ? "bg-green-100" : getScore() >= 60 ? "bg-amber-100" : "bg-red-100"
-            )}>
-              {getScore() >= 80 ? (
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              ) : (
-                <Target className="w-8 h-8 text-amber-600" />
-              )}
-            </div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">Exam Complete</h2>
-            <p className="text-muted-foreground mb-6">
-              You scored <span className="font-semibold text-foreground">{getScore()}%</span>
-            </p>
-            <div className="flex justify-center gap-3">
-              <Button variant="outline" onClick={() => setShowExam(false)}>
-                New Exam
-              </Button>
-              <Button>
-                <BookOpen className="w-4 h-4 mr-2" />
-                Review Answers
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="max-w-3xl mx-auto">
-          <div className="p-4 bg-muted/50 border-b border-border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-foreground">
-                Question {currentQuestion + 1} of {sampleQuestions.length}
-              </span>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="w-4 h-4" />
-                <span>12:45</span>
               </div>
-            </div>
-            <Progress value={(currentQuestion + 1) / sampleQuestions.length * 100} className="h-1.5" />
+
+              <CardContent className="p-6">
+                {examText ? (
+                  (() => {
+                    const sections = splitExamSections(examText);
+                    return (
+                      <div className="space-y-4">
+                        <Card>
+                          <CardHeader className="py-4">
+                            <CardTitle className="text-sm font-medium">Questions</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                              {sections.questions || sections.raw}
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {sections.answers ? (
+                          <Card>
+                            <CardHeader className="py-4">
+                              <CardTitle className="text-sm font-medium">Answers</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                                {sections.answers}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <p className="text-sm text-muted-foreground">No exam generated.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {activeReferences.length > 0 ? (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">References</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {activeReferences.map((r) => (
+                      <button
+                        key={`${r.sourceNo}-${r.chunkId}`}
+                        onClick={() => openReference(r.chunkId, r.pageStart)}
+                        className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
+                      >
+                        <div className="font-medium text-foreground truncate">
+                          Source {r.sourceNo}: {r.materialTitle}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground truncate">
+                          {r.pageStart && r.pageEnd
+                            ? `Pages ${r.pageStart}–${r.pageEnd}`
+                            : r.pageStart
+                              ? `Page ${r.pageStart}`
+                              : "Page range unavailable"}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
           </div>
+        )}
+      </div>
 
-          <CardContent className="p-6">
-            <h3 className="text-base font-medium text-foreground mb-6">
-              {sampleQuestions[currentQuestion].question}
-            </h3>
-
-            <RadioGroup
-              value={selectedAnswer?.toString()}
-              onValueChange={(value) => setSelectedAnswer(parseInt(value))}
-              className="space-y-2"
-            >
-              {sampleQuestions[currentQuestion].options.map((option, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex items-center space-x-3 p-3 rounded-lg border transition-colors cursor-pointer",
-                    selectedAnswer === index
-                      ? "border-secondary bg-secondary/5"
-                      : "border-border hover:border-muted-foreground"
-                  )}
-                  onClick={() => setSelectedAnswer(index)}
-                >
-                  <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                  <Label htmlFor={`option-${index}`} className="cursor-pointer flex-1 text-sm">
-                    {option}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-
-            <div className="flex justify-between mt-6">
-              <Button
-                variant="outline"
-                disabled={currentQuestion === 0}
-                onClick={() => setCurrentQuestion((prev) => prev - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={handleAnswer}
-                disabled={selectedAnswer === null}
-              >
-                {currentQuestion === sampleQuestions.length - 1 ? "Finish Exam" : "Next"}
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
-          </CardContent>
-
-          <div className="p-3 bg-muted/30 border-t border-border">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <BookOpen className="w-3 h-3" />
-              <span>Source: {sampleQuestions[currentQuestion].source}</span>
-            </div>
-          </div>
-        </Card>
-      )}
+      <ReferencePreviewModal
+        open={refOpen}
+        onOpenChange={setRefOpen}
+        title={refTitle}
+        pdfUrl={refUrl}
+        page={refPage}
+        excerpt={refText}
+      />
     </div>
   );
 };

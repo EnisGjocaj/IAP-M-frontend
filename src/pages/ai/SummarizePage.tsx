@@ -5,6 +5,8 @@ import {
   Download,
   RefreshCw,
   CheckCircle,
+  Plus,
+  History,
   BookOpen,
   ListChecks,
   MessageSquare,
@@ -14,6 +16,7 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
+import { getAiConversation, getMyMaterials, listAiConversations, summarizeMaterialSaved } from "../../api/ai";
 import {
   Select,
   SelectContent,
@@ -25,12 +28,21 @@ import { ScrollArea } from "../../components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Label } from "../../components/ui/label";
 
-const availableMaterials = [
-  { id: "1", name: "Marketing Strategy Lecture 5", course: "Marketing" },
-  { id: "2", name: "Financial Accounting Slides", course: "Finance" },
-  { id: "3", name: "Statistics Practice Problems", course: "Statistics" },
-  { id: "4", name: "Economics Chapter 8 Notes", course: "Economics" },
-];
+type AiMaterial = {
+  id: number;
+  title: string;
+  courseName?: string | null;
+  courseType?: string | null;
+  isApproved: boolean;
+};
+
+type ConversationListItem = {
+  id: number;
+  title: string;
+  type: "CHAT" | "SUMMARY" | "EXAM";
+  createdAt: string;
+  updatedAt: string;
+};
 
 const summaryTypes = [
   { id: "bullet", name: "Bullet Points", description: "Key points" },
@@ -39,48 +51,119 @@ const summaryTypes = [
   { id: "key-terms", name: "Key Terms", description: "Vocabulary" },
 ];
 
-const sampleSummary = `# Marketing Strategy - Lecture 5 Summary
-
-## Key Concepts
-
-### 1. Competitive Analysis Framework
-- **Porter's Five Forces**: Understanding industry competition through supplier power, buyer power, competitive rivalry, threat of substitution, and threat of new entrants
-- **SWOT Integration**: Combining internal strengths/weaknesses with external opportunities/threats
-- **Market Positioning**: Identifying unique value propositions in competitive landscapes
-
-### 2. Value Proposition Development
-- Customer-centric approach focusing on solving real problems
-- Unique Selling Propositions (USP) that differentiate from competitors
-- Brand differentiation through emotional and functional benefits
-
-### 3. Strategic Implementation
-- Resource allocation based on strategic priorities
-- Timeline and milestone planning for execution
-- Key Performance Indicators (KPIs) for measuring success
-
-## Exam Focus Areas
-- Porter's Five Forces model application
-- SWOT analysis case study examples
-- Value proposition canvas creation
-
-## Key Terms to Remember
-- **USP**: Unique Selling Proposition
-- **KPI**: Key Performance Indicator
-- **SWOT**: Strengths, Weaknesses, Opportunities, Threats`;
-
 export const SummarizePage: React.FC = () => {
+  const [materials, setMaterials] = useState<AiMaterial[]>([]);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
   const [summaryType, setSummaryType] = useState<string>("bullet");
   const [summary, setSummary] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [customInstructions, setCustomInstructions] = useState("");
 
-  const handleGenerate = () => {
+  const [conversations, setConversations] = useState<ConversationListItem[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const load = async () => {
+      setError(null);
+      try {
+        const data = (await getMyMaterials()) as any[];
+        const list = Array.isArray(data) ? (data as AiMaterial[]) : [];
+        const approved = list.filter((m) => m.isApproved);
+        setMaterials(approved);
+      } catch (e: any) {
+        setError(e?.message || "Failed to load materials");
+      }
+    };
+
+    load();
+  }, []);
+
+  React.useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        const data = (await listAiConversations()) as any[];
+        const list = Array.isArray(data) ? (data as ConversationListItem[]) : [];
+        setConversations(list.filter((c) => c.type === "SUMMARY"));
+      } catch {
+        // ignore
+      }
+    };
+
+    loadConversations();
+  }, []);
+
+  const mapSummaryTypeToBackendStyle = (t: string): "bullet" | "short" | "detailed" => {
+    if (t === "bullet") return "bullet";
+    if (t === "paragraph") return "short";
+    if (t === "study-guide") return "detailed";
+    if (t === "key-terms") return "bullet";
+    return "bullet";
+  };
+
+  const refreshConversations = async () => {
+    try {
+      const data = (await listAiConversations()) as any[];
+      const list = Array.isArray(data) ? (data as ConversationListItem[]) : [];
+      setConversations(list.filter((c) => c.type === "SUMMARY"));
+    } catch {
+      // ignore
+    }
+  };
+
+  const openConversation = async (id: number) => {
+    setError(null);
+    try {
+      const convo = (await getAiConversation(id)) as any;
+      setActiveConversationId(convo?.id || id);
+      const msgs = Array.isArray(convo?.messages) ? convo.messages : [];
+      const lastAssistant = [...msgs].reverse().find((m: any) => String(m.role).toUpperCase() === "ASSISTANT");
+      setSummary(lastAssistant?.content || "");
+
+      const materialId = typeof convo?.materialId === "number" ? convo.materialId : null;
+      if (materialId !== null) {
+        setSelectedMaterial(String(materialId));
+      }
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || "Failed to load summary");
+    }
+  };
+
+  const handleNewSummary = () => {
+    setActiveConversationId(null);
+    setSummary("");
+    setError(null);
+  };
+
+  const handleGenerate = async () => {
+    const materialId = Number(selectedMaterial);
+    if (Number.isNaN(materialId)) {
+      setError("Please select a material.");
+      return;
+    }
+
     setIsGenerating(true);
-    setTimeout(() => {
-      setSummary(sampleSummary);
+    setError(null);
+
+    try {
+      const res = (await summarizeMaterialSaved({
+        materialIds: [materialId],
+        style: mapSummaryTypeToBackendStyle(summaryType),
+        conversationId: activeConversationId || undefined,
+      })) as any;
+      setSummary(res?.summary || "");
+
+      if (typeof res?.conversationId === "number") {
+        setActiveConversationId(res.conversationId);
+      }
+
+      refreshConversations();
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || "Failed to generate summary");
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const handleCopy = () => {
@@ -94,8 +177,46 @@ export const SummarizePage: React.FC = () => {
         <p className="text-sm text-muted-foreground mt-1">Generate summaries of your study materials</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <Card className="lg:col-span-1 h-fit">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <History className="w-4 h-4" />
+                History
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={handleNewSummary}>
+                <Plus className="w-4 h-4 mr-1" />
+                New
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {conversations.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No summaries yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {conversations.slice(0, 12).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => openConversation(Number(c.id))}
+                    className={cn(
+                      "w-full text-left rounded-md border px-3 py-2 text-sm transition-colors",
+                      activeConversationId === c.id ? "bg-muted" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="font-medium text-foreground truncate">{c.title}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {new Date(c.updatedAt).toLocaleDateString()}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4 lg:col-span-1">
           
           <Card>
             <CardHeader className="pb-3">
@@ -107,9 +228,9 @@ export const SummarizePage: React.FC = () => {
                   <SelectValue placeholder="Choose a material" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableMaterials.map((material) => (
-                    <SelectItem key={material.id} value={material.id}>
-                      {material.name}
+                  {materials.map((material) => (
+                    <SelectItem key={material.id} value={String(material.id)}>
+                      {material.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -170,6 +291,10 @@ export const SummarizePage: React.FC = () => {
               "Generate Summary"
             )}
           </Button>
+
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
         </div>
 
         <Card className="lg:col-span-2 h-fit">

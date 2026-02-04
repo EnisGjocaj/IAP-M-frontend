@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
                 <TableCell colSpan={columns.length} className="h-32 text-center">
                   <div className="flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    <span className="ml-3 text-muted-foreground">Loading users...</span>
+                    <span className="ml-3 text-muted-foreground">Loading...</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -83,7 +83,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center text-muted-foreground">
-                    <p>No users found</p>
+                    <p>No results found</p>
                     <p className="text-sm">Try adjusting your search or filters</p>
                   </div>
                 </TableCell>

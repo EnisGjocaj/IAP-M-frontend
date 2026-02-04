@@ -11,13 +11,9 @@ import { Button } from "../../components/ui/button";
 import { Progress } from "../../components/ui/progress";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { getMyMaterials } from "../../api/ai";
 
-const stats = [
-  { title: "Materials Uploaded", value: 24, subtitle: "This semester" },
-  { title: "AI Queries", value: 156, subtitle: "Questions answered" },
-  { title: "Practice Exams", value: 8, subtitle: "Completed this week" },
-  { title: "Study Score", value: "87%", subtitle: "Above average" },
-];
+type AiMaterial = { id: number };
 
 const quickActions = [
   { title: "Ask a Question", description: "Query your study materials with AI", href: "/ai/ask" },
@@ -26,20 +22,30 @@ const quickActions = [
   { title: "Get Study Plan", description: "Personalized recommendations", href: "/ai/advisor" },
 ];
 
-const recentActivities = [
-  { id: "1", title: "Asked about Marketing Strategy", description: "Lecture 5 - Competitive Analysis", time: "2 min ago" },
-  { id: "2", title: "Uploaded Finance Module 6", description: "PDF, 2.4 MB", time: "1 hour ago" },
-  { id: "3", title: "Completed Practice Exam", description: "Statistics - 85% score", time: "3 hours ago" },
-  { id: "4", title: "New Study Recommendation", description: "Focus on Financial Ratios", time: "5 hours ago" },
-];
-
-const upcomingExams = [
-  { course: "Marketing Management", date: "Jan 15, 2025", daysLeft: 3, progress: 75 },
-  { course: "Financial Accounting", date: "Jan 18, 2025", daysLeft: 6, progress: 45 },
-  { course: "Business Statistics", date: "Jan 22, 2025", daysLeft: 10, progress: 30 },
-];
-
 export const AIDashboard: React.FC = () => {
+  const [materialsCount, setMaterialsCount] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const load = async () => {
+      try {
+        const data = (await getMyMaterials()) as any[];
+        const list = Array.isArray(data) ? (data as AiMaterial[]) : [];
+        setMaterialsCount(list.length);
+      } catch {
+        setMaterialsCount(0);
+      }
+    };
+
+    load();
+  }, []);
+
+  const stats = [
+    { title: "Materials Uploaded", value: materialsCount, subtitle: "Your uploads" },
+    { title: "AI Queries", value: "—", subtitle: "Coming soon" },
+    { title: "Practice Exams", value: "—", subtitle: "Coming soon" },
+    { title: "Study Score", value: "—", subtitle: "Coming soon" },
+  ];
+
   return (
     <div className="space-y-8">
       <section className="border-b border-border pb-6">
@@ -107,19 +113,7 @@ export const AIDashboard: React.FC = () => {
             <CardTitle className="text-base font-medium">Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-border">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="py-3 first:pt-0 last:pb-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{activity.description}</p>
-                    </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">{activity.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-muted-foreground">No activity yet.</p>
           </CardContent>
         </Card>
 
@@ -131,24 +125,7 @@ export const AIDashboard: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {upcomingExams.map((exam, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground">{exam.course}</span>
-                    <span className="text-xs text-muted-foreground">{exam.daysLeft}d left</span>
-                  </div>
-                  <Progress value={exam.progress} className="h-1.5" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">{exam.date}</span>
-                    <span className="text-xs text-muted-foreground">{exam.progress}% ready</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" className="w-full mt-4" size="sm" asChild>
-              <Link to="/ai/exam">View All Exams</Link>
-            </Button>
+            <p className="text-sm text-muted-foreground">No upcoming exams.</p>
           </CardContent>
         </Card>
       </div>

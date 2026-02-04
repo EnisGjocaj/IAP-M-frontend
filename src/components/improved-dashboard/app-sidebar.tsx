@@ -12,6 +12,7 @@ import {
   Users,
   UserCheck,
   ChevronRight,
+  Brain,
 } from "lucide-react"
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../components/ui/collapsible"
@@ -32,7 +33,7 @@ import {
   SidebarRail,
 } from "../../components/ui/sidebar"
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const data = {
   navMain: [
@@ -168,10 +169,34 @@ const data = {
         },
       ],
     },
+    {
+      title: "AI Management",
+      url: "#",
+      icon: Brain,
+      items: [
+        {
+          title: "Materials Management",
+          url: "/dashboard/ai/materials",
+        },
+      ],
+    },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  const isDirectActive = (url: string) => {
+    if (url === "/") return pathname === "/";
+    if (url === "/dashboard") return pathname === "/dashboard";
+    return pathname === url;
+  };
+
+  const isSubActive = (url: string) => {
+    return pathname === url;
+  };
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader className="border-b border-border/50 px-4 py-3">
@@ -202,18 +227,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navMain.map((item) => (
-                <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={Boolean(item.items?.some((sub) => isSubActive(sub.url)))}
+                  className="group/collapsible"
+                >
                   <SidebarMenuItem>
                     {item.items ? (
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title}>
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          isActive={Boolean(item.items?.some((sub) => isSubActive(sub.url)))}
+                        >
                           {item.icon && <item.icon />}
                           <span>{item.title}</span>
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                     ) : (
-                      <SidebarMenuButton asChild tooltip={item.title}>
+                      <SidebarMenuButton asChild tooltip={item.title} isActive={isDirectActive(item.url)}>
                         <Link to={item.url}>
                           {item.icon && <item.icon />}
                           <span>{item.title}</span>
@@ -225,7 +258,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuSub>
                           {item.items.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
+                              <SidebarMenuSubButton asChild isActive={isSubActive(subItem.url)}>
                                 <Link to={subItem.url}>
                                   <span>{subItem.title}</span>
                                 </Link>

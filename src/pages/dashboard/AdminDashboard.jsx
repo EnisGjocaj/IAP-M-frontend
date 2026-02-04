@@ -40,6 +40,9 @@ import StudentsPage from '../../components/improved-dashboard/students/students-
 import TrainingsPage from '../../components/improved-dashboard/trainings/training-list';
 import NewTrainingPage from '../../components/improved-dashboard/trainings/training-form';
 
+// AI Management
+import AdminAiMaterialsPage from '../../components/improved-dashboard/ai-materials/ai-materials-list';
+
 const DashboardLayout = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
@@ -100,6 +103,9 @@ const AdminDashboard = () => {
         <Route path="trainings" element={<TrainingsPage />} />
         <Route path="trainings/new" element={<NewTrainingPage />} />
         <Route path="trainings/:id/edit" element={<NewTrainingPage />} />
+
+        {/* AI Management */}
+        <Route path="ai/materials" element={<AdminAiMaterialsPage />} />
       </Routes>
     </DashboardLayout>
   );

@@ -70,7 +70,12 @@ export const Header = () => {
       icon: <FaGraduationCap className="w-4 h-4" />,
       showAlways: true
     },
-    
+    ...(isStudent ? [{
+      name: "AI",
+      path: "/ai",
+      icon: <FaStar className="w-4 h-4" />,
+      studentOnly: true,
+    }] : []),
     ...(isStudent ? [{
       name: "My Profile",
       path: `/student-profile/${user.id}`,
@@ -79,7 +84,6 @@ export const Header = () => {
       </svg>,
       studentOnly: true
     }] : []),
-    // Keep admin dashboard
     ...(isAdmin ? [{
       name: "Dashboard",
       path: "/dashboard",

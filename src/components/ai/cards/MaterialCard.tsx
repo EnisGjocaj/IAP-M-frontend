@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Eye, Lock, Globe, MoreVertical, Download, Trash2, Share2 } from "lucide-react";
+import { FileText, Eye, Lock, Globe, MoreVertical, Download, Trash2, Share2, Pencil } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
@@ -23,6 +23,7 @@ interface MaterialCardProps {
   size: string;
   onView?: () => void;
   onDownload?: () => void;
+  onEdit?: () => void;
   onDelete?: () => void;
 }
 
@@ -49,6 +50,7 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
   size,
   onView,
   onDownload,
+  onEdit,
   onDelete,
 }) => {
   return (
@@ -83,6 +85,12 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
                     <Download className="w-4 h-4 mr-2" />
                     Download
                   </DropdownMenuItem>
+                  {onEdit && (
+                    <DropdownMenuItem onClick={onEdit}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem>
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
