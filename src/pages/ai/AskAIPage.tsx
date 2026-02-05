@@ -7,6 +7,7 @@ import {
   ThumbsDown,
   RotateCcw,
   FileText,
+  Download,
   X,
   Plus,
   History,
@@ -19,6 +20,8 @@ import { ScrollArea } from "../../components/ui/scroll-area";
 import { Card, CardContent } from "../../components/ui/card";
 import { askAIWithConversation, getAiChunk, getAiConversation, getMyMaterials, listAiConversations } from "../../api/ai";
 import { ReferencePreviewModal } from "../../components/ai/ReferencePreviewModal";
+import { AIPdfDownloadButton } from "../../components/ai/pdf/AIPdfDownloadButton";
+import { IapmAIDocument } from "../../components/ai/pdf/IapmAIDocument";
 
 interface Message {
   id: string;
@@ -70,6 +73,7 @@ export const AskAIPage: React.FC = () => {
 
   const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+  const [activeConversationTitle, setActiveConversationTitle] = useState<string | null>(null);
 
   const [refOpen, setRefOpen] = useState(false);
   const [refTitle, setRefTitle] = useState<string | null>(null);
@@ -122,6 +126,7 @@ export const AskAIPage: React.FC = () => {
     try {
       const convo = (await getAiConversation(id)) as any;
       setActiveConversationId(convo?.id || id);
+      setActiveConversationTitle(convo?.title || null);
       const loaded: Message[] = (convo?.messages || []).map((m: any) => ({
         id: String(m.id),
         role: (String(m.role).toLowerCase() === "user" ? "user" : "assistant") as any,
@@ -285,8 +290,46 @@ export const AskAIPage: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Query your academic materials</p>
         </div>
         <div className="flex gap-2">
+          <AIPdfDownloadButton
+            document={
+              <IapmAIDocument
+                title={activeConversationTitle || "Ask AI"}
+                subtitle={selectedMaterials.length > 0 ? `Materials: ${selectedMaterials.length}` : null}
+                generatedAt={new Date()}
+                logoSrc={typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined}
+                transcript={messages.map((m) => ({
+                  role: m.role === "user" ? "USER" : "ASSISTANT",
+                  content: m.content,
+                }))}
+                references={(() => {
+                  const seen = new Set<number>();
+                  const refs: Array<any> = [];
+                  for (const msg of messages) {
+                    for (const r of msg.references || []) {
+                      if (seen.has(r.chunkId)) continue;
+                      seen.add(r.chunkId);
+                      refs.push({
+                        sourceNo: r.sourceNo,
+                        chunkId: r.chunkId,
+                        materialTitle: r.materialTitle,
+                        pageStart: r.pageStart,
+                        pageEnd: r.pageEnd,
+                      });
+                    }
+                  }
+                  return refs;
+                })()}
+              />
+            }
+            fileName={`IAPM_${(activeConversationTitle || "AskAI").replace(/\s+/g, "_")}.pdf`}
+            disabled={messages.length === 0}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export PDF
+          </AIPdfDownloadButton>
           <Button variant="outline" size="sm" onClick={() => {
             setActiveConversationId(null);
+            setActiveConversationTitle(null);
             setMessages([]);
           }}>
             <RotateCcw className="w-4 h-4 mr-2" />

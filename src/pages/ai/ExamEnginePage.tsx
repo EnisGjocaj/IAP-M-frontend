@@ -1,20 +1,12 @@
 import React, { useState } from "react";
 import { 
-  GraduationCap, 
   Play, 
-  Clock,
-  Target,
   RotateCcw,
-  CheckCircle,
-  BookOpen,
   Download,
   History,
   Plus,
-  ChevronRight,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { Badge } from "../../components/ui/badge";
-import { Progress } from "../../components/ui/progress";
 import { cn } from "../../lib/utils";
 import { generateExamSaved, getAiChunk, getAiConversation, getMyMaterials, listAiConversations } from "../../api/ai";
 import {
@@ -26,9 +18,10 @@ import {
 } from "../../components/ui/select";
 import { Slider } from "../../components/ui/slider";
 import { Label } from "../../components/ui/label";
-import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ReferencePreviewModal } from "../../components/ai/ReferencePreviewModal";
+import { AIPdfDownloadButton } from "../../components/ai/pdf/AIPdfDownloadButton";
+import { IapmAIDocument } from "../../components/ai/pdf/IapmAIDocument";
 
 type AiMaterial = {
   id: number;
@@ -184,6 +177,10 @@ export const ExamEnginePage: React.FC = () => {
     return { questions: normalized.trim(), answers: "", references: "", raw: normalized.trim() };
   };
 
+  const logoSrc = typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined;
+  const fileSafeTitle = (activeConversationId ? `Exam_${activeConversationId}` : "Exam").replace(/[^a-z0-9\-_ ]/gi, "");
+  const fileName = `IAPM_${fileSafeTitle.replace(/\s+/g, "_")}.pdf`;
+
   const handleGenerate = async () => {
     const materialId = Number(selectedMaterial);
     if (Number.isNaN(materialId)) {
@@ -214,55 +211,94 @@ export const ExamEnginePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">Exam Engine</h1>
-          <p className="text-sm text-muted-foreground mt-1">Generate practice exams from your study materials</p>
-        </div>
-        <div className="flex gap-2">
+    <div className="h-[calc(100vh-8rem)] flex gap-4">
+
+      <ReferencePreviewModal
+        open={refOpen}
+        onOpenChange={setRefOpen}
+        title={refTitle}
+        url={refUrl}
+        page={refPage}
+        excerpt={refText}
+      />
+
+      <Card className="w-[280px] hidden lg:flex flex-col overflow-hidden">
+        <CardContent className="p-3 flex flex-col gap-2">
           <Button variant="outline" size="sm" onClick={handleNewExam}>
             <Plus className="w-4 h-4 mr-2" />
             New Exam
           </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <Card className="lg:col-span-1 h-fit">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <History className="w-4 h-4" />
-              History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <div className="text-xs text-muted-foreground mt-1">History</div>
+          <div className="space-y-1 overflow-auto pr-2">
             {examConversations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No exams yet.</p>
+              <p className="text-sm text-muted-foreground py-2">No exams yet.</p>
             ) : (
-              <div className="space-y-2">
-                {examConversations.slice(0, 12).map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => openExamConversation(Number(c.id))}
-                    className={cn(
-                      "w-full text-left rounded-md border px-3 py-2 text-sm transition-colors",
-                      activeConversationId === c.id ? "bg-muted" : "hover:bg-muted/50"
-                    )}
-                  >
-                    <div className="font-medium text-foreground truncate">{c.title}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">
-                      {new Date(c.updatedAt).toLocaleDateString()}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              examConversations.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => openExamConversation(Number(c.id))}
+                  className={cn(
+                    "w-full text-left rounded-md border px-2 py-2 text-sm transition-colors",
+                    activeConversationId === c.id ? "bg-muted" : "hover:bg-muted/50"
+                  )}
+                >
+                  <div className="font-medium text-foreground truncate">{c.title}</div>
+                  <div className="text-[11px] text-muted-foreground truncate">
+                    {new Date(c.updatedAt).toLocaleDateString()}
+                  </div>
+                </button>
+              ))
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex-1 flex flex-col">
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Exam Engine</h1>
+            <p className="text-sm text-muted-foreground mt-1">Generate practice exams from your study materials</p>
+          </div>
+          <div className="flex gap-2">
+            <AIPdfDownloadButton
+              document={
+                <IapmAIDocument
+                  title="Exam"
+                  subtitle={activeConversationId ? `Conversation #${activeConversationId}` : null}
+                  generatedAt={new Date()}
+                  logoSrc={logoSrc}
+                  sections={(() => {
+                    const s = splitExamSections(examText);
+                    return [
+                      { title: "Questions", content: s.questions || s.raw || "" },
+                      ...(s.answers ? [{ title: "Answers", content: s.answers }] : []),
+                    ];
+                  })()}
+                  references={activeReferences.map((r) => ({
+                    sourceNo: r.sourceNo,
+                    chunkId: r.chunkId,
+                    materialTitle: r.materialTitle,
+                    pageStart: r.pageStart,
+                    pageEnd: r.pageEnd,
+                  }))}
+                />
+              }
+              fileName={fileName}
+              disabled={!examText}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export PDF
+            </AIPdfDownloadButton>
+            <Button variant="outline" size="sm" onClick={handleNewExam}>
+              <Plus className="w-4 h-4 mr-2" />
+              New
+            </Button>
+          </div>
+        </div>
 
         {!showExam ? (
-          <Card className="lg:col-span-3">
+          <Card className="flex-1 overflow-auto">
             <CardHeader>
               <CardTitle className="text-base font-medium">Create Practice Exam</CardTitle>
             </CardHeader>
@@ -360,35 +396,32 @@ export const ExamEnginePage: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="lg:col-span-3 space-y-4">
-            <Card>
-              <div className="p-4 bg-muted/50 border-b border-border">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-foreground">Generated Exam</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {activeConversationId ? `Conversation #${activeConversationId}` : ""}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        navigator.clipboard.writeText(examText);
-                      }}
-                    >
-                      Copy
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleNewExam}>
-                      <Plus className="w-4 h-4 mr-1" />
-                      New
-                    </Button>
-                  </div>
+          <Card className="flex-1 overflow-hidden flex flex-col">
+            <div className="p-4 bg-muted/50 border-b border-border">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-foreground">Generated Exam</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {activeConversationId ? `Conversation #${activeConversationId}` : ""}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(examText);
+                    }}
+                    disabled={!examText}
+                  >
+                    Copy
+                  </Button>
                 </div>
               </div>
+            </div>
 
-              <CardContent className="p-6">
+            <div className="flex-1 grid grid-cols-1 xl:grid-cols-3">
+              <div className="xl:col-span-2 overflow-auto p-6">
                 {examText ? (
                   (() => {
                     const sections = splitExamSections(examText);
@@ -423,15 +456,13 @@ export const ExamEnginePage: React.FC = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground">No exam generated.</p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
 
-            {activeReferences.length > 0 ? (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">References</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="border-t xl:border-t-0 xl:border-l border-border p-4 overflow-auto">
+                <div className="text-sm font-medium text-foreground mb-2">References</div>
+                {activeReferences.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No references available.</p>
+                ) : (
                   <div className="space-y-2">
                     {activeReferences.map((r) => (
                       <button
@@ -452,21 +483,12 @@ export const ExamEnginePage: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            ) : null}
-          </div>
+                )}
+              </div>
+            </div>
+          </Card>
         )}
       </div>
-
-      <ReferencePreviewModal
-        open={refOpen}
-        onOpenChange={setRefOpen}
-        title={refTitle}
-        pdfUrl={refUrl}
-        page={refPage}
-        excerpt={refText}
-      />
     </div>
   );
 };

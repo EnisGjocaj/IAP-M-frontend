@@ -7,16 +7,12 @@ import {
   CheckCircle,
   Plus,
   History,
-  BookOpen,
-  ListChecks,
-  MessageSquare,
-  FileSearch,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
-import { getAiConversation, getMyMaterials, listAiConversations, summarizeMaterialSaved } from "../../api/ai";
+import { getAiChunk, getAiConversation, getMyMaterials, listAiConversations, summarizeMaterialSaved } from "../../api/ai";
 import {
   Select,
   SelectContent,
@@ -27,6 +23,9 @@ import {
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Label } from "../../components/ui/label";
+import { ReferencePreviewModal } from "../../components/ai/ReferencePreviewModal";
+import { AIPdfDownloadButton } from "../../components/ai/pdf/AIPdfDownloadButton";
+import { IapmAIDocument } from "../../components/ai/pdf/IapmAIDocument";
 
 type AiMaterial = {
   id: number;
@@ -61,6 +60,23 @@ export const SummarizePage: React.FC = () => {
 
   const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+  const [activeConversationTitle, setActiveConversationTitle] = useState<string | null>(null);
+
+  const [activeReferences, setActiveReferences] = useState<
+    Array<{
+      sourceNo: number;
+      chunkId: number;
+      materialTitle: string;
+      pageStart: number | null;
+      pageEnd: number | null;
+    }>
+  >([]);
+
+  const [refOpen, setRefOpen] = useState(false);
+  const [refTitle, setRefTitle] = useState<string | null>(null);
+  const [refUrl, setRefUrl] = useState<string | null>(null);
+  const [refPage, setRefPage] = useState<number | null>(null);
+  const [refText, setRefText] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -117,9 +133,11 @@ export const SummarizePage: React.FC = () => {
     try {
       const convo = (await getAiConversation(id)) as any;
       setActiveConversationId(convo?.id || id);
+      setActiveConversationTitle(convo?.title || null);
       const msgs = Array.isArray(convo?.messages) ? convo.messages : [];
       const lastAssistant = [...msgs].reverse().find((m: any) => String(m.role).toUpperCase() === "ASSISTANT");
       setSummary(lastAssistant?.content || "");
+      setActiveReferences(Array.isArray(lastAssistant?.references) ? lastAssistant.references : []);
 
       const materialId = typeof convo?.materialId === "number" ? convo.materialId : null;
       if (materialId !== null) {
@@ -132,8 +150,25 @@ export const SummarizePage: React.FC = () => {
 
   const handleNewSummary = () => {
     setActiveConversationId(null);
+    setActiveConversationTitle(null);
     setSummary("");
+    setActiveReferences([]);
     setError(null);
+  };
+
+  const openReference = async (chunkId: number, pageStart: number | null) => {
+    try {
+      const chunk = (await getAiChunk(chunkId)) as any;
+      const title = chunk?.material?.title || "Reference";
+      const url = chunk?.material?.cloudinaryUrl || null;
+      setRefTitle(title);
+      setRefUrl(url);
+      setRefPage(pageStart ?? chunk?.pageStart ?? null);
+      setRefText(chunk?.text || null);
+      setRefOpen(true);
+    } catch {
+      // ignore
+    }
   };
 
   const handleGenerate = async () => {
@@ -158,6 +193,9 @@ export const SummarizePage: React.FC = () => {
         setActiveConversationId(res.conversationId);
       }
 
+      setActiveConversationTitle((res as any)?.title || activeConversationTitle);
+      setActiveReferences(Array.isArray(res?.references) ? res.references : []);
+
       refreshConversations();
     } catch (e: any) {
       setError(e?.response?.data?.message || e?.message || "Failed to generate summary");
@@ -170,38 +208,40 @@ export const SummarizePage: React.FC = () => {
     navigator.clipboard.writeText(summary);
   };
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">Summarize</h1>
-        <p className="text-sm text-muted-foreground mt-1">Generate summaries of your study materials</p>
-      </div>
+  const logoSrc = typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined;
+  const fileSafeTitle = (activeConversationTitle || "Summary").replace(/[^a-z0-9\-_ ]/gi, "");
+  const fileName = `IAPM_${fileSafeTitle.replace(/\s+/g, "_")}.pdf`;
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <Card className="lg:col-span-1 h-fit">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <History className="w-4 h-4" />
-                History
-              </CardTitle>
-              <Button variant="outline" size="sm" onClick={handleNewSummary}>
-                <Plus className="w-4 h-4 mr-1" />
-                New
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {conversations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No summaries yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {conversations.slice(0, 12).map((c) => (
+  return (
+    <div className="h-[calc(100vh-8rem)] flex gap-4">
+
+      <ReferencePreviewModal
+        open={refOpen}
+        onOpenChange={setRefOpen}
+        title={refTitle}
+        url={refUrl}
+        page={refPage}
+        excerpt={refText}
+      />
+
+      <Card className="w-[280px] hidden lg:flex flex-col overflow-hidden">
+        <CardContent className="p-3 flex flex-col gap-2">
+          <Button variant="outline" size="sm" onClick={handleNewSummary}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Summary
+          </Button>
+          <div className="text-xs text-muted-foreground mt-1">History</div>
+          <ScrollArea className="flex-1 pr-2">
+            <div className="space-y-1">
+              {conversations.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">No summaries yet.</p>
+              ) : (
+                conversations.map((c) => (
                   <button
                     key={c.id}
                     onClick={() => openConversation(Number(c.id))}
                     className={cn(
-                      "w-full text-left rounded-md border px-3 py-2 text-sm transition-colors",
+                      "w-full text-left rounded-md border px-2 py-2 text-sm transition-colors",
                       activeConversationId === c.id ? "bg-muted" : "hover:bg-muted/50"
                     )}
                   >
@@ -210,100 +250,130 @@ export const SummarizePage: React.FC = () => {
                       {new Date(c.updatedAt).toLocaleDateString()}
                     </div>
                   </button>
-                ))}
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <div className="flex-1 flex flex-col">
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Summarize</h1>
+            <p className="text-sm text-muted-foreground mt-1">Generate summaries of your study materials</p>
+          </div>
+          <div className="flex gap-2">
+            <AIPdfDownloadButton
+              document={
+                <IapmAIDocument
+                  title={activeConversationTitle || "Summary"}
+                  subtitle={selectedMaterial ? `Material #${selectedMaterial}` : null}
+                  generatedAt={new Date()}
+                  logoSrc={logoSrc}
+                  sections={[{ title: "Summary", content: summary || "" }]}
+                  references={activeReferences.map((r) => ({
+                    sourceNo: r.sourceNo,
+                    chunkId: r.chunkId,
+                    materialTitle: r.materialTitle,
+                    pageStart: r.pageStart,
+                    pageEnd: r.pageEnd,
+                  }))}
+                />
+              }
+              fileName={fileName}
+              disabled={!summary}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export PDF
+            </AIPdfDownloadButton>
+            <Button variant="outline" size="sm" onClick={handleNewSummary}>
+              <Plus className="w-4 h-4 mr-2" />
+              New
+            </Button>
+          </div>
+        </div>
+
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-end">
+              <div className="space-y-2">
+                <Label>Material</Label>
+                <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a material" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {materials.map((material) => (
+                      <SelectItem key={material.id} value={String(material.id)}>
+                        {material.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
+
+              <div className="space-y-2">
+                <Label>Summary Format</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {summaryTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setSummaryType(type.id)}
+                      className={cn(
+                        "p-3 rounded-lg border text-left transition-colors",
+                        summaryType === type.id
+                          ? "border-secondary bg-secondary/5"
+                          : "border-border hover:border-muted-foreground"
+                      )}
+                    >
+                      <p className="text-sm font-medium text-foreground">{type.name}</p>
+                      <p className="text-xs text-muted-foreground">{type.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Custom Instructions</Label>
+                <Textarea
+                  value={customInstructions}
+                  onChange={(e) => setCustomInstructions(e.target.value)}
+                  placeholder="Add specific instructions (optional)"
+                  className="min-h-[44px] max-h-28 resize-none text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
+              </div>
+              <Button
+                onClick={handleGenerate}
+                disabled={!selectedMaterial || isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Summary"
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
-        <div className="space-y-4 lg:col-span-1">
-          
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Select Material</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a material" />
-                </SelectTrigger>
-                <SelectContent>
-                  {materials.map((material) => (
-                    <SelectItem key={material.id} value={String(material.id)}>
-                      {material.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Summary Format</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-2">
-                {summaryTypes.map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() => setSummaryType(type.id)}
-                    className={cn(
-                      "p-3 rounded-lg border text-left transition-colors",
-                      summaryType === type.id
-                        ? "border-secondary bg-secondary/5"
-                        : "border-border hover:border-muted-foreground"
-                    )}
-                  >
-                    <p className="text-sm font-medium text-foreground">{type.name}</p>
-                    <p className="text-xs text-muted-foreground">{type.description}</p>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Custom Instructions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={customInstructions}
-                onChange={(e) => setCustomInstructions(e.target.value)}
-                placeholder="Add specific instructions (optional)"
-                className="min-h-[80px] resize-none text-sm"
-              />
-            </CardContent>
-          </Card>
-
-          <Button
-            className="w-full"
-            onClick={handleGenerate}
-            disabled={!selectedMaterial || isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-                Generating...
-              </>
-            ) : (
-              "Generate Summary"
-            )}
-          </Button>
-
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
-        </div>
-
-        <Card className="lg:col-span-2 h-fit">
+        <Card className="flex-1 overflow-hidden flex flex-col">
           {summary ? (
             <>
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium text-foreground">Summary Generated</span>
+                  <span className="text-sm font-medium text-foreground">Summary</span>
                   <Badge variant="outline" className="text-xs">
                     {summaryTypes.find(t => t.id === summaryType)?.name}
                   </Badge>
@@ -313,23 +383,50 @@ export const SummarizePage: React.FC = () => {
                     <Copy className="w-4 h-4 mr-1" />
                     Copy
                   </Button>
-                  <Button variant="ghost" size="sm">
-                    <Download className="w-4 h-4 mr-1" />
-                    Export
-                  </Button>
                   <Button variant="outline" size="sm" onClick={handleGenerate}>
                     <RefreshCw className="w-4 h-4 mr-1" />
                     Regenerate
                   </Button>
                 </div>
               </div>
-              <ScrollArea className="h-[500px] p-6">
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <div className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {summary}
+
+              <div className="flex-1 grid grid-cols-1 xl:grid-cols-3">
+                <ScrollArea className="xl:col-span-2 p-6">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                      {summary}
+                    </div>
                   </div>
+                </ScrollArea>
+
+                <div className="border-t xl:border-t-0 xl:border-l border-border p-4">
+                  <div className="text-sm font-medium text-foreground mb-2">References</div>
+                  {activeReferences.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No references available.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {activeReferences.map((r) => (
+                        <button
+                          key={`${r.sourceNo}-${r.chunkId}`}
+                          onClick={() => openReference(r.chunkId, r.pageStart)}
+                          className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
+                        >
+                          <div className="font-medium text-foreground truncate">
+                            Source {r.sourceNo}: {r.materialTitle}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground truncate">
+                            {r.pageStart && r.pageEnd
+                              ? `Pages ${r.pageStart}–${r.pageEnd}`
+                              : r.pageStart
+                                ? `Page ${r.pageStart}`
+                                : "Page range unavailable"}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </ScrollArea>
+              </div>
             </>
           ) : (
             <CardContent className="flex items-center justify-center py-24">
@@ -345,7 +442,9 @@ export const SummarizePage: React.FC = () => {
             </CardContent>
           )}
         </Card>
+
       </div>
+
     </div>
   );
 };
