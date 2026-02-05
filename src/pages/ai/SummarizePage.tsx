@@ -224,8 +224,8 @@ export const SummarizePage: React.FC = () => {
         excerpt={refText}
       />
 
-      <Card className="w-[280px] hidden lg:flex flex-col overflow-hidden">
-        <CardContent className="p-3 flex flex-col gap-2">
+      <Card className="w-[280px] hidden lg:flex flex-col overflow-hidden shrink-0">
+        <CardContent className="p-3 flex flex-col gap-2 min-h-0">
           <Button variant="outline" size="sm" onClick={handleNewSummary}>
             <Plus className="w-4 h-4 mr-2" />
             Përmbledhje e re
@@ -257,7 +257,7 @@ export const SummarizePage: React.FC = () => {
         </CardContent>
       </Card>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
@@ -367,7 +367,7 @@ export const SummarizePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="flex-1 overflow-hidden flex flex-col">
+        <Card className="flex-1 min-h-0 flex flex-col">
           {summary ? (
             <>
               <div className="flex items-center justify-between p-4 border-b border-border">
@@ -390,8 +390,8 @@ export const SummarizePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex-1 grid grid-cols-1 xl:grid-cols-3">
-                <ScrollArea className="xl:col-span-2 p-6">
+              <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-3">
+                <ScrollArea className="xl:col-span-2 min-h-0 p-6">
                   <div className="prose prose-sm max-w-none dark:prose-invert">
                     <div className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
                       {summary}
@@ -399,32 +399,36 @@ export const SummarizePage: React.FC = () => {
                   </div>
                 </ScrollArea>
 
-                <div className="border-t xl:border-t-0 xl:border-l border-border p-4">
-                  <div className="text-sm font-medium text-foreground mb-2">Referencat</div>
-                  {activeReferences.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Nuk ka referenca.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {activeReferences.map((r) => (
-                        <button
-                          key={`${r.sourceNo}-${r.chunkId}`}
-                          onClick={() => openReference(r.chunkId, r.pageStart)}
-                          className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
-                        >
-                          <div className="font-medium text-foreground truncate">
-                            Burimi {r.sourceNo}: {r.materialTitle}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground truncate">
-                            {r.pageStart && r.pageEnd
-                              ? `Faqet ${r.pageStart}–${r.pageEnd}`
-                              : r.pageStart
-                                ? `Faqja ${r.pageStart}`
-                                : "Intervali i faqeve nuk është i disponueshëm"}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div className="border-t xl:border-t-0 xl:border-l border-border min-h-0 flex flex-col">
+                  <div className="p-4 border-b border-border/60">
+                    <div className="text-sm font-medium text-foreground">Referencat</div>
+                  </div>
+                  <ScrollArea className="flex-1 min-h-0 p-4">
+                    {activeReferences.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">Nuk ka referenca.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {activeReferences.map((r) => (
+                          <button
+                            key={`${r.sourceNo}-${r.chunkId}`}
+                            onClick={() => openReference(r.chunkId, r.pageStart)}
+                            className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
+                          >
+                            <div className="font-medium text-foreground truncate">
+                              Burimi {r.sourceNo}: {r.materialTitle}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground truncate">
+                              {r.pageStart && r.pageEnd
+                                ? `Faqet ${r.pageStart}–${r.pageEnd}`
+                                : r.pageStart
+                                  ? `Faqja ${r.pageStart}`
+                                  : "Intervali i faqeve nuk është i disponueshëm"}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
                 </div>
               </div>
             </>

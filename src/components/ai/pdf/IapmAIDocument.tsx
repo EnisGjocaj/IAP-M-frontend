@@ -194,6 +194,11 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
   return (
     <Document>
       <Page size="A4" style={aiPdfStyles.coverPage}>
+        {logoSrc ? (
+          <View style={aiPdfStyles.coverWatermark} fixed>
+            <Image src={logoSrc} style={aiPdfStyles.coverWatermarkLogo} />
+          </View>
+        ) : null}
         <View style={aiPdfStyles.coverCenter}>
           {logoSrc ? <Image src={logoSrc} style={aiPdfStyles.coverLogo} /> : null}
           <Text style={aiPdfStyles.coverInstitute}>IAP-M</Text>
@@ -211,7 +216,7 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
           </View>
         ) : null}
 
-        <View style={aiPdfStyles.header}>
+        <View style={[aiPdfStyles.header, aiPdfStyles.headerFixed]} fixed>
           <View style={aiPdfStyles.brandLeft}>
             {logoSrc ? <Image src={logoSrc} style={aiPdfStyles.logo} /> : null}
             <View style={aiPdfStyles.brandText}>
@@ -227,56 +232,73 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
           </View>
         </View>
 
-        {Array.isArray(sections) && sections.length > 0
-          ? sections.map((s, idx) => (
-              <View key={`${s.title}-${idx}`} style={aiPdfStyles.section}>
-                <Text style={aiPdfStyles.sectionTitle}>{s.title}</Text>
-                <View>{renderMarkdown(s.content || "", `sec-${idx}`)}</View>
-              </View>
-            ))
-          : null}
-
-        {Array.isArray(transcript) && transcript.length > 0 ? (
-          <View style={aiPdfStyles.section}>
-            <Text style={aiPdfStyles.sectionTitle}>Biseda</Text>
-            {transcript.map((m, idx) => (
-              <View key={`${m.role}-${idx}`} style={aiPdfStyles.transcriptRow}>
-                <Text style={aiPdfStyles.transcriptRole}>{String(m.role).toUpperCase()}</Text>
-                <View style={{ flex: 1 }}>{renderMarkdown(m.content || "", `msg-${idx}`)}</View>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {Array.isArray(references) && references.length > 0 ? (
-          <View style={aiPdfStyles.section}>
-            <Text style={aiPdfStyles.sectionTitle}>Referencat</Text>
-            <View style={aiPdfStyles.referencesTable}>
-              {references.map((r, idx) => (
+        <View style={aiPdfStyles.content}>
+          {Array.isArray(sections) && sections.length > 0
+            ? sections.map((s, idx) => (
                 <View
-                  key={`${r.sourceNo}-${r.chunkId ?? "x"}`}
-                  style={{
-                    ...aiPdfStyles.referenceRow,
-                    ...(idx === references.length - 1 ? aiPdfStyles.referenceRowLast : {}),
-                  }}
+                  key={`${s.title}-${idx}`}
+                  style={aiPdfStyles.section}
+                  minPresenceAhead={160}
                 >
-                  <View style={aiPdfStyles.referenceRowTop}>
-                    <Text style={aiPdfStyles.sourceBadge}>#{r.sourceNo}</Text>
-                    <Text style={aiPdfStyles.referenceTitle}>{r.materialTitle}</Text>
-                  </View>
-                  <Text style={aiPdfStyles.referenceMeta}>{pagesLabel(r)}</Text>
+                  <Text style={aiPdfStyles.sectionTitle} wrap={false}>
+                    {s.title}
+                  </Text>
+                  <View>{renderMarkdown(s.content || "", `sec-${idx}`)}</View>
+                </View>
+              ))
+            : null}
+
+          {Array.isArray(transcript) && transcript.length > 0 ? (
+            <View style={aiPdfStyles.section} minPresenceAhead={180}>
+              <Text style={aiPdfStyles.sectionTitle} wrap={false}>
+                Biseda
+              </Text>
+              {transcript.map((m, idx) => (
+                <View
+                  key={`${m.role}-${idx}`}
+                  style={aiPdfStyles.transcriptRow}
+                  wrap={false}
+                  minPresenceAhead={110}
+                >
+                  <Text style={aiPdfStyles.transcriptRole}>{String(m.role).toUpperCase()}</Text>
+                  <View style={{ flex: 1 }}>{renderMarkdown(m.content || "", `msg-${idx}`)}</View>
                 </View>
               ))}
             </View>
-          </View>
-        ) : null}
+          ) : null}
 
-        <View style={aiPdfStyles.footer}>
+          {Array.isArray(references) && references.length > 0 ? (
+            <View style={aiPdfStyles.section} minPresenceAhead={220}>
+              <Text style={aiPdfStyles.sectionTitle} wrap={false}>
+                Referencat
+              </Text>
+              <View style={aiPdfStyles.referencesTable}>
+                {references.map((r, idx) => (
+                  <View
+                    key={`${r.sourceNo}-${r.chunkId ?? "x"}`}
+                    style={{
+                      ...aiPdfStyles.referenceRow,
+                      ...(idx === references.length - 1 ? aiPdfStyles.referenceRowLast : {}),
+                    }}
+                    minPresenceAhead={60}
+                  >
+                    <View style={aiPdfStyles.referenceRowTop}>
+                      <Text style={aiPdfStyles.sourceBadge}>#{r.sourceNo}</Text>
+                      <Text style={aiPdfStyles.referenceTitle}>{r.materialTitle}</Text>
+                    </View>
+                    <Text style={aiPdfStyles.referenceMeta}>{pagesLabel(r)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+        </View>
+
+        <View style={[aiPdfStyles.footer, aiPdfStyles.footerFixed]} fixed>
           <Text style={aiPdfStyles.footerText}>IAP-M • Eksport akademik</Text>
           <Text
             style={aiPdfStyles.footerText}
             render={({ pageNumber, totalPages }) => `Faqja ${pageNumber} / ${totalPages}`}
-            fixed
           />
         </View>
       </Page>
