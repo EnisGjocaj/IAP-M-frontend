@@ -29,7 +29,7 @@ export const About = () => {
 
   return (
     <>
-      <section className="about py-12 bg-gradient-to-br from-white via-blue-50/20 to-primary/3 relative overflow-hidden">
+      <section className="about py-20 bg-gradient-to-br from-white via-blue-50/20 to-primary/3 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-secondary/5 rounded-full blur-3xl"></div>

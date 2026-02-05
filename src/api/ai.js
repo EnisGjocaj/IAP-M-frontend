@@ -317,11 +317,11 @@ export const generateExam = async ({ materialIds, count }) => {
   }
 };
 
-export const generateExamSaved = async ({ materialIds, count, conversationId }) => {
+export const generateExamSaved = async ({ materialIds, count, difficulty, examType, conversationId }) => {
   try {
     const response = await api.post(
       '/api/ai/exam-engine/generate',
-      { materialIds, count, conversationId, saveConversation: true },
+      { materialIds, count, difficulty, examType, conversationId, saveConversation: true },
       getAuthHeaders()
     );
     return response.data;

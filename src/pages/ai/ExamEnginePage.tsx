@@ -9,6 +9,8 @@ import {
 import { Button } from "../../components/ui/button";
 import { cn } from "../../lib/utils";
 import { generateExamSaved, getAiChunk, getAiConversation, getMyMaterials, listAiConversations } from "../../api/ai";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import { Textarea } from "../../components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -16,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { Slider } from "../../components/ui/slider";
 import { Label } from "../../components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ReferencePreviewModal } from "../../components/ai/ReferencePreviewModal";
@@ -38,16 +39,36 @@ const examTypes = [
   { id: "oral-prep", name: "Përgatitje për provim oral", description: "Praktikë verbale" },
 ];
 
+type ExamJsonQuestion = {
+  id: number;
+  kind: "mcq" | "text";
+  prompt: string;
+  options?: Array<{ key: "A" | "B" | "C" | "D"; text: string }>;
+  correctOption?: "A" | "B" | "C" | "D";
+  correctAnswer: string;
+  explanation?: string;
+  keywords?: string[];
+  points?: number;
+};
+
+type ExamJson = {
+  questions: ExamJsonQuestion[];
+};
+
 
 export const ExamEnginePage: React.FC = () => {
   const [materials, setMaterials] = useState<AiMaterial[]>([]);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("multiple-choice");
-  const [questionCount, setQuestionCount] = useState([10]);
+  const [questionCount, setQuestionCount] = useState<number>(10);
   const [difficulty, setDifficulty] = useState<string>("medium");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showExam, setShowExam] = useState(false);
   const [examText, setExamText] = useState<string>("");
+  const [examJson, setExamJson] = useState<ExamJson | null>(null);
+  const [studentAnswers, setStudentAnswers] = useState<Record<number, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [scoreSummary, setScoreSummary] = useState<{ earned: number; total: number; percent: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [activeReferences, setActiveReferences] = useState<
@@ -85,6 +106,83 @@ export const ExamEnginePage: React.FC = () => {
     load();
   }, []);
 
+  const parseExamTextToJson = (raw: string): ExamJson | null => {
+    const normalized = String(raw || "").replace(/\r\n/g, "\n");
+    const blocks = splitExamSections(normalized);
+
+    const qLines = String(blocks.questions || "").split("\n");
+    const aLines = String(blocks.answers || "").split("\n");
+
+    const questions: ExamJsonQuestion[] = [];
+
+    let i = 0;
+    while (i < qLines.length) {
+      const line = (qLines[i] ?? "").trim();
+      if (!line) {
+        i += 1;
+        continue;
+      }
+
+      const m = line.match(/^(\d+)\.\s+(.*)$/);
+      if (!m) {
+        i += 1;
+        continue;
+      }
+
+      const id = Number(m[1]);
+      const prompt = String(m[2] || "").trim();
+      i += 1;
+
+      const options: Array<{ key: "A" | "B" | "C" | "D"; text: string }> = [];
+      while (i < qLines.length) {
+        const l = (qLines[i] ?? "").trim();
+        if (!l) {
+          i += 1;
+          break;
+        }
+        const om = l.match(/^([ABCD])\)\s+(.*)$/);
+        if (!om) break;
+        options.push({ key: om[1] as any, text: String(om[2] || "").trim() });
+        i += 1;
+      }
+
+      const isMcq = options.length > 0;
+      questions.push({
+        id,
+        kind: isMcq ? "mcq" : "text",
+        prompt,
+        ...(isMcq ? { options } : {}),
+        correctAnswer: "",
+      });
+    }
+
+    if (questions.length === 0) return null;
+
+    const byId = new Map<number, ExamJsonQuestion>(questions.map((q) => [q.id, q]));
+
+    for (const rawLine of aLines) {
+      const l = String(rawLine || "").trim();
+      if (!l) continue;
+      const am = l.match(/^(\d+)\)\s+(.*)$/);
+      if (!am) continue;
+
+      const id = Number(am[1]);
+      const rest = String(am[2] || "").trim();
+      const q = byId.get(id);
+      if (!q) continue;
+
+      const cm = rest.match(/^([ABCD])\s+—\s+(.*)$/);
+      if (cm) {
+        q.correctOption = cm[1] as any;
+        q.correctAnswer = String(cm[2] || "").trim();
+      } else {
+        q.correctAnswer = rest;
+      }
+    }
+
+    return { questions };
+  };
+
   React.useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -116,7 +214,13 @@ export const ExamEnginePage: React.FC = () => {
       setActiveConversationId(convo?.id || id);
       const msgs = Array.isArray(convo?.messages) ? convo.messages : [];
       const lastAssistant = [...msgs].reverse().find((m: any) => String(m.role).toUpperCase() === "ASSISTANT");
-      setExamText(lastAssistant?.content || "");
+      const txt = lastAssistant?.content || "";
+      setExamText(txt);
+      const parsed = parseExamTextToJson(txt);
+      setExamJson(parsed);
+      setStudentAnswers({});
+      setSubmitted(false);
+      setScoreSummary(null);
       setActiveReferences(Array.isArray(lastAssistant?.references) ? lastAssistant.references : []);
       setShowExam(true);
     } catch (e: any) {
@@ -127,9 +231,54 @@ export const ExamEnginePage: React.FC = () => {
   const handleNewExam = () => {
     setActiveConversationId(null);
     setExamText("");
+    setExamJson(null);
+    setStudentAnswers({});
+    setSubmitted(false);
+    setScoreSummary(null);
     setActiveReferences([]);
     setShowExam(false);
     setError(null);
+  };
+
+  const resetAttempt = () => {
+    setStudentAnswers({});
+    setSubmitted(false);
+    setScoreSummary(null);
+  };
+
+  const scoreExam = (data: ExamJson, answers: Record<number, string>) => {
+    const norm = (s: string) => String(s || "").toLowerCase();
+    let earned = 0;
+    let total = 0;
+
+    for (const q of data.questions) {
+      const pts = Math.max(1, Number(q.points ?? 1));
+      total += pts;
+
+      const a = (answers[q.id] ?? "").trim();
+      if (!a) continue;
+
+      if (q.kind === "mcq") {
+        if (q.correctOption && a === q.correctOption) earned += pts;
+        continue;
+      }
+
+      const kws = Array.isArray(q.keywords) ? q.keywords : [];
+      if (kws.length === 0) {
+        earned += Math.max(0, Math.round(pts * 0.5));
+        continue;
+      }
+
+      const hay = norm(a);
+      const matched = kws.filter((k) => hay.includes(norm(k))).length;
+      const ratio = matched / kws.length;
+
+      if (ratio >= 0.6) earned += pts;
+      else if (ratio >= 0.3) earned += Math.max(1, Math.round(pts * 0.5));
+    }
+
+    const percent = total > 0 ? Math.round((earned / total) * 100) : 0;
+    return { earned, total, percent };
   };
 
   const openReference = async (chunkId: number, pageStart: number | null) => {
@@ -193,10 +342,16 @@ export const ExamEnginePage: React.FC = () => {
     try {
       const res = (await generateExamSaved({
         materialIds: [materialId],
-        count: questionCount[0],
+        count: questionCount,
+        difficulty,
+        examType: selectedType,
         conversationId: activeConversationId || undefined,
       })) as any;
-      setExamText(res?.exam || "");
+      const txt = res?.exam || "";
+      setExamText(txt);
+      const json = res?.examJson && Array.isArray(res.examJson?.questions) ? (res.examJson as ExamJson) : null;
+      setExamJson(json ?? parseExamTextToJson(txt));
+      resetAttempt();
       setShowExam(true);
       if (typeof res?.conversationId === "number") {
         setActiveConversationId(res.conversationId);
@@ -319,56 +474,61 @@ export const ExamEnginePage: React.FC = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Lloji i provimit</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {examTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      onClick={() => setSelectedType(type.id)}
-                      className={cn(
-                        "p-3 rounded-lg border text-left transition-colors",
-                        selectedType === type.id
-                          ? "border-secondary bg-secondary/5"
-                          : "border-border hover:border-muted-foreground"
-                      )}
-                    >
-                      <p className="font-medium text-sm text-foreground">{type.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <div className="rounded-lg border border-border p-4 space-y-5">
+                <div className="text-sm font-medium text-foreground">Konfigurimi</div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="space-y-2">
                   <Label>Numri i pyetjeve</Label>
-                  <span className="text-sm font-medium text-foreground">{questionCount[0]}</span>
+                  <Select value={String(questionCount)} onValueChange={(v) => setQuestionCount(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Zgjidh numrin e pyetjeve" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} pyetje
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Slider
-                  value={questionCount}
-                  onValueChange={setQuestionCount}
-                  min={5}
-                  max={50}
-                  step={5}
-                  className="w-full"
-                />
-              </div>
 
-              <div className="space-y-2">
-                <Label>Niveli i vështirësisë</Label>
-                <div className="flex gap-2">
-                  {["easy", "medium", "hard"].map((level) => (
-                    <Button
-                      key={level}
-                      variant={difficulty === level ? "secondary" : "outline"}
-                      size="sm"
-                      onClick={() => setDifficulty(level)}
-                      className="flex-1 capitalize"
-                    >
-                      {level === "easy" ? "lehtë" : level === "medium" ? "mesatare" : "vështirë"}
-                    </Button>
-                  ))}
+                <div className="space-y-2">
+                  <Label>Niveli i vështirësisë</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["easy", "medium", "hard"].map((level) => (
+                      <Button
+                        key={level}
+                        variant={difficulty === level ? "secondary" : "outline"}
+                        size="sm"
+                        onClick={() => setDifficulty(level)}
+                        className="capitalize"
+                      >
+                        {level === "easy" ? "lehtë" : level === "medium" ? "mesatare" : "vështirë"}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Lloji i provimit</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {examTypes.map((type) => (
+                      <button
+                        key={type.id}
+                        onClick={() => setSelectedType(type.id)}
+                        className={cn(
+                          "p-3 rounded-lg border text-left transition-colors",
+                          selectedType === type.id
+                            ? "border-secondary bg-secondary/5"
+                            : "border-border hover:border-muted-foreground"
+                        )}
+                      >
+                        <p className="font-medium text-sm text-foreground">{type.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -406,6 +566,29 @@ export const ExamEnginePage: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex gap-2">
+                  {examJson ? (
+                    <Button
+                      variant={submitted ? "outline" : "secondary"}
+                      size="sm"
+                      onClick={() => {
+                        const data = examJson;
+                        if (!data) return;
+                        const s = scoreExam(data, studentAnswers);
+                        setScoreSummary(s);
+                        setSubmitted(true);
+                      }}
+                      disabled={submitted || !examJson?.questions?.length}
+                    >
+                      Dorëzo
+                    </Button>
+                  ) : null}
+
+                  {examJson ? (
+                    <Button variant="outline" size="sm" onClick={resetAttempt} disabled={isGenerating}>
+                      Rifillo
+                    </Button>
+                  ) : null}
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -427,14 +610,135 @@ export const ExamEnginePage: React.FC = () => {
                     const sections = splitExamSections(examText);
                     return (
                       <div className="space-y-4">
+                        {examJson ? (
+                          <Card>
+                            <CardHeader className="py-4">
+                              <CardTitle className="text-sm font-medium">Rezultati</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {scoreSummary ? (
+                                <div className="text-sm text-foreground">
+                                  <div className="font-medium">
+                                    Pikët: {scoreSummary.earned} / {scoreSummary.total} ({scoreSummary.percent}%)
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    Për provimet me përgjigje të hapur, vlerësimi bëhet me përputhje fjalë-kyçe.
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-sm text-muted-foreground">
+                                  Plotëso pyetjet dhe kliko "Dorëzo" për të marrë rezultatin.
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        ) : null}
+
                         <Card>
                           <CardHeader className="py-4">
                             <CardTitle className="text-sm font-medium">Pyetjet</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
-                              {sections.questions || sections.raw}
-                            </div>
+                            {examJson ? (
+                              <div className="space-y-4">
+                                {examJson.questions.map((q) => {
+                                  const a = studentAnswers[q.id] ?? "";
+                                  const pts = Math.max(1, Number(q.points ?? 1));
+
+                                  const isCorrect =
+                                    submitted &&
+                                    q.kind === "mcq" &&
+                                    q.correctOption &&
+                                    a &&
+                                    a === q.correctOption;
+
+                                  return (
+                                    <Card key={q.id} className={cn(submitted ? "border-border" : "border-border")}> 
+                                      <CardHeader className="py-4">
+                                        <CardTitle className="text-sm font-medium">
+                                          {q.id}. {q.prompt}
+                                          <span className="text-xs text-muted-foreground ml-2">({pts}p)</span>
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="space-y-3">
+                                        {q.kind === "mcq" ? (
+                                          <RadioGroup
+                                            value={a}
+                                            onValueChange={(v) =>
+                                              setStudentAnswers((prev) => ({
+                                                ...prev,
+                                                [q.id]: v,
+                                              }))
+                                            }
+                                            disabled={submitted}
+                                          >
+                                            <div className="space-y-2">
+                                              {(q.options || []).map((opt) => (
+                                                <label
+                                                  key={opt.key}
+                                                  className={cn(
+                                                    "flex items-start gap-3 rounded-md border px-3 py-2 text-sm",
+                                                    submitted && q.correctOption === opt.key
+                                                      ? "border-secondary bg-secondary/5"
+                                                      : "border-border"
+                                                  )}
+                                                >
+                                                  <RadioGroupItem value={opt.key} />
+                                                  <div className="flex-1">
+                                                    <div className="font-medium text-foreground">
+                                                      {opt.key}) <span className="font-normal">{opt.text}</span>
+                                                    </div>
+                                                  </div>
+                                                </label>
+                                              ))}
+                                            </div>
+                                          </RadioGroup>
+                                        ) : (
+                                          <div className="space-y-2">
+                                            <Label>Përgjigjja juaj</Label>
+                                            <Textarea
+                                              value={a}
+                                              onChange={(e) =>
+                                                setStudentAnswers((prev) => ({
+                                                  ...prev,
+                                                  [q.id]: e.target.value,
+                                                }))
+                                              }
+                                              disabled={submitted}
+                                              placeholder="Shkruani përgjigjen këtu..."
+                                            />
+                                          </div>
+                                        )}
+
+                                        {submitted ? (
+                                          <div className="rounded-md border border-border bg-muted/30 p-3 text-sm">
+                                            <div className="font-medium text-foreground">
+                                              Përgjigjja e saktë:
+                                              <span className="font-normal"> {q.correctAnswer}</span>
+                                            </div>
+                                            {q.kind === "mcq" && q.correctOption ? (
+                                              <div className="text-xs text-muted-foreground mt-1">
+                                                Opsioni i saktë: {q.correctOption}
+                                                {isCorrect ? " • Saktë" : ""}
+                                              </div>
+                                            ) : null}
+                                            {q.explanation ? (
+                                              <div className="text-xs text-muted-foreground mt-2 whitespace-pre-wrap">
+                                                {q.explanation}
+                                              </div>
+                                            ) : null}
+                                          </div>
+                                        ) : null}
+                                      </CardContent>
+                                    </Card>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                                {sections.questions || sections.raw}
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
 

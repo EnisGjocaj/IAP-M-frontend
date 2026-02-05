@@ -226,9 +226,17 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
           </View>
 
           <View style={aiPdfStyles.headerRight}>
-            <Text style={aiPdfStyles.docTitle}>{title}</Text>
-            {subtitle ? <Text style={aiPdfStyles.docSubtitle}>{subtitle}</Text> : null}
-            <Text style={aiPdfStyles.meta}>Gjeneruar: {formatDate(date)}</Text>
+            <Text style={aiPdfStyles.docTitle}>
+              {title}
+            </Text>
+            {subtitle ? (
+              <Text style={aiPdfStyles.docSubtitle}>
+                {subtitle}
+              </Text>
+            ) : null}
+            <Text style={aiPdfStyles.meta}>
+              Gjeneruar: {formatDate(date)}
+            </Text>
           </View>
         </View>
 
