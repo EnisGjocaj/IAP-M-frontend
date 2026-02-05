@@ -193,6 +193,16 @@ export const listAiConversations = async () => {
   }
 };
 
+export const getAiStats = async () => {
+  try {
+    const response = await api.get('/api/ai/stats', getAuthHeaders());
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching AI stats:', error);
+    throw error;
+  }
+};
+
 export const getAiConversation = async (id) => {
   try {
     const response = await api.get(`/api/ai/conversations/${id}`, getAuthHeaders());

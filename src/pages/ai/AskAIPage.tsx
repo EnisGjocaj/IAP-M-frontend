@@ -55,10 +55,10 @@ type AiMaterial = {
 };
 
 const suggestedQueries = [
-  "Explain this concept simply",
-  "What are likely exam questions?",
-  "Summarize in bullet points",
-  "Compare these two concepts",
+  "Shpjego këtë koncept thjesht",
+  "Cilat janë pyetjet e mundshme të provimit?",
+  "Përmbledh me pika",
+  "Krahaso këto dy koncepte",
 ];
 
 export const AskAIPage: React.FC = () => {
@@ -101,7 +101,7 @@ export const AskAIPage: React.FC = () => {
           setSelectedMaterials([approved[0].id]);
         }
       } catch (e: any) {
-        setError(e?.message || "Failed to load materials");
+        setError(e?.message || "Dështoi ngarkimi i materialeve");
       }
     };
 
@@ -144,7 +144,7 @@ export const AskAIPage: React.FC = () => {
       }));
       setMessages(loaded);
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Failed to load conversation");
+      setError(e?.response?.data?.message || e?.message || "Dështoi ngarkimi i bisedës");
     }
   };
 
@@ -160,7 +160,7 @@ export const AskAIPage: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
     if (!selectedMaterials || selectedMaterials.length === 0) {
-      setError("Please select at least one approved material.");
+      setError("Ju lutem zgjidhni të paktën një material të aprovuar.");
       return;
     }
 
@@ -209,7 +209,7 @@ export const AskAIPage: React.FC = () => {
       setMessages((prev) => [...prev, aiMessage]);
       refreshConversations();
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Failed to get answer";
+      const msg = e?.response?.data?.message || e?.message || "Dështoi marrja e përgjigjes";
       setError(msg);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -259,9 +259,9 @@ export const AskAIPage: React.FC = () => {
             }}
           >
             <RotateCcw className="w-4 h-4 mr-2" />
-            New Chat
+            Bisedë e re
           </Button>
-          <div className="text-xs text-muted-foreground mt-1">History</div>
+          <div className="text-xs text-muted-foreground mt-1">Historik</div>
           <div className="space-y-1">
             {conversations.map((c) => (
               <button
@@ -274,7 +274,7 @@ export const AskAIPage: React.FC = () => {
               >
                 <div className="font-medium text-foreground truncate">{c.title}</div>
                 <div className="text-[11px] text-muted-foreground truncate">
-                  {c.type === "SUMMARY" ? "Summary" : "Chat"} · {new Date(c.updatedAt).toLocaleDateString()}
+                  {c.type === "SUMMARY" ? "Përmbledhje" : "Bisedë"} · {new Date(c.updatedAt).toLocaleDateString()}
                 </div>
               </button>
             ))}
@@ -286,15 +286,15 @@ export const AskAIPage: React.FC = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Ask AI</h1>
-          <p className="text-sm text-muted-foreground mt-1">Query your academic materials</p>
+          <h1 className="text-xl font-semibold text-foreground">Pyet AI</h1>
+          <p className="text-sm text-muted-foreground mt-1">Bëni pyetje mbi materialet tuaja akademike</p>
         </div>
         <div className="flex gap-2">
           <AIPdfDownloadButton
             document={
               <IapmAIDocument
-                title={activeConversationTitle || "Ask AI"}
-                subtitle={selectedMaterials.length > 0 ? `Materials: ${selectedMaterials.length}` : null}
+                title={activeConversationTitle || "Pyet AI"}
+                subtitle={selectedMaterials.length > 0 ? `Materiale: ${selectedMaterials.length}` : null}
                 generatedAt={new Date()}
                 logoSrc={typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined}
                 transcript={messages.map((m) => ({
@@ -321,11 +321,11 @@ export const AskAIPage: React.FC = () => {
                 })()}
               />
             }
-            fileName={`IAPM_${(activeConversationTitle || "AskAI").replace(/\s+/g, "_")}.pdf`}
+            fileName={`IAPM_${(activeConversationTitle || "PyetAI").replace(/\s+/g, "_")}.pdf`}
             disabled={messages.length === 0}
           >
             <Download className="w-4 h-4 mr-2" />
-            Export PDF
+            Eksporto PDF
           </AIPdfDownloadButton>
           <Button variant="outline" size="sm" onClick={() => {
             setActiveConversationId(null);
@@ -333,7 +333,7 @@ export const AskAIPage: React.FC = () => {
             setMessages([]);
           }}>
             <RotateCcw className="w-4 h-4 mr-2" />
-            New Chat
+            Bisedë e re
           </Button>
         </div>
       </div>
@@ -342,7 +342,7 @@ export const AskAIPage: React.FC = () => {
         <CardContent className="py-3">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Selected Materials</span>
+            <span className="text-sm font-medium text-foreground">Materialet e zgjedhura</span>
             <span className="text-xs text-muted-foreground">({selectedMaterials.length})</span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -362,7 +362,7 @@ export const AskAIPage: React.FC = () => {
             ))}
             <Badge variant="outline" className="cursor-pointer hover:bg-muted">
               <Plus className="w-3 h-3 mr-1" />
-              Add More
+              Shto të tjera
             </Badge>
           </div>
         </CardContent>
@@ -381,9 +381,9 @@ export const AskAIPage: React.FC = () => {
                 <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mx-auto mb-4">
                   <BookOpen className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium text-foreground">Start a conversation</h3>
+                <h3 className="font-medium text-foreground">Fillo një bisedë</h3>
                 <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                  Ask questions about your study materials.
+                  Bëni pyetje rreth materialeve tuaja të studimit.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
                   {suggestedQueries.map((query, index) => (
@@ -427,15 +427,15 @@ export const AskAIPage: React.FC = () => {
                   </div>
                   {message.references && message.references.length > 0 && (
                     <div className="mt-2 pt-2 border-t border-border/50">
-                      <span className="text-xs text-muted-foreground">Sources:</span>
+                      <span className="text-xs text-muted-foreground">Burimet:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {message.references.map((r) => {
                           const pages =
                             r.pageStart && r.pageEnd
                               ? r.pageStart === r.pageEnd
-                                ? `page ${r.pageStart}`
-                                : `pages ${r.pageStart}–${r.pageEnd}`
-                              : "pages ?";
+                                ? `faqja ${r.pageStart}`
+                                : `faqet ${r.pageStart}–${r.pageEnd}`
+                              : "faqet ?";
                           const label = `${r.materialTitle} (${pages})`;
                           return (
                             <Badge
@@ -451,7 +451,7 @@ export const AskAIPage: React.FC = () => {
                                   setRefText(data?.text || null);
                                   setRefOpen(true);
                                 } catch (e: any) {
-                                  setError(e?.response?.data?.message || e?.message || "Failed to load reference");
+                                  setError(e?.response?.data?.message || e?.message || "Dështoi ngarkimi i referencës");
                                 }
                               }}
                             >
@@ -509,7 +509,7 @@ export const AskAIPage: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question about your materials..."
+              placeholder="Bëni një pyetje rreth materialeve tuaja..."
               className="min-h-[40px] max-h-24 resize-none text-sm"
               rows={1}
             />
@@ -523,7 +523,7 @@ export const AskAIPage: React.FC = () => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-1.5">
-            Press Enter to send, Shift+Enter for new line
+            Shtyp Enter për të dërguar, Shift+Enter për rresht të ri
           </p>
         </div>
       </Card>

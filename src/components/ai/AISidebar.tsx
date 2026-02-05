@@ -29,17 +29,17 @@ import { cn } from "../../lib/utils";
 import { Button } from "../../components/ui/button";
 
 const mainNavItems = [
-  { title: "Dashboard", url: "/ai", icon: LayoutDashboard },
-  { title: "Materials", url: "/ai/materials", icon: FolderOpen },
-  { title: "Ask AI", url: "/ai/ask", icon: MessageSquare },
-  { title: "Summarize", url: "/ai/summarize", icon: FileText },
-  { title: "Exam Engine", url: "/ai/exam", icon: GraduationCap },
-  { title: "Advisor", url: "/ai/advisor", icon: Brain },
+  { title: "Paneli", url: "/ai", icon: LayoutDashboard },
+  { title: "Materialet", url: "/ai/materials", icon: FolderOpen },
+  { title: "Pyet AI", url: "/ai/ask", icon: MessageSquare },
+  { title: "Përmbledhje", url: "/ai/summarize", icon: FileText },
+  { title: "Motori i Provimeve", url: "/ai/exam", icon: GraduationCap },
+  { title: "Këshilltari", url: "/ai/advisor", icon: Brain },
 ];
 
 const supportNavItems = [
-  { title: "Help", url: "/ai/help", icon: HelpCircle },
-  { title: "Settings", url: "/ai/settings", icon: Settings },
+  { title: "Ndihmë", url: "/ai/help", icon: HelpCircle },
+  { title: "Cilësimet", url: "/ai/settings", icon: Settings },
 ];
 
 export const AISidebar: React.FC = () => {
@@ -72,7 +72,7 @@ export const AISidebar: React.FC = () => {
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-semibold text-sidebar-foreground">IAP-M AI</span>
-              <span className="text-xs text-sidebar-foreground/70">Academic Tools</span>
+              <span className="text-xs text-sidebar-foreground/70">Mjete Akademike</span>
             </div>
           )}
         </div>
@@ -82,7 +82,7 @@ export const AISidebar: React.FC = () => {
         <SidebarGroup>
           {!isCollapsed && (
             <SidebarGroupLabel className="text-sidebar-foreground/60 text-xs uppercase tracking-wider mb-2 px-2">
-              Features
+              Veçoritë
             </SidebarGroupLabel>
           )}
           <SidebarGroupContent>
@@ -113,7 +113,7 @@ export const AISidebar: React.FC = () => {
         <SidebarGroup className="mt-6">
           {!isCollapsed && (
             <SidebarGroupLabel className="text-sidebar-foreground/60 text-xs uppercase tracking-wider mb-2 px-2">
-              Support
+              Mbështetje
             </SidebarGroupLabel>
           )}
           <SidebarGroupContent>
@@ -146,7 +146,7 @@ export const AISidebar: React.FC = () => {
         <div className="flex items-center justify-between  overflow-x-hidden">
           {!isCollapsed && (
             <span className="text-xs text-sidebar-foreground/60  overflow-x-hidden whitespace-nowrap">
-              Faculty of Business
+              Fakulteti i Biznesit
             </span>
           )}
           <Button

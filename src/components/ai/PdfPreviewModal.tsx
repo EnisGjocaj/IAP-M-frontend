@@ -25,9 +25,9 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({ open, onOpenCh
       <DialogContent className="max-w-5xl h-[85vh] p-0 overflow-hidden">
         <div className="flex h-full flex-col">
           <DialogHeader className="px-6 pt-6">
-            <DialogTitle className="truncate">{title || "PDF Preview"}</DialogTitle>
+            <DialogTitle className="truncate">{title || "Parapamje PDF"}</DialogTitle>
             <DialogDescription className="truncate">
-              {canPreview ? "Previewing inside the app" : "No preview available"}
+              {canPreview ? "Parapamje brenda aplikacionit" : "Nuk ka parapamje"}
             </DialogDescription>
           </DialogHeader>
 
@@ -40,14 +40,14 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({ open, onOpenCh
               />
             ) : (
               <div className="h-full w-full rounded-md border bg-muted/30 flex items-center justify-center text-sm text-muted-foreground">
-                Missing PDF URL
+                Mungon URL-ja e PDF-së
               </div>
             )}
           </div>
 
           <DialogFooter className="px-6 pb-6">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Close
+              Mbyll
             </Button>
             <Button
               onClick={() => {
@@ -56,7 +56,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({ open, onOpenCh
               }}
               disabled={!url}
             >
-              Download
+              Shkarko
             </Button>
           </DialogFooter>
         </div>

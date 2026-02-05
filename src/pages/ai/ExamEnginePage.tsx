@@ -32,10 +32,10 @@ type AiMaterial = {
 };
 
 const examTypes = [
-  { id: "multiple-choice", name: "Multiple Choice", description: "Test with MCQs" },
-  { id: "case-study", name: "Case Study", description: "Analyze scenarios" },
-  { id: "short-answer", name: "Short Answer", description: "Brief responses" },
-  { id: "oral-prep", name: "Oral Exam Prep", description: "Verbal practice" },
+  { id: "multiple-choice", name: "Me alternativa", description: "Test me alternativa" },
+  { id: "case-study", name: "Studim rasti", description: "Analizo skenarë" },
+  { id: "short-answer", name: "Përgjigje e shkurtër", description: "Përgjigje të shkurtra" },
+  { id: "oral-prep", name: "Përgatitje për provim oral", description: "Praktikë verbale" },
 ];
 
 
@@ -78,7 +78,7 @@ export const ExamEnginePage: React.FC = () => {
         const approved = list.filter((m) => m.isApproved);
         setMaterials(approved);
       } catch (e: any) {
-        setError(e?.message || "Failed to load materials");
+        setError(e?.message || "Dështoi ngarkimi i materialeve");
       }
     };
 
@@ -120,7 +120,7 @@ export const ExamEnginePage: React.FC = () => {
       setActiveReferences(Array.isArray(lastAssistant?.references) ? lastAssistant.references : []);
       setShowExam(true);
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Failed to load exam");
+      setError(e?.response?.data?.message || e?.message || "Dështoi ngarkimi i provimit");
     }
   };
 
@@ -135,7 +135,7 @@ export const ExamEnginePage: React.FC = () => {
   const openReference = async (chunkId: number, pageStart: number | null) => {
     try {
       const chunk = (await getAiChunk(chunkId)) as any;
-      const title = chunk?.material?.title || "Reference";
+      const title = chunk?.material?.title || "Referencë";
       const url = chunk?.material?.cloudinaryUrl || null;
       setRefTitle(title);
       setRefUrl(url);
@@ -178,13 +178,13 @@ export const ExamEnginePage: React.FC = () => {
   };
 
   const logoSrc = typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined;
-  const fileSafeTitle = (activeConversationId ? `Exam_${activeConversationId}` : "Exam").replace(/[^a-z0-9\-_ ]/gi, "");
+  const fileSafeTitle = (activeConversationId ? `Provim_${activeConversationId}` : "Provim").replace(/[^a-z0-9\-_ ]/gi, "");
   const fileName = `IAPM_${fileSafeTitle.replace(/\s+/g, "_")}.pdf`;
 
   const handleGenerate = async () => {
     const materialId = Number(selectedMaterial);
     if (Number.isNaN(materialId)) {
-      setError("Please select a material.");
+      setError("Ju lutem zgjidhni një material.");
       return;
     }
 
@@ -204,7 +204,7 @@ export const ExamEnginePage: React.FC = () => {
       setActiveReferences(Array.isArray(res?.references) ? res.references : []);
       refreshHistory();
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Failed to generate exam");
+      setError(e?.response?.data?.message || e?.message || "Dështoi gjenerimi i provimit");
     } finally {
       setIsGenerating(false);
     }
@@ -226,12 +226,12 @@ export const ExamEnginePage: React.FC = () => {
         <CardContent className="p-3 flex flex-col gap-2">
           <Button variant="outline" size="sm" onClick={handleNewExam}>
             <Plus className="w-4 h-4 mr-2" />
-            New Exam
+            Provim i ri
           </Button>
-          <div className="text-xs text-muted-foreground mt-1">History</div>
+          <div className="text-xs text-muted-foreground mt-1">Historik</div>
           <div className="space-y-1 overflow-auto pr-2">
             {examConversations.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-2">No exams yet.</p>
+              <p className="text-sm text-muted-foreground py-2">Ende s’ka provime.</p>
             ) : (
               examConversations.map((c) => (
                 <button
@@ -257,22 +257,22 @@ export const ExamEnginePage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Exam Engine</h1>
-            <p className="text-sm text-muted-foreground mt-1">Generate practice exams from your study materials</p>
+            <h1 className="text-xl font-semibold text-foreground">Motori i Provimeve</h1>
+            <p className="text-sm text-muted-foreground mt-1">Gjeneroni provime praktike nga materialet tuaja të studimit</p>
           </div>
           <div className="flex gap-2">
             <AIPdfDownloadButton
               document={
                 <IapmAIDocument
-                  title="Exam"
-                  subtitle={activeConversationId ? `Conversation #${activeConversationId}` : null}
+                  title="Provim"
+                  subtitle={activeConversationId ? `Biseda #${activeConversationId}` : null}
                   generatedAt={new Date()}
                   logoSrc={logoSrc}
                   sections={(() => {
                     const s = splitExamSections(examText);
                     return [
-                      { title: "Questions", content: s.questions || s.raw || "" },
-                      ...(s.answers ? [{ title: "Answers", content: s.answers }] : []),
+                      { title: "Pyetjet", content: s.questions || s.raw || "" },
+                      ...(s.answers ? [{ title: "Përgjigjet", content: s.answers }] : []),
                     ];
                   })()}
                   references={activeReferences.map((r) => ({
@@ -288,11 +288,11 @@ export const ExamEnginePage: React.FC = () => {
               disabled={!examText}
             >
               <Download className="w-4 h-4 mr-2" />
-              Export PDF
+              Eksporto PDF
             </AIPdfDownloadButton>
             <Button variant="outline" size="sm" onClick={handleNewExam}>
               <Plus className="w-4 h-4 mr-2" />
-              New
+              I ri
             </Button>
           </div>
         </div>
@@ -300,14 +300,14 @@ export const ExamEnginePage: React.FC = () => {
         {!showExam ? (
           <Card className="flex-1 overflow-auto">
             <CardHeader>
-              <CardTitle className="text-base font-medium">Create Practice Exam</CardTitle>
+              <CardTitle className="text-base font-medium">Krijo provim praktik</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Material</Label>
+                <Label>Materiali</Label>
                 <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a material" />
+                    <SelectValue placeholder="Zgjidh një material" />
                   </SelectTrigger>
                   <SelectContent>
                     {materials.map((m) => (
@@ -320,7 +320,7 @@ export const ExamEnginePage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Exam Type</Label>
+                <Label>Lloji i provimit</Label>
                 <div className="grid grid-cols-2 gap-3">
                   {examTypes.map((type) => (
                     <button
@@ -342,7 +342,7 @@ export const ExamEnginePage: React.FC = () => {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label>Number of Questions</Label>
+                  <Label>Numri i pyetjeve</Label>
                   <span className="text-sm font-medium text-foreground">{questionCount[0]}</span>
                 </div>
                 <Slider
@@ -356,7 +356,7 @@ export const ExamEnginePage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Difficulty Level</Label>
+                <Label>Niveli i vështirësisë</Label>
                 <div className="flex gap-2">
                   {["easy", "medium", "hard"].map((level) => (
                     <Button
@@ -366,7 +366,7 @@ export const ExamEnginePage: React.FC = () => {
                       onClick={() => setDifficulty(level)}
                       className="flex-1 capitalize"
                     >
-                      {level}
+                      {level === "easy" ? "lehtë" : level === "medium" ? "mesatare" : "vështirë"}
                     </Button>
                   ))}
                 </div>
@@ -380,12 +380,12 @@ export const ExamEnginePage: React.FC = () => {
                 {isGenerating ? (
                   <>
                     <RotateCcw className="w-4 h-4 animate-spin mr-2" />
-                    Generating...
+                    Duke gjeneruar...
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Generate Practice Exam
+                    Gjenero provim praktik
                   </>
                 )}
               </Button>
@@ -400,9 +400,9 @@ export const ExamEnginePage: React.FC = () => {
             <div className="p-4 bg-muted/50 border-b border-border">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">Generated Exam</span>
+                  <span className="text-sm font-medium text-foreground">Provim i gjeneruar</span>
                   <span className="text-[11px] text-muted-foreground">
-                    {activeConversationId ? `Conversation #${activeConversationId}` : ""}
+                    {activeConversationId ? `Biseda #${activeConversationId}` : ""}
                   </span>
                 </div>
                 <div className="flex gap-2">
@@ -414,7 +414,7 @@ export const ExamEnginePage: React.FC = () => {
                     }}
                     disabled={!examText}
                   >
-                    Copy
+                    Kopjo
                   </Button>
                 </div>
               </div>
@@ -429,7 +429,7 @@ export const ExamEnginePage: React.FC = () => {
                       <div className="space-y-4">
                         <Card>
                           <CardHeader className="py-4">
-                            <CardTitle className="text-sm font-medium">Questions</CardTitle>
+                            <CardTitle className="text-sm font-medium">Pyetjet</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
@@ -441,7 +441,7 @@ export const ExamEnginePage: React.FC = () => {
                         {sections.answers ? (
                           <Card>
                             <CardHeader className="py-4">
-                              <CardTitle className="text-sm font-medium">Answers</CardTitle>
+                              <CardTitle className="text-sm font-medium">Përgjigjet</CardTitle>
                             </CardHeader>
                             <CardContent>
                               <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
@@ -454,14 +454,14 @@ export const ExamEnginePage: React.FC = () => {
                     );
                   })()
                 ) : (
-                  <p className="text-sm text-muted-foreground">No exam generated.</p>
+                  <p className="text-sm text-muted-foreground">Nuk u gjenerua asnjë provim.</p>
                 )}
               </div>
 
               <div className="border-t xl:border-t-0 xl:border-l border-border p-4 overflow-auto">
-                <div className="text-sm font-medium text-foreground mb-2">References</div>
+                <div className="text-sm font-medium text-foreground mb-2">Referencat</div>
                 {activeReferences.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No references available.</p>
+                  <p className="text-sm text-muted-foreground">Nuk ka referenca.</p>
                 ) : (
                   <div className="space-y-2">
                     {activeReferences.map((r) => (
@@ -471,14 +471,14 @@ export const ExamEnginePage: React.FC = () => {
                         className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
                       >
                         <div className="font-medium text-foreground truncate">
-                          Source {r.sourceNo}: {r.materialTitle}
+                          Burimi {r.sourceNo}: {r.materialTitle}
                         </div>
                         <div className="text-[11px] text-muted-foreground truncate">
                           {r.pageStart && r.pageEnd
-                            ? `Pages ${r.pageStart}–${r.pageEnd}`
+                            ? `Faqet ${r.pageStart}–${r.pageEnd}`
                             : r.pageStart
-                              ? `Page ${r.pageStart}`
-                              : "Page range unavailable"}
+                              ? `Faqja ${r.pageStart}`
+                              : "Intervali i faqeve nuk është i disponueshëm"}
                         </div>
                       </button>
                     ))}

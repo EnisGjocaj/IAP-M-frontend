@@ -44,10 +44,10 @@ type ConversationListItem = {
 };
 
 const summaryTypes = [
-  { id: "bullet", name: "Bullet Points", description: "Key points" },
-  { id: "paragraph", name: "Paragraph", description: "Narrative" },
-  { id: "study-guide", name: "Study Guide", description: "Exam-ready" },
-  { id: "key-terms", name: "Key Terms", description: "Vocabulary" },
+  { id: "bullet", name: "Pika", description: "Pikat kryesore" },
+  { id: "paragraph", name: "Paragraf", description: "Rrëfim" },
+  { id: "study-guide", name: "Udhëzues Studimi", description: "Gati për provim" },
+  { id: "key-terms", name: "Terma kyç", description: "Fjalor" },
 ];
 
 export const SummarizePage: React.FC = () => {
@@ -89,7 +89,7 @@ export const SummarizePage: React.FC = () => {
         const approved = list.filter((m) => m.isApproved);
         setMaterials(approved);
       } catch (e: any) {
-        setError(e?.message || "Failed to load materials");
+        setError(e?.message || "Dështoi ngarkimi i materialeve");
       }
     };
 
@@ -144,7 +144,7 @@ export const SummarizePage: React.FC = () => {
         setSelectedMaterial(String(materialId));
       }
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Failed to load summary");
+      setError(e?.response?.data?.message || e?.message || "Dështoi ngarkimi i përmbledhjes");
     }
   };
 
@@ -159,7 +159,7 @@ export const SummarizePage: React.FC = () => {
   const openReference = async (chunkId: number, pageStart: number | null) => {
     try {
       const chunk = (await getAiChunk(chunkId)) as any;
-      const title = chunk?.material?.title || "Reference";
+      const title = chunk?.material?.title || "Referencë";
       const url = chunk?.material?.cloudinaryUrl || null;
       setRefTitle(title);
       setRefUrl(url);
@@ -174,7 +174,7 @@ export const SummarizePage: React.FC = () => {
   const handleGenerate = async () => {
     const materialId = Number(selectedMaterial);
     if (Number.isNaN(materialId)) {
-      setError("Please select a material.");
+      setError("Ju lutem zgjidhni një material.");
       return;
     }
 
@@ -198,7 +198,7 @@ export const SummarizePage: React.FC = () => {
 
       refreshConversations();
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Failed to generate summary");
+      setError(e?.response?.data?.message || e?.message || "Dështoi gjenerimi i përmbledhjes");
     } finally {
       setIsGenerating(false);
     }
@@ -209,7 +209,7 @@ export const SummarizePage: React.FC = () => {
   };
 
   const logoSrc = typeof window !== "undefined" ? `${window.location.origin}/iap-m-logo.jpg` : undefined;
-  const fileSafeTitle = (activeConversationTitle || "Summary").replace(/[^a-z0-9\-_ ]/gi, "");
+  const fileSafeTitle = (activeConversationTitle || "Përmbledhje").replace(/[^a-z0-9\-_ ]/gi, "");
   const fileName = `IAPM_${fileSafeTitle.replace(/\s+/g, "_")}.pdf`;
 
   return (
@@ -228,13 +228,13 @@ export const SummarizePage: React.FC = () => {
         <CardContent className="p-3 flex flex-col gap-2">
           <Button variant="outline" size="sm" onClick={handleNewSummary}>
             <Plus className="w-4 h-4 mr-2" />
-            New Summary
+            Përmbledhje e re
           </Button>
-          <div className="text-xs text-muted-foreground mt-1">History</div>
+          <div className="text-xs text-muted-foreground mt-1">Historik</div>
           <ScrollArea className="flex-1 pr-2">
             <div className="space-y-1">
               {conversations.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-2">No summaries yet.</p>
+                <p className="text-sm text-muted-foreground py-2">Ende s’ka përmbledhje.</p>
               ) : (
                 conversations.map((c) => (
                   <button
@@ -261,18 +261,18 @@ export const SummarizePage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Summarize</h1>
-            <p className="text-sm text-muted-foreground mt-1">Generate summaries of your study materials</p>
+            <h1 className="text-xl font-semibold text-foreground">Përmbledhje</h1>
+            <p className="text-sm text-muted-foreground mt-1">Gjeneroni përmbledhje të materialeve tuaja të studimit</p>
           </div>
           <div className="flex gap-2">
             <AIPdfDownloadButton
               document={
                 <IapmAIDocument
-                  title={activeConversationTitle || "Summary"}
-                  subtitle={selectedMaterial ? `Material #${selectedMaterial}` : null}
+                  title={activeConversationTitle || "Përmbledhje"}
+                  subtitle={selectedMaterial ? `Materiali #${selectedMaterial}` : null}
                   generatedAt={new Date()}
                   logoSrc={logoSrc}
-                  sections={[{ title: "Summary", content: summary || "" }]}
+                  sections={[{ title: "Përmbledhje", content: summary || "" }]}
                   references={activeReferences.map((r) => ({
                     sourceNo: r.sourceNo,
                     chunkId: r.chunkId,
@@ -286,11 +286,11 @@ export const SummarizePage: React.FC = () => {
               disabled={!summary}
             >
               <Download className="w-4 h-4 mr-2" />
-              Export PDF
+              Eksporto PDF
             </AIPdfDownloadButton>
             <Button variant="outline" size="sm" onClick={handleNewSummary}>
               <Plus className="w-4 h-4 mr-2" />
-              New
+              I ri
             </Button>
           </div>
         </div>
@@ -299,10 +299,10 @@ export const SummarizePage: React.FC = () => {
           <CardContent className="p-4">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-end">
               <div className="space-y-2">
-                <Label>Material</Label>
+                <Label>Materiali</Label>
                 <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a material" />
+                    <SelectValue placeholder="Zgjidh një material" />
                   </SelectTrigger>
                   <SelectContent>
                     {materials.map((material) => (
@@ -315,7 +315,7 @@ export const SummarizePage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Summary Format</Label>
+                <Label>Formati i përmbledhjes</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {summaryTypes.map((type) => (
                     <button
@@ -336,11 +336,11 @@ export const SummarizePage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Custom Instructions</Label>
+                <Label>Udhëzime të personalizuara</Label>
                 <Textarea
                   value={customInstructions}
                   onChange={(e) => setCustomInstructions(e.target.value)}
-                  placeholder="Add specific instructions (optional)"
+                  placeholder="Shto udhëzime specifike (opsionale)"
                   className="min-h-[44px] max-h-28 resize-none text-sm"
                 />
               </div>
@@ -357,10 +357,10 @@ export const SummarizePage: React.FC = () => {
                 {isGenerating ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-                    Generating...
+                    Duke gjeneruar...
                   </>
                 ) : (
-                  "Generate Summary"
+                  "Gjenero përmbledhje"
                 )}
               </Button>
             </div>
@@ -373,7 +373,7 @@ export const SummarizePage: React.FC = () => {
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium text-foreground">Summary</span>
+                  <span className="text-sm font-medium text-foreground">Përmbledhje</span>
                   <Badge variant="outline" className="text-xs">
                     {summaryTypes.find(t => t.id === summaryType)?.name}
                   </Badge>
@@ -381,11 +381,11 @@ export const SummarizePage: React.FC = () => {
                 <div className="flex gap-1">
                   <Button variant="ghost" size="sm" onClick={handleCopy}>
                     <Copy className="w-4 h-4 mr-1" />
-                    Copy
+                    Kopjo
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleGenerate}>
                     <RefreshCw className="w-4 h-4 mr-1" />
-                    Regenerate
+                    Rigjenero
                   </Button>
                 </div>
               </div>
@@ -400,9 +400,9 @@ export const SummarizePage: React.FC = () => {
                 </ScrollArea>
 
                 <div className="border-t xl:border-t-0 xl:border-l border-border p-4">
-                  <div className="text-sm font-medium text-foreground mb-2">References</div>
+                  <div className="text-sm font-medium text-foreground mb-2">Referencat</div>
                   {activeReferences.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No references available.</p>
+                    <p className="text-sm text-muted-foreground">Nuk ka referenca.</p>
                   ) : (
                     <div className="space-y-2">
                       {activeReferences.map((r) => (
@@ -412,14 +412,14 @@ export const SummarizePage: React.FC = () => {
                           className="w-full text-left rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
                         >
                           <div className="font-medium text-foreground truncate">
-                            Source {r.sourceNo}: {r.materialTitle}
+                            Burimi {r.sourceNo}: {r.materialTitle}
                           </div>
                           <div className="text-[11px] text-muted-foreground truncate">
                             {r.pageStart && r.pageEnd
-                              ? `Pages ${r.pageStart}–${r.pageEnd}`
+                              ? `Faqet ${r.pageStart}–${r.pageEnd}`
                               : r.pageStart
-                                ? `Page ${r.pageStart}`
-                                : "Page range unavailable"}
+                                ? `Faqja ${r.pageStart}`
+                                : "Intervali i faqeve nuk është i disponueshëm"}
                           </div>
                         </button>
                       ))}
@@ -434,9 +434,9 @@ export const SummarizePage: React.FC = () => {
                 <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium text-foreground">No Summary Yet</h3>
+                <h3 className="font-medium text-foreground">Ende s’ka përmbledhje</h3>
                 <p className="text-sm text-muted-foreground mt-2 max-w-sm">
-                  Select a material and click "Generate Summary" to create a summary.
+                  Zgjidhni një material dhe klikoni "Gjenero përmbledhje" për të krijuar një përmbledhje.
                 </p>
               </div>
             </CardContent>

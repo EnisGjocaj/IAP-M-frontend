@@ -14,31 +14,31 @@ import {
 const features = [
   {
     icon: MessageSquare,
-    title: "AI Academic Assistant",
-    description: "Query your study materials with natural language and get instant, accurate answers.",
+    title: "Asistenti Akademik AI",
+    description: "Bëni pyetje mbi materialet tuaja të studimit me gjuhë natyrore dhe merrni përgjigje të shpejta e të sakta.",
   },
   {
     icon: FileText,
-    title: "Smart Summarization",
-    description: "Generate concise summaries of lectures, slides, and readings in seconds.",
+    title: "Përmbledhje inteligjente",
+    description: "Gjeneroni përmbledhje të shkurtra të leksioneve, slajdeve dhe leximeve brenda sekondash.",
   },
   {
     icon: GraduationCap,
-    title: "Exam Engine",
-    description: "Create practice exams based on your course materials to prepare effectively.",
+    title: "Motori i Provimeve",
+    description: "Krijoni provime praktike bazuar në materialet e lëndës për t’u përgatitur më mirë.",
   },
   {
     icon: Brain,
-    title: "Personal Advisor",
-    description: "Get personalized study recommendations based on your performance and goals.",
+    title: "Këshilltar personal",
+    description: "Merrni rekomandime të personalizuara për studim bazuar në performancën dhe objektivat tuaja.",
   },
 ];
 
 const benefits = [
-  "Access AI-powered study tools 24/7",
-  "Study smarter with personalized recommendations",
-  "Practice with exams generated from your materials",
-  "Track your progress and identify weak areas",
+  "Qasje 24/7 në mjete studimi të fuqizuara nga AI",
+  "Studioni më zgjuar me rekomandime të personalizuara",
+  "Praktikoni me provime të gjeneruara nga materialet tuaja",
+  "Ndiqni progresin dhe identifikoni pikat e dobëta",
 ];
 
 const Index = () => {
@@ -51,24 +51,24 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary mb-6">
               <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">IAP-M Faculty of Business</span>
+              <span className="text-sm font-medium">IAP-M Fakulteti i Biznesit</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Your AI-Powered{" "}
+              Asistenti juaj{" "}
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Academic Assistant
+                Akademik me AI
               </span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Transform your study experience with intelligent tools designed for business students. 
-              Query materials, generate summaries, and prepare for exams with AI.
+              Transformoni përvojën tuaj të studimit me mjete inteligjente të dizajnuara për studentët e biznesit.
+              Pyetni materialet, gjeneroni përmbledhje dhe përgatituni për provime me AI.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {/* @ts-ignore */}
               <Button variant="ai" size="xl" asChild>
                 <Link to="/ai">
                   <Sparkles className="w-5 h-5" />
-                  Launch AI Hub
+                  Hap Qendrën AI
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </Button>
@@ -76,7 +76,7 @@ const Index = () => {
               <Button variant="outline" size="xl" asChild>
                 <Link to="/ai/help">
                   <BookOpen className="w-5 h-5" />
-                  Learn More
+                  Mëso më shumë
                 </Link>
               </Button>
             </div>
@@ -87,10 +87,10 @@ const Index = () => {
       <div className="container mx-auto px-4 py-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-4">
-            Everything You Need to Excel
+            Gjithçka që ju duhet për sukses
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Powerful AI tools designed specifically for academic success at IAP-M
+            Mjete të fuqishme AI të dizajnuara posaçërisht për sukses akademik në IAP-M
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -115,7 +115,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-bold text-secondary-foreground mb-6">
-                  Study Smarter, Not Harder
+                  Studioni më zgjuar, jo më shumë
                 </h2>
                 <div className="space-y-4">
                   {benefits.map((benefit, index) => (
@@ -129,7 +129,7 @@ const Index = () => {
               <div className="bg-secondary-foreground/10 rounded-2xl p-8 text-center">
                 <div className="text-6xl font-bold text-primary mb-2">87%</div>
                 <p className="text-secondary-foreground/80">
-                  of students report improved exam performance using AI study tools
+                  e studentëve raportojnë përmirësim në performancën e provimeve duke përdorur mjete studimi me AI
                 </p>
               </div>
             </div>
@@ -141,16 +141,16 @@ const Index = () => {
         <div className="max-w-2xl mx-auto text-center">
           <GraduationCap className="w-16 h-16 text-secondary mx-auto mb-6" />
           <h2 className="text-3xl font-bold text-foreground mb-4">
-            Ready to Transform Your Studies?
+            Gati të transformoni studimet tuaja?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Join your fellow IAP-M students in using AI to achieve academic excellence.
+            Bashkohuni me studentët e tjerë të IAP-M dhe përdorni AI për të arritur sukses akademik.
           </p>
           {/* @ts-ignore */}
           <Button variant="ai" size="xl" asChild>
             <Link to="/ai">
               <Sparkles className="w-5 h-5" />
-              Get Started Now
+              Fillo tani
             </Link>
           </Button>
         </div>
@@ -166,7 +166,7 @@ const Index = () => {
               <span className="font-bold text-secondary-foreground">IAP-M AI</span>
             </div>
             <p className="text-secondary-foreground/70 text-sm">
-              © {new Date().getFullYear()} IAP-M Faculty of Business. All rights reserved.
+              © {new Date().getFullYear()} IAP-M Fakulteti i Biznesit. Të gjitha të drejtat e rezervuara.
             </p>
           </div>
         </div>

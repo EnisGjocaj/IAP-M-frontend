@@ -1,6 +1,47 @@
 import { StyleSheet } from "@react-pdf/renderer";
 
 export const aiPdfStyles = StyleSheet.create({
+  coverPage: {
+    paddingTop: 64,
+    paddingBottom: 64,
+    paddingHorizontal: 40,
+    fontSize: 11,
+    fontFamily: "Helvetica",
+    color: "#0b1220",
+    backgroundColor: "#ffffff",
+    justifyContent: "center",
+  },
+  coverCenter: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  coverLogo: {
+    width: 92,
+    height: 92,
+    borderRadius: 18,
+    marginBottom: 18,
+  },
+  coverInstitute: {
+    fontSize: 16,
+    fontWeight: 700,
+    marginBottom: 6,
+  },
+  coverDocType: {
+    fontSize: 22,
+    fontWeight: 700,
+    marginBottom: 8,
+  },
+  coverMeta: {
+    fontSize: 10,
+    color: "#475569",
+  },
+  coverDivider: {
+    marginTop: 22,
+    marginBottom: 18,
+    height: 1,
+    width: "60%",
+    backgroundColor: "#e5e7eb",
+  },
   page: {
     paddingTop: 40,
     paddingBottom: 48,
@@ -71,7 +112,73 @@ export const aiPdfStyles = StyleSheet.create({
   bodyText: {
     fontSize: 11,
     lineHeight: 1.45,
-    whiteSpace: "pre-wrap",
+  },
+  paragraph: {
+    fontSize: 11,
+    lineHeight: 1.55,
+    marginBottom: 6,
+  },
+  mdH1: {
+    fontSize: 16,
+    fontWeight: 700,
+    marginBottom: 10,
+  },
+  mdH2: {
+    fontSize: 13,
+    fontWeight: 700,
+    marginBottom: 8,
+    marginTop: 6,
+  },
+  mdH3: {
+    fontSize: 12,
+    fontWeight: 700,
+    marginBottom: 6,
+    marginTop: 4,
+  },
+  list: {
+    marginBottom: 8,
+  },
+  listItem: {
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: 3,
+  },
+  listBullet: {
+    width: 10,
+    fontSize: 11,
+    color: "#334155",
+  },
+  listContent: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 1.55,
+  },
+  codeBlock: {
+    fontSize: 10,
+    fontFamily: "Courier",
+    backgroundColor: "#f1f5f9",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderStyle: "solid",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    lineHeight: 1.4,
+  },
+  watermark: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.06,
+  },
+  watermarkLogo: {
+    width: 360,
+    height: 360,
   },
   transcriptRow: {
     flexDirection: "row",
@@ -92,6 +199,42 @@ export const aiPdfStyles = StyleSheet.create({
   },
   referenceItem: {
     marginBottom: 6,
+  },
+  referencesTable: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderStyle: "solid",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  referenceRow: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f5f9",
+    borderBottomStyle: "solid",
+  },
+  referenceRowLast: {
+    borderBottomWidth: 0,
+  },
+  referenceRowTop: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  sourceBadge: {
+    fontSize: 9,
+    color: "#0b1220",
+    backgroundColor: "#e2e8f0",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 999,
+  },
+  referenceTitle: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#0b1220",
   },
   referenceLabel: {
     fontSize: 10,

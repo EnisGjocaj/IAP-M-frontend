@@ -19,14 +19,14 @@ import {
 import { Badge } from "../../components/ui/badge";
 
 const pageConfig: Record<string, { title: string; description: string }> = {
-  "/ai": { title: "Dashboard", description: "Overview of your academic activity" },
-  "/ai/materials": { title: "Materials", description: "Upload and manage study materials" },
-  "/ai/ask": { title: "Ask AI", description: "Query your academic materials" },
-  "/ai/summarize": { title: "Summarize", description: "Generate concise summaries" },
-  "/ai/exam": { title: "Exam Engine", description: "Practice and prepare for exams" },
-  "/ai/advisor": { title: "Advisor", description: "Personalized study recommendations" },
-  "/ai/help": { title: "Help", description: "Support and guidance" },
-  "/ai/settings": { title: "Settings", description: "Configure your preferences" },
+  "/ai": { title: "Paneli", description: "Përmbledhje e aktivitetit tuaj akademik" },
+  "/ai/materials": { title: "Materialet", description: "Ngarkoni dhe menaxhoni materialet e studimit" },
+  "/ai/ask": { title: "Pyet AI", description: "Bëni pyetje mbi materialet tuaja akademike" },
+  "/ai/summarize": { title: "Përmbledhje", description: "Gjeneroni përmbledhje të shkurtra" },
+  "/ai/exam": { title: "Motori i Provimeve", description: "Praktikoni dhe përgatituni për provime" },
+  "/ai/advisor": { title: "Këshilltari", description: "Rekomandime të personalizuara për studim" },
+  "/ai/help": { title: "Ndihmë", description: "Mbështetje dhe udhëzime" },
+  "/ai/settings": { title: "Cilësimet", description: "Konfiguroni preferencat tuaja" },
 };
 
 export const AIHeader: React.FC = () => {
@@ -51,7 +51,7 @@ export const AIHeader: React.FC = () => {
           <div className="hidden md:flex relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder="Kërko..."
               className="w-48 pl-8 h-8 text-sm bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
@@ -66,19 +66,19 @@ export const AIHeader: React.FC = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72">
-              <DropdownMenuLabel className="text-xs">Notifications</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs">Njoftime</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="flex flex-col items-start gap-0.5 py-2">
-                <span className="text-sm">New material uploaded</span>
-                <span className="text-xs text-muted-foreground">Finance Module 5 is now available</span>
+                <span className="text-sm">U ngarkua material i ri</span>
+                <span className="text-xs text-muted-foreground">Moduli 5 i Financave tani është i disponueshëm</span>
               </DropdownMenuItem>
               <DropdownMenuItem className="flex flex-col items-start gap-0.5 py-2">
-                <span className="text-sm">Exam reminder</span>
-                <span className="text-xs text-muted-foreground">Marketing exam in 3 days</span>
+                <span className="text-sm">Kujtesë për provim</span>
+                <span className="text-xs text-muted-foreground">Provimi i Marketingut pas 3 ditësh</span>
               </DropdownMenuItem>
               <DropdownMenuItem className="flex flex-col items-start gap-0.5 py-2">
-                <span className="text-sm">Study recommendation</span>
-                <span className="text-xs text-muted-foreground">Review Statistics Chapter 4</span>
+                <span className="text-sm">Rekomandim studimi</span>
+                <span className="text-xs text-muted-foreground">Rishikoni Statistikë – Kapitulli 4</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -94,19 +94,19 @@ export const AIHeader: React.FC = () => {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel className="text-xs">
                 <div className="flex flex-col">
-                  <span>Student Profile</span>
+                  <span>Profili i Studentit</span>
                   <span className="font-normal text-muted-foreground">student@iapm.edu</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm">My Profile</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm">Study History</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm">Progress Report</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">Profili im</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">Historiku i Studimit</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">Raporti i Progresit</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-sm" asChild>
-                <Link to="/">Back to Main Site</Link>
+                <Link to="/">Kthehu te Faqja Kryesore</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm text-destructive">Sign Out</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm text-destructive">Dil</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

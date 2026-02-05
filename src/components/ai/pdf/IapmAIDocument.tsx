@@ -46,9 +46,138 @@ const formatDate = (d: Date) => {
 const pagesLabel = (r: AiPdfReference) => {
   const s = r.pageStart ?? null;
   const e = r.pageEnd ?? null;
-  if (s && e) return s === e ? `Page ${s}` : `Pages ${s}–${e}`;
-  if (s) return `Page ${s}`;
-  return "Pages —";
+  if (s && e) return s === e ? `Faqja ${s}` : `Faqet ${s}–${e}`;
+  if (s) return `Faqja ${s}`;
+  return "Faqet —";
+};
+
+const renderMarkdown = (raw: string, keyPrefix: string) => {
+  const text = String(raw || "");
+  const lines = text.split(/\r?\n/);
+
+  const nodes: React.ReactNode[] = [];
+  let inCode = false;
+  let codeBuf: string[] = [];
+
+  const flushCode = () => {
+    if (codeBuf.length === 0) return;
+    nodes.push(
+      <Text key={`${keyPrefix}-code-${nodes.length}`} style={aiPdfStyles.codeBlock}>
+        {codeBuf.join("\n")}
+      </Text>
+    );
+    codeBuf = [];
+  };
+
+  const renderList = (items: Array<{ bullet: string; content: string }>) => {
+    nodes.push(
+      <View key={`${keyPrefix}-list-${nodes.length}`} style={aiPdfStyles.list}>
+        {items.map((it, idx) => (
+          <View key={`${keyPrefix}-li-${nodes.length}-${idx}`} style={aiPdfStyles.listItem}>
+            <Text style={aiPdfStyles.listBullet}>{it.bullet}</Text>
+            <Text style={aiPdfStyles.listContent}>{it.content}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i] ?? "";
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("```")) {
+      if (inCode) {
+        inCode = false;
+        flushCode();
+      } else {
+        inCode = true;
+      }
+      i += 1;
+      continue;
+    }
+
+    if (inCode) {
+      codeBuf.push(line);
+      i += 1;
+      continue;
+    }
+
+    if (!trimmed) {
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      nodes.push(
+        <Text key={`${keyPrefix}-h3-${nodes.length}`} style={aiPdfStyles.mdH3}>
+          {trimmed.replace(/^###\s+/, "")}
+        </Text>
+      );
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      nodes.push(
+        <Text key={`${keyPrefix}-h2-${nodes.length}`} style={aiPdfStyles.mdH2}>
+          {trimmed.replace(/^##\s+/, "")}
+        </Text>
+      );
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("# ")) {
+      nodes.push(
+        <Text key={`${keyPrefix}-h1-${nodes.length}`} style={aiPdfStyles.mdH1}>
+          {trimmed.replace(/^#\s+/, "")}
+        </Text>
+      );
+      i += 1;
+      continue;
+    }
+
+    const isUnordered = /^[-*]\s+/.test(trimmed);
+    const isOrdered = /^\d+\.[)\]]?\s+/.test(trimmed);
+    if (isUnordered || isOrdered) {
+      const listItems: Array<{ bullet: string; content: string }> = [];
+      while (i < lines.length) {
+        const t = (lines[i] ?? "").trim();
+        if (!t) {
+          i += 1;
+          break;
+        }
+        const u = /^[-*]\s+/.test(t);
+        const o = /^\d+\.[)\]]?\s+/.test(t);
+        if (!u && !o) break;
+
+        if (u) {
+          listItems.push({ bullet: "•", content: t.replace(/^[-*]\s+/, "") });
+        } else {
+          const m = t.match(/^(\d+)\.[)\]]?\s+(.*)$/);
+          listItems.push({ bullet: `${m?.[1] ?? ""}.`, content: m?.[2] ?? t });
+        }
+        i += 1;
+      }
+      renderList(listItems);
+      continue;
+    }
+
+    nodes.push(
+      <Text key={`${keyPrefix}-p-${nodes.length}`} style={aiPdfStyles.paragraph}>
+        {line}
+      </Text>
+    );
+    i += 1;
+  }
+
+  if (inCode) {
+    flushCode();
+  }
+
+  return nodes;
 };
 
 export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
@@ -64,20 +193,37 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
 
   return (
     <Document>
+      <Page size="A4" style={aiPdfStyles.coverPage}>
+        <View style={aiPdfStyles.coverCenter}>
+          {logoSrc ? <Image src={logoSrc} style={aiPdfStyles.coverLogo} /> : null}
+          <Text style={aiPdfStyles.coverInstitute}>IAP-M</Text>
+          <Text style={aiPdfStyles.coverDocType}>{title}</Text>
+          <View style={aiPdfStyles.coverDivider} />
+          {subtitle ? <Text style={aiPdfStyles.coverMeta}>{subtitle}</Text> : null}
+          <Text style={aiPdfStyles.coverMeta}>Gjeneruar: {formatDate(date)}</Text>
+        </View>
+      </Page>
+
       <Page size="A4" style={aiPdfStyles.page}>
+        {logoSrc ? (
+          <View style={aiPdfStyles.watermark} fixed>
+            <Image src={logoSrc} style={aiPdfStyles.watermarkLogo} />
+          </View>
+        ) : null}
+
         <View style={aiPdfStyles.header}>
           <View style={aiPdfStyles.brandLeft}>
             {logoSrc ? <Image src={logoSrc} style={aiPdfStyles.logo} /> : null}
             <View style={aiPdfStyles.brandText}>
               <Text style={aiPdfStyles.brandName}>IAP-M</Text>
-              <Text style={aiPdfStyles.brandTagline}>AI Study Tools</Text>
+              <Text style={aiPdfStyles.brandTagline}>Mjete studimi me AI</Text>
             </View>
           </View>
 
           <View style={aiPdfStyles.headerRight}>
             <Text style={aiPdfStyles.docTitle}>{title}</Text>
             {subtitle ? <Text style={aiPdfStyles.docSubtitle}>{subtitle}</Text> : null}
-            <Text style={aiPdfStyles.meta}>Generated: {formatDate(date)}</Text>
+            <Text style={aiPdfStyles.meta}>Gjeneruar: {formatDate(date)}</Text>
           </View>
         </View>
 
@@ -85,18 +231,18 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
           ? sections.map((s, idx) => (
               <View key={`${s.title}-${idx}`} style={aiPdfStyles.section}>
                 <Text style={aiPdfStyles.sectionTitle}>{s.title}</Text>
-                <Text style={aiPdfStyles.bodyText}>{s.content || ""}</Text>
+                <View>{renderMarkdown(s.content || "", `sec-${idx}`)}</View>
               </View>
             ))
           : null}
 
         {Array.isArray(transcript) && transcript.length > 0 ? (
           <View style={aiPdfStyles.section}>
-            <Text style={aiPdfStyles.sectionTitle}>Conversation</Text>
+            <Text style={aiPdfStyles.sectionTitle}>Biseda</Text>
             {transcript.map((m, idx) => (
               <View key={`${m.role}-${idx}`} style={aiPdfStyles.transcriptRow}>
                 <Text style={aiPdfStyles.transcriptRole}>{String(m.role).toUpperCase()}</Text>
-                <Text style={aiPdfStyles.transcriptContent}>{m.content || ""}</Text>
+                <View style={{ flex: 1 }}>{renderMarkdown(m.content || "", `msg-${idx}`)}</View>
               </View>
             ))}
           </View>
@@ -104,23 +250,32 @@ export const IapmAIDocument: React.FC<IapmAIDocumentProps> = ({
 
         {Array.isArray(references) && references.length > 0 ? (
           <View style={aiPdfStyles.section}>
-            <Text style={aiPdfStyles.sectionTitle}>References</Text>
-            {references.map((r) => (
-              <View key={`${r.sourceNo}-${r.chunkId ?? "x"}`} style={aiPdfStyles.referenceItem}>
-                <Text style={aiPdfStyles.referenceLabel}>
-                  Source {r.sourceNo}: {r.materialTitle}
-                </Text>
-                <Text style={aiPdfStyles.referenceMeta}>{pagesLabel(r)}</Text>
-              </View>
-            ))}
+            <Text style={aiPdfStyles.sectionTitle}>Referencat</Text>
+            <View style={aiPdfStyles.referencesTable}>
+              {references.map((r, idx) => (
+                <View
+                  key={`${r.sourceNo}-${r.chunkId ?? "x"}`}
+                  style={{
+                    ...aiPdfStyles.referenceRow,
+                    ...(idx === references.length - 1 ? aiPdfStyles.referenceRowLast : {}),
+                  }}
+                >
+                  <View style={aiPdfStyles.referenceRowTop}>
+                    <Text style={aiPdfStyles.sourceBadge}>#{r.sourceNo}</Text>
+                    <Text style={aiPdfStyles.referenceTitle}>{r.materialTitle}</Text>
+                  </View>
+                  <Text style={aiPdfStyles.referenceMeta}>{pagesLabel(r)}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         ) : null}
 
         <View style={aiPdfStyles.footer}>
-          <Text style={aiPdfStyles.footerText}>IAP-M • Academic Export</Text>
+          <Text style={aiPdfStyles.footerText}>IAP-M • Eksport akademik</Text>
           <Text
             style={aiPdfStyles.footerText}
-            render={({ pageNumber, totalPages }) => `Page ${pageNumber} / ${totalPages}`}
+            render={({ pageNumber, totalPages }) => `Faqja ${pageNumber} / ${totalPages}`}
             fixed
           />
         </View>

@@ -40,6 +40,12 @@ const statusStyles = {
   rejected: "bg-red-50 text-red-600 border-red-200",
 };
 
+const statusLabels = {
+  approved: "Aprovuar",
+  pending: "Në pritje",
+  rejected: "Refuzuar",
+};
+
 export const MaterialCard: React.FC<MaterialCardProps> = ({
   title,
   type,
@@ -79,26 +85,26 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={onView}>
                     <Eye className="w-4 h-4 mr-2" />
-                    View
+                    Shiko
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onDownload}>
                     <Download className="w-4 h-4 mr-2" />
-                    Download
+                    Shkarko
                   </DropdownMenuItem>
                   {onEdit && (
                     <DropdownMenuItem onClick={onEdit}>
                       <Pencil className="w-4 h-4 mr-2" />
-                      Edit
+                      Ndrysho
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem>
                     <Share2 className="w-4 h-4 mr-2" />
-                    Share
+                    Ndaj
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onDelete} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
+                    Fshi
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -108,13 +114,13 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
                 {typeLabels[type]}
               </Badge>
               <Badge variant="outline" className={cn("text-xs", statusStyles[status])}>
-                {status}
+                {statusLabels[status]}
               </Badge>
               <Badge variant="outline" className="text-xs">
                 {visibility === "private" ? (
-                  <><Lock className="w-3 h-3 mr-1" /> Private</>
+                  <><Lock className="w-3 h-3 mr-1" /> Privat</>
                 ) : (
-                  <><Globe className="w-3 h-3 mr-1" /> Public</>
+                  <><Globe className="w-3 h-3 mr-1" /> Publik</>
                 )}
               </Badge>
             </div>

@@ -34,9 +34,9 @@ export const ReferencePreviewModal: React.FC<ReferencePreviewModalProps> = ({
       <DialogContent className="max-w-6xl h-[85vh] p-0 overflow-hidden">
         <div className="flex h-full flex-col">
           <DialogHeader className="px-6 pt-6">
-            <DialogTitle className="truncate">{title || "Reference"}</DialogTitle>
+            <DialogTitle className="truncate">{title || "Referencë"}</DialogTitle>
             <DialogDescription className="truncate">
-              {page ? `Opening at page ${page}` : "Preview"}
+              {page ? `Duke hapur në faqen ${page}` : "Parapamje"}
             </DialogDescription>
           </DialogHeader>
 
@@ -50,20 +50,20 @@ export const ReferencePreviewModal: React.FC<ReferencePreviewModalProps> = ({
                 />
               ) : (
                 <div className="h-full w-full rounded-md border bg-muted/30 flex items-center justify-center text-sm text-muted-foreground">
-                  Missing PDF URL
+                  Mungon URL-ja e PDF-së
                 </div>
               )}
             </div>
 
             <div className="h-full rounded-md border bg-background p-4 overflow-auto">
-              <div className="text-sm font-medium text-foreground mb-2">Referenced text</div>
+              <div className="text-sm font-medium text-foreground mb-2">Teksti i referuar</div>
               <div className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">{excerpt || "—"}</div>
             </div>
           </div>
 
           <DialogFooter className="px-6 pb-6">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Close
+              Mbyll
             </Button>
             <Button
               onClick={() => {
@@ -72,7 +72,7 @@ export const ReferencePreviewModal: React.FC<ReferencePreviewModalProps> = ({
               }}
               disabled={!url}
             >
-              Download
+              Shkarko
             </Button>
           </DialogFooter>
         </div>

@@ -32,7 +32,7 @@ export const AIPdfDownloadButton: React.FC<AIPdfDownloadButtonProps> = ({
           className={cn(className)}
           disabled={Boolean(disabled) || loading}
         >
-          {loading ? "Preparing…" : children}
+          {loading ? "Po përgatitet…" : children}
         </Button>
       )}
     </PDFDownloadLink>
