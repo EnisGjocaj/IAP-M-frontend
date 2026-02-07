@@ -175,6 +175,10 @@ const data = {
       icon: Brain,
       items: [
         {
+          title: "AI Dashboard",
+          url: "/dashboard/ai",
+        },
+        {
           title: "Materials Management",
           url: "/dashboard/ai/materials",
         },

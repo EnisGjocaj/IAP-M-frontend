@@ -30,15 +30,34 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    if (status === 401 || status === 403) {
+    const reqUrl = error?.config?.url || '';
+    const path = window.location?.pathname || '';
+
+    const isAiApiRequest = typeof reqUrl === 'string' && reqUrl.includes('/api/ai');
+    const hasUiMessage = Boolean(error?.response?.data?.uiMessage);
+
+    // IMPORTANT:
+    // - 401 means auth is invalid/expired: clear user and optionally redirect.
+    // - 403 can be a business-rule block (e.g. AI disabled) and must NOT log the user out.
+    if (status === 401) {
       try {
         localStorage.removeItem('user');
       } catch {
         // ignore
       }
 
-      const path = window.location?.pathname || '';
       if (path.startsWith('/ai') || path.startsWith('/dashboard')) {
+        window.location.href = '/';
+      }
+    }
+
+    if (status === 403) {
+      // If AI is disabled, backend returns a 403 with a UI message. Let the UI show the modal.
+      if (isAiApiRequest && hasUiMessage) {
+        return Promise.reject(error);
+      }
+
+      if (path.startsWith('/dashboard')) {
         window.location.href = '/';
       }
     }

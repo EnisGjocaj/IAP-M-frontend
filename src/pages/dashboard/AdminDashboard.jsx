@@ -42,6 +42,7 @@ import NewTrainingPage from '../../components/improved-dashboard/trainings/train
 
 // AI Management
 import AdminAiMaterialsPage from '../../components/improved-dashboard/ai-materials/ai-materials-list';
+import AdminAiDashboardPage from '../../components/improved-dashboard/ai-dashboard/admin-ai-dashboard';
 
 const DashboardLayout = ({ children }) => {
   return (
@@ -105,6 +106,7 @@ const AdminDashboard = () => {
         <Route path="trainings/:id/edit" element={<NewTrainingPage />} />
 
         {/* AI Management */}
+        <Route path="ai" element={<AdminAiDashboardPage />} />
         <Route path="ai/materials" element={<AdminAiMaterialsPage />} />
       </Routes>
     </DashboardLayout>

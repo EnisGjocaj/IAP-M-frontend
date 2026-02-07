@@ -1,5 +1,14 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
+import { getAiStatus } from "../../api/ai";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 import { 
   Sparkles, 
   GraduationCap, 
@@ -42,6 +51,51 @@ const benefits = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [aiEnabled, setAiEnabled] = React.useState(true);
+  const [aiChecked, setAiChecked] = React.useState(false);
+  const [showAiDisabledModal, setShowAiDisabledModal] = React.useState(false);
+
+  React.useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getAiStatus();
+        setAiEnabled(Boolean((data as any)?.aiEnabled ?? true));
+      } catch {
+        setAiEnabled(true);
+      } finally {
+        setAiChecked(true);
+      }
+    };
+
+    load();
+  }, []);
+
+  const handleAiNavigate = async (to: string) => {
+    if (aiChecked && !aiEnabled) {
+      setShowAiDisabledModal(true);
+      return;
+    }
+
+    // If not checked yet, do a quick fresh check to avoid navigating into a blocked route.
+    if (!aiChecked) {
+      try {
+        const data = await getAiStatus();
+        const enabled = Boolean((data as any)?.aiEnabled ?? true);
+        setAiEnabled(enabled);
+        setAiChecked(true);
+        if (!enabled) {
+          setShowAiDisabledModal(true);
+          return;
+        }
+      } catch {
+        // fail-open in case status endpoint is temporarily unavailable
+      }
+    }
+
+    navigate(to);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       
@@ -65,19 +119,15 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {/* @ts-ignore */}
-              <Button variant="ai" size="xl" asChild>
-                <Link to="/ai">
-                  <Sparkles className="w-5 h-5" />
-                  Hap Qendrën AI
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
+              <Button variant="ai" size="xl" type="button" onClick={() => handleAiNavigate("/ai")}>
+                <Sparkles className="w-5 h-5" />
+                Hap Qendrën AI
+                <ArrowRight className="w-5 h-5" />
               </Button>
               {/* @ts-ignore */}
-              <Button variant="outline" size="xl" asChild>
-                <Link to="/ai/help">
-                  <BookOpen className="w-5 h-5" />
-                  Mëso më shumë
-                </Link>
+              <Button variant="outline" size="xl" type="button" onClick={() => handleAiNavigate("/ai/help")}>
+                <BookOpen className="w-5 h-5" />
+                Mëso më shumë
               </Button>
             </div>
           </div>
@@ -147,11 +197,9 @@ const Index = () => {
             Bashkohuni me studentët e tjerë të IAP-M dhe përdorni AI për të arritur sukses akademik.
           </p>
           {/* @ts-ignore */}
-          <Button variant="ai" size="xl" asChild>
-            <Link to="/ai">
-              <Sparkles className="w-5 h-5" />
-              Fillo tani
-            </Link>
+          <Button variant="ai" size="xl" type="button" onClick={() => handleAiNavigate("/ai")}>
+            <Sparkles className="w-5 h-5" />
+            Fillo tani
           </Button>
         </div>
       </div>
@@ -171,6 +219,44 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showAiDisabledModal} onOpenChange={setShowAiDisabledModal}>
+        <DialogContent className="overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200 sm:max-w-lg">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
+          <DialogHeader className="pt-2">
+            <DialogTitle className="text-xl">Shërbimi AI</DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
+              Shërbimi AI është përkohësisht i çaktivizuar dhe do të rikthehet shumë shpejt.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-5 rounded-lg border bg-muted/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
+              <div className="flex-1">
+                <div className="text-sm font-medium">Po punojmë për rikthimin e shërbimit</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Ju mund të vazhdoni të përdorni pjesët e tjera të platformës normalisht.
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-primary/70 via-secondary/70 to-primary/70 animate-pulse" />
+            </div>
+          </div>
+
+          <div className="mt-5 flex justify-end">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted"
+              onClick={() => setShowAiDisabledModal(false)}
+            >
+              Mbyll
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

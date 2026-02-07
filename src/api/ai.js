@@ -149,12 +149,40 @@ export const getAiSettings = async () => {
   }
 };
 
-export const updateAiSettings = async ({ requireApproval }) => {
+export const updateAiSettings = async ({ requireApproval, aiEnabled } = {}) => {
   try {
-    const response = await api.put('/api/ai/settings', { requireApproval }, getAuthHeaders());
+    const payload = {};
+    if (typeof requireApproval === 'boolean') payload.requireApproval = requireApproval;
+    if (typeof aiEnabled === 'boolean') payload.aiEnabled = aiEnabled;
+
+    const response = await api.put('/api/ai/settings', payload, getAuthHeaders());
     return response.data;
   } catch (error) {
     console.error('Error updating AI settings:', error);
+    throw error;
+  }
+};
+
+export const getAiStatus = async () => {
+  try {
+    const response = await api.get('/api/ai/settings/status', getAuthHeaders());
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching AI status:', error);
+    throw error;
+  }
+};
+
+export const getAdminAiDashboard = async ({ range = '7d' } = {}) => {
+  try {
+    const auth = getAuthHeaders();
+    const response = await api.get('/api/ai/admin/dashboard', {
+      ...auth,
+      params: { range },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching admin AI dashboard:', error);
     throw error;
   }
 };

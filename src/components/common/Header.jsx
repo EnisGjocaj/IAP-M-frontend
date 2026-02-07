@@ -7,22 +7,34 @@ import { HiViewGrid } from "react-icons/hi"
 import { useAuth } from "../../contexts/authContext"
 import { LoginPopup } from "./LoginPopup"
 import { LinkData } from "../assets/data/dummydata"
+import { getAiStatus } from "../../api/ai"
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog"
 
 import Logo from "../assets/images/iapm-logo.jpg"
 import { FaGraduationCap, FaStar, FaLinkedin, FaTrophy, FaFilter } from "react-icons/fa"
 
 import { toast } from "react-toastify"
 
-
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLoginOpen, setLoginOpen] = useState(false)
+  const [aiEnabled, setAiEnabled] = useState(true)
+  const [aiChecked, setAiChecked] = useState(false)
+  const [showAiDisabledModal, setShowAiDisabledModal] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
   const isStudent = user?.isStudent 
+
   const [isOnBrightPage, setIsOnBrightPage] = useState(false)
   const brightPages = [
     '/bord', 
@@ -46,6 +58,23 @@ export const Header = () => {
   useEffect(() => {
     setIsOnBrightPage(brightPages.some(path => location.pathname.startsWith(path)))
   }, [location.pathname])
+
+  useEffect(() => {
+    if (!isStudent) return
+
+    const load = async () => {
+      try {
+        const data = await getAiStatus()
+        setAiEnabled(Boolean(data?.aiEnabled ?? true))
+      } catch {
+        setAiEnabled(true)
+      } finally {
+        setAiChecked(true)
+      }
+    }
+
+    load()
+  }, [isStudent])
 
   const handleLogout = () => {
     logout()
@@ -138,6 +167,12 @@ export const Header = () => {
                 <Link
                   key={item.name}
                   to={item.path}
+                  onClick={(e) => {
+                    if (item.path === '/ai' && isStudent && aiChecked && !aiEnabled) {
+                      e.preventDefault()
+                      setShowAiDisabledModal(true)
+                    }
+                  }}
                   className={`px-3 py-1.5 mx-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                     location.pathname === item.path
                       ? isScrolled || isOnBrightPage
@@ -155,7 +190,6 @@ export const Header = () => {
             </div>
           </nav>
 
-        
           <div className="hidden lg:flex items-center gap-2">
             {user ? (
               <div className="flex items-center gap-3">
@@ -207,7 +241,6 @@ export const Header = () => {
             )}
           </div>
 
-         
           <button
             className={`lg:hidden p-1.5 rounded-lg transition-colors ${
               isScrolled || isOnBrightPage
@@ -235,12 +268,21 @@ export const Header = () => {
                   <Link
                     key={item.name}
                     to={item.path}
+                    onClick={(e) => {
+                      if (item.path === '/ai' && isStudent && aiChecked && !aiEnabled) {
+                        e.preventDefault()
+                        setShowAiDisabledModal(true)
+                        setIsOpen(false)
+                        return
+                      }
+
+                      setIsOpen(false)
+                    }}
                     className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${
                       location.pathname === item.path
                         ? "bg-secondary/10 text-secondary"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
-                    onClick={() => setIsOpen(false)}
                   >
                     {item.icon}
                     {item.name}
@@ -291,6 +333,44 @@ export const Header = () => {
       </AnimatePresence>
 
       <LoginPopup isOpen={isLoginOpen} onClose={() => setLoginOpen(false)} />
+
+      <Dialog open={showAiDisabledModal} onOpenChange={setShowAiDisabledModal}>
+        <DialogContent className="overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200 sm:max-w-lg">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
+          <DialogHeader className="pt-2">
+            <DialogTitle className="text-xl">Shërbimi AI</DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed">
+              Shërbimi AI është përkohësisht i çaktivizuar dhe do të rikthehet shumë shpejt.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-5 rounded-lg border bg-muted/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
+              <div className="flex-1">
+                <div className="text-sm font-medium">Po punojmë për rikthimin e shërbimit</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Ju mund të vazhdoni të përdorni pjesët e tjera të platformës normalisht.
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-primary/70 via-secondary/70 to-primary/70 animate-pulse" />
+            </div>
+          </div>
+
+          <div className="mt-5 flex justify-end">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted"
+              onClick={() => setShowAiDisabledModal(false)}
+            >
+              Mbyll
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.header>
   )
 }

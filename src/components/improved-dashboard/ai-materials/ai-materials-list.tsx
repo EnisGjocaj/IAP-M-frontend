@@ -457,20 +457,27 @@ export default function AdminAiMaterialsPage() {
             <p className="text-muted-foreground mt-1">Approve, re-index, edit metadata, or delete AI materials</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-            <Card className="w-full sm:w-[420px]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <div className="min-w-0 pr-4">
-                  <CardTitle className="text-base">AI Material Approval</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
-                    Require admin approval before materials become usable by AI
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-3">
+            <Card className="w-full sm:w-[520px]">
+              <CardHeader className="space-y-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 pr-4">
+                    <CardTitle className="text-base">AI Settings</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      Manage global AI availability and content approval rules
+                    </CardDescription>
+                  </div>
                   {(settingsLoading || settingsSaving) && (
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {settingsLoading ? "Loading…" : "Saving…"}
                     </span>
                   )}
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-foreground">AI Material Approval</div>
+                    <div className="text-xs text-muted-foreground">Require admin approval before materials become usable by AI</div>
+                  </div>
                   <Switch
                     checked={requireApproval}
                     disabled={settingsLoading || settingsSaving}
