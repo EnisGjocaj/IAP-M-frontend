@@ -46,9 +46,8 @@ import { Separator } from "../components/ui/separator"
 import { Label } from "../components/ui/label"
 import { Input } from "../components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog"
-import { PDFDownloadLink, PDFDownloadLinkProps } from '@react-pdf/renderer';
-import type { BlobProviderParams } from '@react-pdf/renderer';
 import CVTemplate from '../components/CVTemplate';
+import { AIPdfDownloadButton } from "../components/ai/pdf/AIPdfDownloadButton";
 import { TrainingReviewModal } from "../components/improved-dashboard/featured-students/TrainingReviewModal"
 
 const calculateRating = (grade: number | null | undefined): number => {
@@ -551,7 +550,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -559,7 +558,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600">Error loading profile: {error}</div>
+        <div className="text-destructive">Error loading profile: {error}</div>
       </div>
     )
   }
@@ -567,7 +566,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
   if (!studentData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">No profile data found</div>
+        <div className="text-muted-foreground">No profile data found</div>
       </div>
     )
   }
@@ -588,7 +587,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
     <div>
       <Label>{label}</Label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -607,21 +606,21 @@ const handleProfileUpdate = async (data: FormData | Object) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-2 sm:p-4 md:p-6 my-4 sm:my-10">
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="min-h-screen bg-background px-3 sm:px-6 lg:px-10 py-6 sm:py-10">
+      <div className="max-w-screen-2xl mx-auto space-y-4 sm:space-y-6">
         
-        <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <Card className="overflow-hidden border shadow-sm bg-card">
           <CardContent className="p-4 sm:p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
               
               <div className="relative flex flex-col items-center md:items-start">
-                <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-white shadow-lg cursor-pointer"
+                <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-background shadow-md cursor-pointer"
                   onClick={() => fileInputRef.current?.click()}>
                   <AvatarImage 
                     src={studentData?.profileImage || "/placeholder.svg"} 
                     alt={studentData?.name || "Profile"} 
                   />
-                  <AvatarFallback className="text-xl sm:text-2xl bg-white text-blue-600">
+                  <AvatarFallback className="text-xl sm:text-2xl bg-muted text-foreground">
                     {studentData?.name
                       ? studentData.name
                           .split(" ")
@@ -635,7 +634,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 {canEdit && (
                   <Button
                     size="sm"
-                    className="absolute -bottom-2 -right-2 rounded-full bg-white text-blue-600 hover:bg-gray-100 shadow-md"
+                    className="absolute -bottom-2 -right-2 rounded-full bg-background text-foreground hover:bg-muted shadow-md"
                     onClick={() => setIsEditing(true)}
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -655,48 +654,37 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 <div className="flex flex-row sm:flex-col gap-2 mt-3 w-full">
                   {canEdit && (
                     <Button 
-                      onClick={() => setIsEditing(true)}
-                      className="text-xs sm:text-sm bg-blue-600 text-white hover:bg-blue-700 w-full"
+                      variant="outline" 
+                      onClick={() => setIsEditing(!isEditing)}
+                      className="text-xs sm:text-sm w-full"
                     >
                       <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Ndrysho
                     </Button>
                   )}
-                  <Button 
-                    className="text-xs sm:text-sm bg-white text-blue-600 hover:bg-gray-100 w-full"
+                  <AIPdfDownloadButton
+                    variant="outline"
+                    size="sm"
+                    className="text-xs sm:text-sm w-full"
+                    document={<CVTemplate studentData={studentData} />}
+                    fileName={`${(studentData?.name || 'Student').replace(/\s+/g, '_')}_CV.pdf`}
+                    disabled={!studentData}
                   >
-                    <PDFDownloadLink
-                      document={<CVTemplate studentData={studentData} />}
-                      fileName={`${studentData.name.replace(/\s+/g, '_')}_CV.pdf`}
-                      className="flex items-center justify-center w-full"
-                    >
-                      {(props: BlobProviderParams) => (
-                        <div className="flex items-center justify-center">
-                          {props.loading ? (
-                            <>
-                              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
-                              <span>Duke gjeneruar...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                              <span>CV</span>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </PDFDownloadLink>
-                  </Button>
+                    <div className="flex items-center justify-center">
+                      <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span>CV</span>
+                    </div>
+                  </AIPdfDownloadButton>
                 </div>
               </div>
 
               <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
                 <div>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">{studentData?.name || "Student"}</h1>
-                  <p className="text-sm sm:text-base text-blue-100 mb-2 sm:mb-4">{studentData?.bio || "No bio available"}</p>
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-1 sm:mb-2">{studentData?.name || "Student"}</h1>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-4">{studentData?.bio || "No bio available"}</p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   <div className="flex items-center justify-center md:justify-start gap-1 sm:gap-2">
                     <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span className="truncate">{studentData?.email}</span>
@@ -720,7 +708,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     <Button 
                       variant="secondary" 
                       size="sm" 
-                      className="text-xs sm:text-sm bg-white/90 text-blue-600 hover:bg-white"
+                      className="text-xs sm:text-sm"
                       onClick={() => window.open(studentData.socialLinks.linkedin, '_blank')}
                     >
                       <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -731,7 +719,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     <Button 
                       variant="secondary" 
                       size="sm" 
-                      className="text-xs sm:text-sm bg-white/90 text-blue-600 hover:bg-white"
+                      className="text-xs sm:text-sm"
                       onClick={() => window.open(studentData.socialLinks.facebook, '_blank')}
                     >
                       <Facebook className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -742,7 +730,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     <Button 
                       variant="secondary" 
                       size="sm" 
-                      className="text-xs sm:text-sm bg-white/90 text-blue-600 hover:bg-white"
+                      className="text-xs sm:text-sm"
                       onClick={() => window.location.href = `mailto:${studentData.email}`}
                     >
                       <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -753,7 +741,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     <Button 
                       variant="secondary" 
                       size="sm" 
-                      className="text-xs sm:text-sm bg-white/90 text-blue-600 hover:bg-white"
+                      className="text-xs sm:text-sm"
                       onClick={() => window.open(studentData.cvPath, '_blank')}
                     >
                       <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -767,82 +755,82 @@ const handleProfileUpdate = async (data: FormData | Object) => {
         </Card>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-          <Card className="border-0 shadow-lg">
+          <Card className="shadow-sm">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Mesatarja Aktuale</p>
-                  <p className="text-lg sm:text-2xl font-bold text-green-600">{studentData.academicData.currentGPA}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Mesatarja Aktuale</p>
+                  <p className="text-lg sm:text-2xl font-semibold text-foreground">{studentData.academicData.currentGPA}</p>
                 </div>
-                <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="shadow-sm">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Trajnime të Përfunduara</p>
-                  <p className="text-lg sm:text-2xl font-bold text-blue-600">{studentData.trainingData.completed.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Trajnime të Përfunduara</p>
+                  <p className="text-lg sm:text-2xl font-semibold text-foreground">{studentData.trainingData.completed.length}</p>
                 </div>
-                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="shadow-sm">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Certifikata të Fituara</p>
-                  <p className="text-lg sm:text-2xl font-bold text-purple-600">{studentData.skillsAndBadges.badges.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Certifikata të Fituara</p>
+                  <p className="text-lg sm:text-2xl font-semibold text-foreground">{studentData.skillsAndBadges.badges.length}</p>
                 </div>
-                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="shadow-sm">
             <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Pjesëmarrja</p>
-                  <p className="text-lg sm:text-2xl font-bold text-orange-600">{studentData.academicData.attendance}%</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Pjesëmarrja</p>
+                  <p className="text-lg sm:text-2xl font-semibold text-foreground">{studentData.academicData.attendance}%</p>
                 </div>
-                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
+                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="flex overflow-x-auto sm:grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 h-auto p-1 bg-white shadow-lg rounded-lg">
-            <TabsTrigger value="overview" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+          <TabsList className="flex overflow-x-auto sm:grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 h-auto p-1 bg-muted/40 border border-border rounded-xl">
+            <TabsTrigger value="overview" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Përmbledhje
             </TabsTrigger>
-            <TabsTrigger value="academic" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="academic" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Akademike
             </TabsTrigger>
-            <TabsTrigger value="training" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="training" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Trajnime
             </TabsTrigger>
-            <TabsTrigger value="skills" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="skills" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Aftësitë
             </TabsTrigger>
-            <TabsTrigger value="activity" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="activity" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Aktiviteti
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="reviews" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Vlerësimet
             </TabsTrigger>
-            <TabsTrigger value="cv" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="cv" className="flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               CV
             </TabsTrigger>
@@ -850,17 +838,17 @@ const handleProfileUpdate = async (data: FormData | Object) => {
 
           <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="lg:col-span-2 border-0 shadow-lg bg-white rounded-lg">
-                <div className="p-6">
+              <div className="lg:col-span-2 rounded-xl border border-border bg-card shadow-sm">
+                <div className="p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Informacioni Personal</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Informacioni Personal</h3>
                     {canEdit && (
                       <Button 
                         onClick={() => {
                           console.log('Toggle edit mode');
                           setIsEditing(!isEditing);
                         }}
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                       >
                         {isEditing ? (
                           <>
@@ -888,7 +876,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, name: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.name}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.name}</p>
                         )}
                       </div>
 
@@ -902,7 +890,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, email: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.email}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.email}</p>
                         )}
                       </div>
 
@@ -915,7 +903,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, university: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.university}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.university}</p>
                         )}
                       </div>
 
@@ -928,7 +916,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, faculty: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.faculty}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.faculty}</p>
                         )}
                       </div>
 
@@ -941,7 +929,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, year: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.year}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.year}</p>
                         )}
                       </div>
 
@@ -956,7 +944,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, gpa: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.academicData.currentGPA}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.academicData.currentGPA}</p>
                         )}
                       </div>
 
@@ -969,7 +957,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, phoneNumber: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.phone}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.phone}</p>
                         )}
                       </div>
 
@@ -982,7 +970,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             onChange={(e) => setFormState(prev => ({...prev, location: e.target.value}))}
                           />
                         ) : (
-                          <p className="mt-1 text-gray-600">{studentData.location}</p>
+                          <p className="mt-1 text-muted-foreground">{studentData.location}</p>
                         )}
                       </div>
                     </div>
@@ -996,12 +984,12 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                           onChange={(e) => setFormState(prev => ({...prev, bio: e.target.value}))}
                         />
                       ) : (
-                        <p className="mt-1 text-gray-600">{studentData.bio}</p>
+                        <p className="mt-1 text-muted-foreground">{studentData.bio}</p>
                       )}
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Social Links</h3>
+                      <h3 className="text-base font-semibold text-foreground">Social Links</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SocialLinkInput
                           label="LinkedIn URL"
@@ -1060,7 +1048,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                         >
                           Anulo
                         </Button>
-                        <Button type="submit" className="bg-blue-600 text-white">
+                        <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
                           Ruaj ndryshimet
                         </Button>
                       </div>
@@ -1069,7 +1057,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 </div>
               </div>
 
-              <Card className="border-0 shadow-lg">
+              <Card className="rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
@@ -1080,12 +1068,12 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   {(studentData.skillsAndBadges.badges || []).slice(0, 3).map((badge, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg"
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30"
                     >
-                      <Award className="w-6 h-6 text-blue-600" />
+                      <Award className="w-6 h-6 text-muted-foreground" />
                       <div>
                         <p className="font-medium text-sm">{badge.name}</p>
-                        <p className="text-xs text-gray-600">{badge.date}</p>
+                        <p className="text-xs text-muted-foreground">{badge.date}</p>
                       </div>
                     </div>
                   ))}
@@ -1096,7 +1084,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
 
           <TabsContent value="academic" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2 border-0 shadow-lg">
+              <Card className="lg:col-span-2 rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="w-5 h-5" />
@@ -1106,10 +1094,10 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 <CardContent>
                   <div className="space-y-4">
                     {(studentData.academicData.subjects || []).map((subject, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl">
                         <div>
                           <h4 className="font-medium">{subject.name}</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             Semestri {subject.semester} • {subject.credits} Kredite
                           </p>
                         </div>
@@ -1125,22 +1113,22 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
+              <Card className="rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
                   <CardTitle>Përmbledhje Akademike</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{studentData.academicData.currentGPA}</p>
-                    <p className="text-sm text-gray-600">Mesatarja Aktuale</p>
+                  <div className="text-center p-4 bg-muted/30 border border-border rounded-xl">
+                    <p className="text-2xl font-semibold text-foreground">{studentData.academicData.currentGPA}</p>
+                    <p className="text-sm text-muted-foreground">Mesatarja Aktuale</p>
                   </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{studentData.academicData.totalCredits}</p>
-                    <p className="text-sm text-gray-600">Kredite Totale</p>
+                  <div className="text-center p-4 bg-muted/30 border border-border rounded-xl">
+                    <p className="text-2xl font-semibold text-foreground">{studentData.academicData.totalCredits}</p>
+                    <p className="text-sm text-muted-foreground">Kredite Totale</p>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <p className="text-2xl font-bold text-orange-600">{studentData.academicData.attendance}%</p>
-                    <p className="text-sm text-gray-600">Shkalla e Pjesëmarrjes</p>
+                  <div className="text-center p-4 bg-muted/30 border border-border rounded-xl">
+                    <p className="text-2xl font-semibold text-foreground">{studentData.academicData.attendance}%</p>
+                    <p className="text-sm text-muted-foreground">Shkalla e Pjesëmarrjes</p>
                   </div>
                 </CardContent>
               </Card>
@@ -1149,21 +1137,21 @@ const handleProfileUpdate = async (data: FormData | Object) => {
 
           <TabsContent value="training" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
+              <Card className="rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-600">
+                  <CardTitle className="flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
                     Trajnime të Përfunduara
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {(studentData.trainingData.completed || []).map((training, index) => (
-                    <div key={index} className="p-4 border border-green-200 bg-green-50 rounded-lg">
+                    <div key={index} className="p-4 border border-border bg-muted/30 rounded-xl">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-medium">{training.title}</h4>
                         <div className="flex items-center gap-2">
                           {/* grade percentage display */}
-                          <div className="flex items-center gap-1.5 bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full">
+                          <div className="flex items-center gap-1.5 bg-muted text-foreground px-2 py-1 rounded-full border border-border">
                             <Star size={12} />
                             <span className="text-sm font-medium">{training.grade || 'N/A'}</span>
                           </div>
@@ -1180,7 +1168,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                           )}
                         </div>
                       </div>
-                      <div className="space-y-2 text-sm text-gray-600">
+                      <div className="space-y-2 text-sm text-muted-foreground">
                         {/* grade progress bar */}
                         <div className="flex items-center justify-between">
                           <span>Nota:</span>
@@ -1201,16 +1189,16 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                           Përfunduar më: {new Date(training.completionDate).toLocaleDateString()} • {training.totalHours} orë
                         </p>
                         {training.feedback && (
-                          <div className="mt-2 p-2 bg-white rounded border border-green-100">
-                            <p className="font-medium text-xs mb-1">Feedback:</p>
-                            <p className="text-xs">{training.feedback}</p>
+                          <div className="mt-2 p-3 bg-card rounded-xl border border-border">
+                            <p className="font-medium text-xs mb-1 text-foreground">Feedback:</p>
+                            <p className="text-xs text-muted-foreground">{training.feedback}</p>
                           </div>
                         )}
                       </div>
                     </div>
                   ))}
                   {(studentData.trainingData.completed || []).length === 0 && (
-                    <div className="text-center py-6 text-gray-500">
+                    <div className="text-center py-6 text-muted-foreground">
                       Nuk ka trajnime të përfunduara
                     </div>
                   )}
@@ -1218,16 +1206,16 @@ const handleProfileUpdate = async (data: FormData | Object) => {
               </Card>
 
               <div className="space-y-6">
-                <Card className="border-0 shadow-lg">
+                <Card className="rounded-xl border border-border bg-card shadow-sm">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-blue-600">
+                    <CardTitle className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
                       Trajnime në Vazhdim
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {(studentData.trainingData.ongoing || []).map((training, index) => (
-                      <div key={index} className="p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                      <div key={index} className="p-4 border border-border bg-muted/30 rounded-xl">
                         <h4 className="font-medium mb-2">{training.title}</h4>
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
@@ -1240,38 +1228,38 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                             <span>{training.attendance}%</span>
                           </div>
                           <Progress value={training.attendance} className="h-2" />
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             Instruktori: {training.instructor}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             Orë të mbetura: {training.remainingHours} nga {training.totalHours}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             Përfundon më: {new Date(training.endDate).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                     ))}
                     {(studentData.trainingData.ongoing || []).length === 0 && (
-                      <div className="text-center py-6 text-gray-500">
+                      <div className="text-center py-6 text-muted-foreground">
                         Nuk ka trajnime në vazhdim
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
-                <Card className="border-0 shadow-lg">
+                <Card className="rounded-xl border border-border bg-card shadow-sm">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-purple-600">
+                    <CardTitle className="flex items-center gap-2">
                       <CalendarIcon className="w-5 h-5" />
                       Trajnime të Ardhshme
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {(studentData.trainingData.upcoming || []).map((training, index) => (
-                      <div key={index} className="p-4 border border-purple-200 bg-purple-50 rounded-lg">
+                      <div key={index} className="p-4 border border-border bg-muted/30 rounded-xl">
                         <h4 className="font-medium mb-2">{training.title}</h4>
-                        <div className="space-y-1 text-sm text-gray-600">
+                        <div className="space-y-1 text-sm text-muted-foreground">
                           <p>
                             Kategoria: {training.category} • Niveli: {training.level}
                           </p>
@@ -1283,7 +1271,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                       </div>
                     ))}
                     {(studentData.trainingData.upcoming || []).length === 0 && (
-                      <div className="text-center py-6 text-gray-500">
+                      <div className="text-center py-6 text-muted-foreground">
                         Nuk ka trajnime të ardhshme
                       </div>
                     )}
@@ -1295,7 +1283,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
 
           <TabsContent value="skills" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
+              <Card className="rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5" />
@@ -1307,7 +1295,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between">
                         <span className="font-medium">{skill.name}</span>
-                        <span className="text-sm text-gray-600">{skill.level}%</span>
+                        <span className="text-sm text-muted-foreground">{skill.level}%</span>
                       </div>
                       <Progress value={skill.level} className="h-2" />
                     </div>
@@ -1315,7 +1303,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
+              <Card className="rounded-xl border border-border bg-card shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="w-5 h-5" />
@@ -1326,14 +1314,14 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   {(studentData.skillsAndBadges.badges || []).map((badge, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200"
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30"
                     >
-                      <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
-                        <Award className="w-5 h-5 text-white" />
+                      <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                        <Award className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium">{badge.name}</h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {badge.type} • {badge.date}
                         </p>
                       </div>
@@ -1345,7 +1333,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="rounded-xl border border-border bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
@@ -1354,14 +1342,14 @@ const handleProfileUpdate = async (data: FormData | Object) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-white" />
+                  <div className="flex gap-4 p-4 bg-muted/30 border border-border rounded-xl">
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium">Aktivitet Shembull</h4>
-                      <p className="text-sm text-gray-600 mb-1">Nuk ka të dhëna specifike për aktivitetin.</p>
-                      <p className="text-xs text-gray-500">Përditësuar së fundmi: N/A</p>
+                      <p className="text-sm text-muted-foreground mb-1">Nuk ka të dhëna specifike për aktivitetin.</p>
+                      <p className="text-xs text-muted-foreground">Përditësuar së fundmi: N/A</p>
                     </div>
                   </div>
                 </div>
@@ -1370,7 +1358,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
           </TabsContent>
 
           <TabsContent value="reviews" className="space-y-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="rounded-xl border border-border bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
@@ -1381,14 +1369,14 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 {(studentData.trainingData.completed || []).map((training) => (
                   <div
                     key={training.id}
-                    className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200"
+                    className="p-6 rounded-xl border border-border bg-muted/30"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium">{training.title}</h4>
-                            <span className="text-sm text-gray-600">• {training.category}</span>
+                            <span className="text-sm text-muted-foreground">• {training.category}</span>
                           </div>
                           <Button
                             variant="outline"
@@ -1409,11 +1397,11 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                               ))}
                             </div>
                             {training.feedback && (
-                              <p className="text-gray-700 italic">"{training.feedback}"</p>
+                              <p className="text-foreground italic">"{training.feedback}"</p>
                             )}
                           </>
                         )}
-                        <div className="mt-2 text-sm text-gray-600">
+                        <div className="mt-2 text-sm text-muted-foreground">
                           Completed on: {new Date(training.completionDate).toLocaleDateString()}
                         </div>
                       </div>
@@ -1422,9 +1410,9 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                 ))}
                 {(studentData.trainingData.completed || []).length === 0 && (
                   <div className="text-center py-12">
-                    <MessageSquare className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Yet</h3>
-                    <p className="text-sm text-gray-500">
+                    <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No Reviews Yet</h3>
+                    <p className="text-sm text-muted-foreground">
                       Complete trainings to start leaving reviews and testimonials.
                     </p>
                   </div>
@@ -1451,7 +1439,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
           </TabsContent>
 
           <TabsContent value="cv" className="space-y-6">
-            <Card className="border-0 shadow-lg">
+            <Card className="rounded-xl border border-border bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1473,7 +1461,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                       />
                       <Button 
                         onClick={() => document.getElementById('cv-upload')?.click()}
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                         disabled={cvUploadState.isLoading}
                       >
                         {cvUploadState.isLoading ? (
@@ -1495,18 +1483,18 @@ const handleProfileUpdate = async (data: FormData | Object) => {
               <CardContent>
                 {cvUploadState.isLoading ? (
                   <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                    <p className="text-sm text-gray-600">Uploading your CV...</p>
+                    <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                    <p className="text-sm text-muted-foreground">Uploading your CV...</p>
                   </div>
                 ) : cvUploadState.error ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-red-600">
+                  <div className="flex flex-col items-center justify-center py-12 text-destructive">
                     <AlertCircle className="w-8 h-8 mb-4" />
                     <p className="text-sm">{cvUploadState.error}</p>
                   </div>
                 ) : studentData?.socialLinks?.cvPath ? (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <FileText className="w-4 h-4" />
                         Current CV Document
                       </div>
@@ -1520,7 +1508,7 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                       </Button>
                     </div>
                     
-                    <div className="w-full h-[800px] border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="w-full h-[800px] border border-border rounded-xl overflow-hidden bg-card">
                       <iframe
                         src={`${studentData.socialLinks.cvPath}#toolbar=0`}
                         className="w-full h-full"
@@ -1530,15 +1518,15 @@ const handleProfileUpdate = async (data: FormData | Object) => {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <FileText className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No CV Uploaded</h3>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No CV Uploaded</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
                       Upload your CV to make it available for viewing and downloading.
                     </p>
                     {canEdit && (
                       <Button
                         onClick={() => document.getElementById('cv-upload')?.click()}
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         Upload CV
